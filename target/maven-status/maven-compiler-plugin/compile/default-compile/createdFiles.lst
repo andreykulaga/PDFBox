@@ -1,0 +1,9 @@
+org/example/Pdf$Outline.class
+org/example/Main.class
+org/example/ConfigurationDeserializer.class
+org/example/Transaction.class
+org/example/Configuration.class
+org/example/TextAlign.class
+org/example/TransactionComparator.class
+org/example/ColumnName.class
+org/example/Pdf.class
