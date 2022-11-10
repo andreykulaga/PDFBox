@@ -57,6 +57,7 @@ public class Pdf {
     public void addNewPage() throws IOException {
         PDPage page = new PDPage(new PDRectangle(PDRectangle.A3.getHeight(), PDRectangle.A3.getWidth()));
         int pageNumber = document.getNumberOfPages()+1;
+
         document.addPage(page);
 
         pageHeight = page.getTrimBox().getHeight();
@@ -67,13 +68,32 @@ public class Pdf {
         initX = configuration.getLeftMargin();
         initY = pageHeight - configuration.getTopMargin();
 
-        //add page number
         PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
+
+        //add TableHeader
+        if (pageNumber > 1 && configuration.isHeaderAtEveryPage()) {
+            int sumOfHashMapValues = 0;
+            for (int i: columnNameHashMap.values()) {
+                sumOfHashMapValues += i;
+            };
+            float cellWidth;
+            for (ColumnName columnName: ColumnName.values()){
+                if (columnNameHashMap.containsKey(columnName)) {
+                    cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
+                    addCellWithText(contentStream, columnName.toString(),
+                            configuration.getTextAlignInColumn().get(columnName), configuration.getHeadFillingColor(),
+                            Outline.OUTLINED, initX, initY, cellWidth);
+                    initX += cellWidth;
+                }
+            }
+            initX = configuration.getLeftMargin();
+            initY -= cellHeight;
+        }
+
+        //add page number
         addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
         contentStream.close();
     }
-
-//    public void addTableAtPage(HashMap<ColumnName, Integer> columnNameIntegerHashMap)
 
     public void addHeadOfTable() throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(0), PDPageContentStream.AppendMode.APPEND, true);
@@ -141,9 +161,9 @@ public class Pdf {
         contentStream.close();
         initX = configuration.getLeftMargin();
         initY -= cellHeight;
+
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
-            initY = pageHeight - configuration.getTopMargin();
         }
     }
 
@@ -166,7 +186,6 @@ public class Pdf {
         initY -= cellHeight;
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
-            initY = pageHeight - configuration.getTopMargin();
         }
     }
 
@@ -207,7 +226,6 @@ public class Pdf {
         initY -= cellHeight;
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
-            initY = pageHeight - configuration.getTopMargin();
         }
     }
 
@@ -246,7 +264,6 @@ public class Pdf {
         initY -= cellHeight;
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
-            initY = pageHeight - configuration.getTopMargin();
         }
     }
 
@@ -268,15 +285,6 @@ public class Pdf {
         contentStream.addRect(initX, initY, cellWidth, -cellHeight);
         contentStream.fill();
 
-//        if (fillingColor != Color.WHITE) {
-//            contentStream.setNonStrokingColor(fillingColor);
-//            contentStream.addRect(initX, initY, cellWidth, -cellHeight);
-//            contentStream.fill();
-//        } else {
-//            contentStream.setNonStrokingColor(Color.WHITE);
-//            contentStream.addRect(initX, initY, cellWidth, -cellHeight);
-//            contentStream.fill();
-//        }
 
         //set color for text
         contentStream.setNonStrokingColor(configuration.getFontColor());

@@ -21,6 +21,7 @@ import static org.example.ColumnName.Asset_Type_Nm;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public class Configuration {
+    boolean headerAtEveryPage = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
     float fontSize = 10;
     Color fontColor = Color.BLACK;
