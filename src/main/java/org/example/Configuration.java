@@ -23,7 +23,6 @@ import static org.example.ColumnName.Asset_Type_Nm;
 public class Configuration {
     boolean headerAtEveryPage = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
-    float fontSize = 10;
     Color fontColor = Color.BLACK;
     Color strokingColor = Color.DARK_GRAY;
     Color headFillingColor = Color.GRAY;

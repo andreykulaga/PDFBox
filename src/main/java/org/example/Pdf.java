@@ -36,6 +36,10 @@ public class Pdf {
     float tableWidth;
     float initX;
     float initY;
+    float pageXSize;
+    float pageYSize;
+    float fontSize;
+
     HashMap<ColumnName, Integer> columnNameHashMap;
 
 
@@ -44,29 +48,46 @@ public class Pdf {
         this.configuration = configuration;
         this.columnNameHashMap = columnNameHashMap;
 
-        fontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * configuration.getFontSize()/1000;
-        fontAscent = configuration.getFont().getFontDescriptor().getAscent() * configuration.getFontSize()/1000;
-        fontDescent = configuration.getFont().getFontDescriptor().getDescent() * configuration.getFontSize()/1000;
-        fontLeading = configuration.getFont().getFontDescriptor().getLeading() * configuration.getFontSize()/1000;
-        fontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * configuration.getFontSize()/1000;
-        //define cell height by font and it's size
-        cellHeight = fontCapHeight + fontAscent - fontDescent + fontLeading;
-    }
 
-
-    public void addNewPage() throws IOException {
-        PDPage page = new PDPage(new PDRectangle(PDRectangle.A3.getHeight(), PDRectangle.A3.getWidth()));
-        int pageNumber = document.getNumberOfPages()+1;
-
-        document.addPage(page);
+        pageXSize = PDRectangle.A3.getWidth();
+        pageYSize = PDRectangle.A3.getHeight();
+        PDPage page = new PDPage(new PDRectangle(pageYSize, pageXSize));
 
         pageHeight = page.getTrimBox().getHeight();
         pageWidth = page.getTrimBox().getWidth();
         tableWidth = pageWidth - configuration.getLeftMargin() - configuration.getRightMargin();
 
+        //count max length of all columns in characters to decide font size
+        int rowCharacterLength = 0;
+        for (ColumnName columnName: ColumnName.values()){
+            if (columnNameHashMap.containsKey(columnName)) {
+                rowCharacterLength += (columnNameHashMap.get(columnName) + 2);
+            }
+        }
+
+        //define font size
+        fontSize = tableWidth*1000/(rowCharacterLength*configuration.getFont().getFontDescriptor().getAverageWidth());
+
+        fontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * fontSize/1000;
+        fontAscent = configuration.getFont().getFontDescriptor().getAscent() * fontSize/1000;
+        fontDescent = configuration.getFont().getFontDescriptor().getDescent() * fontSize/1000;
+        fontLeading = configuration.getFont().getFontDescriptor().getLeading() * fontSize/1000;
+        fontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * fontSize/1000;
+        //define cell height by font and it's size
+        cellHeight = fontCapHeight + fontAscent - fontDescent + fontLeading;
+
+    }
+
+
+    public void addNewPage() throws IOException {
+        PDPage page = new PDPage(new PDRectangle(pageYSize, pageXSize));
+        int pageNumber = document.getNumberOfPages()+1;
+
+        document.addPage(page);
 
         initX = configuration.getLeftMargin();
         initY = pageHeight - configuration.getTopMargin();
+
 
         PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
 
@@ -306,7 +327,7 @@ public class Pdf {
         //add text
         contentStream.beginText();
         contentStream.newLineAtOffset(textInitX, textInitY);
-        contentStream.setFont(configuration.getFont(), configuration.getFontSize());
+        contentStream.setFont(configuration.getFont(), fontSize);
         contentStream.showText(text);
         contentStream.endText();
 

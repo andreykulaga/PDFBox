@@ -75,6 +75,7 @@ public class Main {
             }
         }
 
+
         try (PDDocument doc = new PDDocument()){
             Pdf pdf = new Pdf(doc, configuration, columnNameHashMap);
             pdf.addNewPage();

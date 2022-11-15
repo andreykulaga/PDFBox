@@ -87,10 +87,6 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
 
         boolean headerAtEveryPage = node.get("HeaderAtEveryPage").booleanValue();
 
-        float fontSize = node.get("fontSize").floatValue();
-
-
-
         String fontColor1 = node.get("fontColor").textValue();
         Color fontColor = colorFromString(fontColor1);
 
@@ -153,7 +149,7 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         textAlignHashMap.put(Create_Date, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Create_Date").textValue()));
 
 
-        Configuration configuration = new Configuration(headerAtEveryPage, font, fontSize, fontColor, strokingColor, headFillingColor,
+        Configuration configuration = new Configuration(headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
                 subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
                 whatColumnsToShow, columnsToGroupBy, textAlignHashMap);
 
