@@ -1,6 +1,6 @@
 Investment_Name|Transaction_Type_Name|Contract_Settlement|Currency_Cd|Trade_Dt|Unit_Price_Local_Amt|Asset_Type_Nm|Net_Local_Amt|Trade_Type|Transaction_Event|Tax_Local_Amt|Create_Date
 Central Bank|Desposit|Equites|USD|2022-01-01 09:21 AM|-23232.1324|Equites|-53232.1324|Credit|Share|-1200.1233|2022-01-01 09:21 AM
-Central Bank|Desposit|Cash|USDtgrwgrwth erh rtgertgh faerf fgfg afgfae adffga rger|2022-01-01 09:21 AM|-232.1324|Cash|-532.1324|Credit|Share|-10.1233|2022-01-01 09:21 AM
+Central Bank|Desposit|Cash|USD***************!*********!***********!**********!***********!********! erh rtgertgh faerf fgfg afgfae adffga rger|2022-01-01 09:21 AM|-232.1324|Cash|-532.1324|Credit|Share|-10.1233|2022-01-01 09:21 AM
 Central Bank|WithDrawal|Cash|USD|2022-01-01 09:21 AM|-232.1324|Cash|-532.1324|Desposit|Share|-10.1233|2022-01-01 09:21 AM
 Central Bank|WithDrawal|Cash|USD|2022-01-01 09:21 AM|-232.1324|Cash|-532.1324|Desposit|Share|-10.1233|2022-01-01 09:21 AM
 Central Bank|Desposit|Cash|USD|2022-01-01 09:21 AM|-262.1324|Cash|-5422.1324|Credit|Share|-10.1233|2022-01-01 09:21 AM

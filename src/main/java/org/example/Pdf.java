@@ -369,8 +369,24 @@ public class Pdf {
                     LinkedList<String> textByLines = new LinkedList<>();
                     String[] strings = text.split(" ");
                     textByLines.addAll(Arrays.asList(strings));
+
+
                     int size = textByLines.size();
                     for (int i = 0; i < size-1; i++) {
+                        //divide word if it is too long
+                        int max = configuration.getMaxCharactersInTextLine();
+                        if (textByLines.get(i).length() > max) {
+                            String string = textByLines.get(i);
+                            textByLines.remove(i);
+                            int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
+                            for (int j = 0; j < numberOfParts-1; j++) {
+                                String part = string.substring(j*max, (j+1)*max);
+                                textByLines.add(i+j, part);
+                            }
+                            //add last part
+                            String part = string.substring(max*(numberOfParts-1));
+                            textByLines.add(i+numberOfParts-1, part);
+                        }
                         while ((textByLines.get(i).length() + 1 + textByLines.get(i+1).length()) <= configuration.getMaxCharactersInTextLine()) {
                             String newString = textByLines.get(i) + " " + textByLines.get(i+1);
                             textByLines.set(i, newString);
@@ -404,7 +420,25 @@ public class Pdf {
             String[] strings = text.split(" ");
             textByLines.addAll(Arrays.asList(strings));
             int size = textByLines.size();
+
             for (int i = 0; i < size-1; i++) {
+
+                //divide word if it is too long
+                int max = configuration.getMaxCharactersInTextLine();
+                if (textByLines.get(i).length() > max) {
+                    String string = textByLines.get(i);
+                    textByLines.remove(i);
+                    int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
+                    for (int j = 0; j < numberOfParts-1; j++) {
+                        String part = string.substring(j*max, (j+1)*max);
+                        textByLines.add(i+j, part);
+                    }
+                    //add last part
+                    String part = string.substring(max*(numberOfParts-1));
+                    textByLines.add(i+numberOfParts-1, part);
+                }
+
+                //wrap words
                 while ((textByLines.get(i).length() + 1 + textByLines.get(i+1).length()) <= configuration.getMaxCharactersInTextLine()) {
                     String newString = textByLines.get(i) + " " + textByLines.get(i+1);
                     textByLines.set(i, newString);

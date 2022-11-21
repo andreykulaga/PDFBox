@@ -109,6 +109,7 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         float bottomMargin = node.get("bottomMargin").floatValue();
 
         int maxCharactersInTextLine = node.get("max characters in text line").intValue();
+//        boolean forceMaxCharactersInTextLine = node.get("force max characters in text line").booleanValue();
 
         HashMap<ColumnName, Boolean> whatColumnsToShow = new HashMap<>();
         whatColumnsToShow.put(Investment_Name, node.get("whatColumnsToShow").get("Investment_Name").booleanValue());
