@@ -1,6 +1,5 @@
 package org.example;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -79,7 +78,7 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         }
     }
     @Override
-    public Configuration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public Configuration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         String font1 = node.get("font").textValue();
@@ -108,6 +107,8 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         float rightMargin = node.get("rightMargin").floatValue();
         float topMargin = node.get("topMargin").floatValue();
         float bottomMargin = node.get("bottomMargin").floatValue();
+
+        int maxCharactersInTextLine = node.get("max characters in text line").intValue();
 
         HashMap<ColumnName, Boolean> whatColumnsToShow = new HashMap<>();
         whatColumnsToShow.put(Investment_Name, node.get("whatColumnsToShow").get("Investment_Name").booleanValue());
@@ -149,10 +150,8 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         textAlignHashMap.put(Create_Date, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Create_Date").textValue()));
 
 
-        Configuration configuration = new Configuration(headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
+        return new Configuration(headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
                 subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
-                whatColumnsToShow, columnsToGroupBy, textAlignHashMap);
-
-        return configuration;
+                maxCharactersInTextLine, whatColumnsToShow, columnsToGroupBy, textAlignHashMap);
     }
 }

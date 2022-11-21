@@ -26,6 +26,7 @@ public class Main {
         }
 
 
+        //create hashmap with length of name of each column
         HashMap<ColumnName, Integer> columnNameHashMap = new HashMap<>();
         for (ColumnName columnName: ColumnName.values()) {
             columnNameHashMap.put(columnName, columnName.toString().length());
@@ -60,14 +61,18 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        //update ColumnNameHashMap with the biggest length
+        //update ColumnNameHashMap with the biggest length -> hashmap of each column and it's max cell length
         int i = 0;
         for (ColumnName columnName: ColumnName.values()) {
             if (valuesLengths[i] > (columnNameHashMap.get(columnName))) {
                 columnNameHashMap.put(columnName, valuesLengths[i]);
             }
+            if (columnNameHashMap.get(columnName) > configuration.getMaxCharactersInTextLine()) {
+                columnNameHashMap.put(columnName, configuration.getMaxCharactersInTextLine());
+            }
             i++;
         }
+
         //clean columnNameHashMap from columns that are hided
         for (ColumnName columnName: ColumnName.values()) {
             if (!configuration.getWhatColumnsToShow().get(columnName)) {

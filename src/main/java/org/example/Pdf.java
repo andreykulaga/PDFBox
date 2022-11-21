@@ -11,7 +11,10 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Pdf {
@@ -39,6 +42,7 @@ public class Pdf {
     float pageXSize;
     float pageYSize;
     float fontSize;
+//    boolean doWeNeedToWrapTextInCell;
 
     HashMap<ColumnName, Integer> columnNameHashMap;
 
@@ -61,7 +65,7 @@ public class Pdf {
         int rowCharacterLength = 0;
         for (ColumnName columnName: ColumnName.values()){
             if (columnNameHashMap.containsKey(columnName)) {
-                rowCharacterLength += (columnNameHashMap.get(columnName) + 2);
+                rowCharacterLength += (columnNameHashMap.get(columnName) + 2); // +2 - is one space before and after text
             }
         }
 
@@ -75,6 +79,11 @@ public class Pdf {
         fontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * fontSize/1000;
         //define cell height by font and it's size
         cellHeight = fontCapHeight + fontAscent - fontDescent + fontLeading;
+
+//        for (ColumnName columnName: columnNameHashMap.keySet()) {
+//            if (columnNameHashMap.get(columnName) > configuration.getMaxCharactersInTextLine())
+//                doWeNeedToWrapTextInCell = true;
+//        }
 
     }
 
@@ -170,18 +179,32 @@ public class Pdf {
         };
 
         float cellWidth;
-        for (ColumnName columnName: ColumnName.values()){
-            if (columnNameHashMap.containsKey(columnName)) {
-                cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
-                addCellWithText(contentStream, transaction.getValue(columnName),
-                        configuration.getTextAlignInColumn().get(columnName), Color.WHITE, Outline.OUTLINED,
-                        initX, initY, cellWidth);
-                initX += cellWidth;
+        int quantityOfLinesOfText = howManyLinesInARow(transaction);
+//        if (doWeNeedToWrapTextInCell) {
+            for (ColumnName columnName: ColumnName.values()){
+                if (columnNameHashMap.containsKey(columnName)) {
+                    cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
+                    addCellWithMultipleTextLines(contentStream, transaction.getValue(columnName),
+                            configuration.getTextAlignInColumn().get(columnName), Color.WHITE, Outline.OUTLINED,
+                            initX, initY, cellWidth, quantityOfLinesOfText);
+                    initX += cellWidth;
+                }
             }
-        }
+//        } else {
+//            for (ColumnName columnName: ColumnName.values()){
+//                if (columnNameHashMap.containsKey(columnName)) {
+//                    cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
+//                    addCellWithText(contentStream, transaction.getValue(columnName),
+//                            configuration.getTextAlignInColumn().get(columnName), Color.WHITE, Outline.OUTLINED,
+//                            initX, initY, cellWidth);
+//                    initX += cellWidth;
+//                }
+//            }
+//        }
+
         contentStream.close();
         initX = configuration.getLeftMargin();
-        initY -= cellHeight;
+        initY -= cellHeight*quantityOfLinesOfText;
 
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
@@ -314,6 +337,7 @@ public class Pdf {
         float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
         float textInitX = 0;
         float textLength = text.length() * fontAverageWidth;
+
         if (textAlign == TextAlign.LEFT) {
             textInitX = initX + fontAverageWidth;
         }
@@ -331,5 +355,115 @@ public class Pdf {
         contentStream.showText(text);
         contentStream.endText();
 
+    }
+
+
+    public int howManyLinesInARow(Transaction transaction) {
+        int result = 1;
+
+        for (ColumnName columnName: ColumnName.values()){
+            if (columnNameHashMap.containsKey(columnName)) {
+                String text = transaction.getValue(columnName);
+                //if text is small enough, only one line
+                if (text.length() > configuration.getMaxCharactersInTextLine()) {
+                    LinkedList<String> textByLines = new LinkedList<>();
+                    String[] strings = text.split(" ");
+                    textByLines.addAll(Arrays.asList(strings));
+                    int size = textByLines.size();
+                    for (int i = 0; i < size-1; i++) {
+                        while ((textByLines.get(i).length() + 1 + textByLines.get(i+1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                            String newString = textByLines.get(i) + " " + textByLines.get(i+1);
+                            textByLines.set(i, newString);
+                            textByLines.remove(i+1);
+                            size--;
+
+                            if (i+1 == size) {
+                                break;
+                            }
+                        }
+                    }
+                    if (textByLines.size() > result) {
+                        result = textByLines.size();
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public void addCellWithMultipleTextLines(PDPageContentStream contentStream, String text,
+                                TextAlign textAlign, Color fillingColor, Outline outline,
+                                float initX, float initY, float cellWidth, int quantityOfLines) throws IOException {
+
+        //create linked list of all words in text
+        LinkedList<String> textByLines = new LinkedList<>();
+        //if text is small enough, add only one line
+        if (text.length() <= configuration.getMaxCharactersInTextLine()) {
+            textByLines.add(text);
+        } else {
+            String[] strings = text.split(" ");
+            textByLines.addAll(Arrays.asList(strings));
+            int size = textByLines.size();
+            for (int i = 0; i < size-1; i++) {
+                while ((textByLines.get(i).length() + 1 + textByLines.get(i+1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                    String newString = textByLines.get(i) + " " + textByLines.get(i+1);
+                    textByLines.set(i, newString);
+                    textByLines.remove(i+1);
+                    size--;
+
+                    if (i+1 == size) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        //set color and draw stroke rectangle
+        if (outline == Outline.OUTLINED) {
+            contentStream.setStrokingColor(configuration.getStrokingColor());
+            contentStream.setLineWidth(configuration.getLineWidth());
+            contentStream.addRect(initX, initY, cellWidth, -(cellHeight * quantityOfLines));
+            contentStream.stroke();
+        }
+
+
+
+        //set color and draw filling rectangle
+        contentStream.setNonStrokingColor(fillingColor);
+        contentStream.addRect(initX, initY, cellWidth, -(cellHeight * quantityOfLines));
+        contentStream.fill();
+
+
+        //set color for text
+        contentStream.setNonStrokingColor(configuration.getFontColor());
+
+        //define starting position of text
+        float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
+        float textInitX = 0;
+        float textLength = text.length() * fontAverageWidth;
+        //change textLength if it is more than max
+        if (text.length() > configuration.getMaxCharactersInTextLine()) {
+            textLength = configuration.getMaxCharactersInTextLine() * fontAverageWidth;
+        }
+        if (textAlign == TextAlign.LEFT) {
+            textInitX = initX + fontAverageWidth;
+        }
+        if (textAlign == TextAlign.CENTER) {
+            textInitX = initX + cellWidth/2 - textLength/2;
+        }
+        if (textAlign == TextAlign.RIGHT) {
+            textInitX = initX + cellWidth - textLength;
+        }
+
+        //add text
+        contentStream.beginText();
+        contentStream.newLineAtOffset(textInitX, textInitY);
+        contentStream.setFont(configuration.getFont(), fontSize);
+        contentStream.setLeading(cellHeight);
+        for (String string: textByLines) {
+            contentStream.showText(string);
+            contentStream.newLine();
+        }
+        contentStream.endText();
     }
  }

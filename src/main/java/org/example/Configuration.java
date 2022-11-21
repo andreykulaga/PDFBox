@@ -34,6 +34,7 @@ public class Configuration {
     float rightMargin = 50;
     float topMargin = 50;
     float bottomMargin = 50;
+    int maxCharactersInTextLine = 100;
 
     HashMap<ColumnName, Boolean> whatColumnsToShow;
     ColumnName[] columnsToGroupBy = {Investment_Name, Asset_Type_Nm};
