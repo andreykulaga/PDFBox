@@ -129,7 +129,9 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         HashMap<String, TextAlign> textAlignHashMap = new HashMap<>();
         for (Iterator<String> it = textAlignAsNode.fieldNames(); it.hasNext(); ) {
             String string = it.next();
-            textAlignHashMap.put(string, TextAlign.fromStringToTextAlign(textAlignAsNode.get(string).textValue()));
+            String child = textAlignAsNode.get(string).textValue();
+            TextAlign newTextAlign = TextAlign.fromStringToTextAlign(child);
+            textAlignHashMap.put(string, newTextAlign);
 
         }
 

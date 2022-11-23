@@ -117,8 +117,14 @@ public class Pdf {
         float cellWidth;
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
+            TextAlign textAlign;
+            if (configuration.getTextAlignInColumn().containsKey(string)) {
+                textAlign = configuration.getTextAlignInColumn().get(string);
+            } else {
+                textAlign = configuration.getTextAlignInColumn().get("Default");
+            }
             addCellWithText(contentStream, string,
-                    configuration.getTextAlignInColumn().get(string), configuration.getHeadFillingColor(),
+                    textAlign, configuration.getHeadFillingColor(),
                     Outline.OUTLINED, initX, initY, cellWidth);
             initX += cellWidth;
         }
@@ -172,8 +178,14 @@ public class Pdf {
 
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
+            TextAlign textAlign;
+            if (configuration.getTextAlignInColumn().containsKey(string)) {
+                textAlign = configuration.getTextAlignInColumn().get(string);
+            } else {
+                textAlign = configuration.getTextAlignInColumn().get("Default");
+            }
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString().get(string),
-                    configuration.getTextAlignInColumn().get(string), Color.WHITE, Outline.OUTLINED,
+                    textAlign, Color.WHITE, Outline.OUTLINED,
                     initX, initY, cellWidth, quantityOfLinesOfText);
             initX += cellWidth;
         }
@@ -236,8 +248,14 @@ public class Pdf {
 
             if (type.equalsIgnoreCase("float")) {
                 text = subtotal.getNumberFields().get(tempColumnName).toString();
+                TextAlign textAlign;
+                if (configuration.getTextAlignInColumn().containsKey(tempColumnName)) {
+                    textAlign = configuration.getTextAlignInColumn().get(tempColumnName);
+                } else {
+                    textAlign = configuration.getTextAlignInColumn().get("Default");
+                }
                 addCellWithText(contentStream, text,
-                        configuration.getTextAlignInColumn().get(tempColumnName),
+                        textAlign,
                         color, Outline.OUTLINED, initX, initY, cellWidth);
                 initX += cellWidth;
             } else {
@@ -277,8 +295,15 @@ public class Pdf {
 
             if (type.equalsIgnoreCase("float")) {
                 text = subtotal.getNumberFields().get(tempColumnName).toString();
+
+                TextAlign textAlign;
+                if (configuration.getTextAlignInColumn().containsKey(tempColumnName)) {
+                    textAlign = configuration.getTextAlignInColumn().get(tempColumnName);
+                } else {
+                    textAlign = configuration.getTextAlignInColumn().get("Default");
+                }
                 addCellWithText(contentStream, text,
-                        configuration.getTextAlignInColumn().get(tempColumnName),
+                        textAlign,
                         color, Outline.OUTLINED, initX, initY, cellWidth);
                 initX += cellWidth;
             } else {
@@ -329,7 +354,7 @@ public class Pdf {
             textInitX = initX + cellWidth/2 - textLength/2;
         }
         if (textAlign == TextAlign.RIGHT) {
-            textInitX = initX + cellWidth - textLength;
+            textInitX = initX + cellWidth - textLength - fontAverageWidth;
         }
 
         //add text
@@ -469,7 +494,7 @@ public class Pdf {
             textInitX = initX + cellWidth/2 - textLength/2;
         }
         if (textAlign == TextAlign.RIGHT) {
-            textInitX = initX + cellWidth - textLength;
+            textInitX = initX + cellWidth - textLength - fontAverageWidth;
         }
 
         //add text
