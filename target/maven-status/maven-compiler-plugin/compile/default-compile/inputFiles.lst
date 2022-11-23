@@ -4,5 +4,7 @@
 /Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/Configuration.java
 /Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/ConfigurationDeserializer.java
 /Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/Main.java
+/Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/Subtotal.java
 /Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/TransactionComparator.java
+/Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/TransactionParser.java
 /Users/andreykulaga/Documents/PDFBox/src/main/java/org/example/Transaction.java
