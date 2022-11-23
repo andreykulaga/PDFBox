@@ -9,7 +9,9 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import static org.example.ColumnName.*;
 import static org.example.ColumnName.Create_Date;
@@ -111,48 +113,28 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         int maxCharactersInTextLine = node.get("max characters in text line").intValue();
 //        boolean forceMaxCharactersInTextLine = node.get("force max characters in text line").booleanValue();
 
-        HashMap<ColumnName, Boolean> whatColumnsToShow = new HashMap<>();
-        whatColumnsToShow.put(Investment_Name, node.get("whatColumnsToShow").get("Investment_Name").booleanValue());
-        whatColumnsToShow.put(Transaction_Type_Name, node.get("whatColumnsToShow").get("Transaction_Type_Name").booleanValue());
-        whatColumnsToShow.put(Contract_Settlement, node.get("whatColumnsToShow").get("Contract_Settlement").booleanValue());
-        whatColumnsToShow.put(Currency_Cd, node.get("whatColumnsToShow").get("Currency_Cd").booleanValue());
-        whatColumnsToShow.put(Trade_Dt, node.get("whatColumnsToShow").get("Trade_Dt").booleanValue());
-        whatColumnsToShow.put(Unit_Price_Local_Amt, node.get("whatColumnsToShow").get("Unit_Price_Local_Amt").booleanValue());
-        whatColumnsToShow.put(Asset_Type_Nm, node.get("whatColumnsToShow").get("Asset_Type_Nm").booleanValue());
-        whatColumnsToShow.put(Net_Local_Amt, node.get("whatColumnsToShow").get("Net_Local_Amt").booleanValue());
-        whatColumnsToShow.put(Trade_Type, node.get("whatColumnsToShow").get("Trade_Type").booleanValue());
-        whatColumnsToShow.put(Transaction_Event, node.get("whatColumnsToShow").get("Transaction_Event").booleanValue());
-        whatColumnsToShow.put(Tax_Local_Amt, node.get("whatColumnsToShow").get("Tax_Local_Amt").booleanValue());
-        whatColumnsToShow.put(Create_Date, node.get("whatColumnsToShow").get("Create_Date").booleanValue());
-
-
-        JsonNode columnsToGroupByAsNode = node.get("columnsToGroupBy");
-        int size = node.get("columnsToGroupBy").size();
-//        ArrayList<ColumnName> list = new ArrayList<>();
-        ColumnName[] columnsToGroupBy = new ColumnName[size];
-        int i = 0;
-        for (JsonNode objNode: columnsToGroupByAsNode) {
-            columnsToGroupBy[i] = (ColumnName.fromString(objNode.asText()));
-            i++;
+        JsonNode columnsToHideAsNode = node.get("whatColumnsToHide");
+        ArrayList<String> whatColumnsToHide = new ArrayList<>();
+        for (JsonNode objNode: columnsToHideAsNode) {
+            whatColumnsToHide.add(objNode.asText());
         }
 
-        HashMap<ColumnName, TextAlign> textAlignHashMap = new HashMap<>();
-        textAlignHashMap.put(Investment_Name, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Investment_Name").textValue()));
-        textAlignHashMap.put(Transaction_Type_Name, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Transaction_Type_Name").textValue()));
-        textAlignHashMap.put(Contract_Settlement, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Contract_Settlement").textValue()));
-        textAlignHashMap.put(Currency_Cd, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Currency_Cd").textValue()));
-        textAlignHashMap.put(Trade_Dt, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Trade_Dt").textValue()));
-        textAlignHashMap.put(Unit_Price_Local_Amt, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Unit_Price_Local_Amt").textValue()));
-        textAlignHashMap.put(Asset_Type_Nm, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Asset_Type_Nm").textValue()));
-        textAlignHashMap.put(Net_Local_Amt, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Net_Local_Amt").textValue()));
-        textAlignHashMap.put(Trade_Type, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Trade_Type").textValue()));
-        textAlignHashMap.put(Transaction_Event, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Transaction_Event").textValue()));
-        textAlignHashMap.put(Tax_Local_Amt, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Tax_Local_Amt").textValue()));
-        textAlignHashMap.put(Create_Date, TextAlign.fromStringToTextAlign(node.get("textAlignInColumn").get("Create_Date").textValue()));
+        JsonNode columnsToGroupByAsNode = node.get("columnsToGroupBy");
+        ArrayList<String> columnsToGroupBy = new ArrayList<>();
+        for (JsonNode objNode: columnsToGroupByAsNode) {
+            columnsToGroupBy.add(objNode.asText());
+        }
 
+        JsonNode textAlignAsNode = node.get("textAlignInColumn");
+        HashMap<String, TextAlign> textAlignHashMap = new HashMap<>();
+        for (Iterator<String> it = textAlignAsNode.fieldNames(); it.hasNext(); ) {
+            String string = it.next();
+            textAlignHashMap.put(string, TextAlign.fromStringToTextAlign(textAlignAsNode.get(string).textValue()));
+
+        }
 
         return new Configuration(headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
                 subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
-                maxCharactersInTextLine, whatColumnsToShow, columnsToGroupBy, textAlignHashMap);
+                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy, textAlignHashMap);
     }
 }

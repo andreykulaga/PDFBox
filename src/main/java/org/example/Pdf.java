@@ -44,13 +44,16 @@ public class Pdf {
     float fontSize;
 //    boolean doWeNeedToWrapTextInCell;
 
-    HashMap<ColumnName, Integer> columnNameHashMap;
+    HashMap<String, Integer> textLengths;
+    ArrayList<String> columnNames;
 
 
-    public Pdf(PDDocument document, Configuration configuration, HashMap<ColumnName, Integer> columnNameHashMap) {
+
+    public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, HashMap<String, Integer> textLengths) {
         this.document = document;
         this.configuration = configuration;
-        this.columnNameHashMap = columnNameHashMap;
+        this.columnNames = columnNames;
+        this.textLengths = textLengths;
 
 
         pageXSize = PDRectangle.A3.getWidth();
@@ -63,29 +66,23 @@ public class Pdf {
 
         //count max length of all columns in characters to decide font size
         int rowCharacterLength = 0;
-        for (ColumnName columnName: ColumnName.values()){
-            if (columnNameHashMap.containsKey(columnName)) {
-                rowCharacterLength += (columnNameHashMap.get(columnName) + 2); // +2 - is one space before and after text
-            }
+        for (String string : textLengths.keySet()) {
+            rowCharacterLength += (textLengths.get(string) + 2); // +2 - is one space before and after text
+
         }
 
         //define font size
-        fontSize = tableWidth*1000/(rowCharacterLength*configuration.getFont().getFontDescriptor().getAverageWidth());
+        fontSize = tableWidth * 1000 / (rowCharacterLength * configuration.getFont().getFontDescriptor().getAverageWidth());
 
-        fontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * fontSize/1000;
-        fontAscent = configuration.getFont().getFontDescriptor().getAscent() * fontSize/1000;
-        fontDescent = configuration.getFont().getFontDescriptor().getDescent() * fontSize/1000;
-        fontLeading = configuration.getFont().getFontDescriptor().getLeading() * fontSize/1000;
-        fontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * fontSize/1000;
+        fontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * fontSize / 1000;
+        fontAscent = configuration.getFont().getFontDescriptor().getAscent() * fontSize / 1000;
+        fontDescent = configuration.getFont().getFontDescriptor().getDescent() * fontSize / 1000;
+        fontLeading = configuration.getFont().getFontDescriptor().getLeading() * fontSize / 1000;
+        fontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * fontSize / 1000;
         //define cell height by font and it's size
         cellHeight = fontCapHeight + fontAscent - fontDescent + fontLeading;
-
-//        for (ColumnName columnName: columnNameHashMap.keySet()) {
-//            if (columnNameHashMap.get(columnName) > configuration.getMaxCharactersInTextLine())
-//                doWeNeedToWrapTextInCell = true;
-//        }
-
     }
+
 
 
     public void addNewPage() throws IOException {
@@ -100,29 +97,33 @@ public class Pdf {
 
         PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
 
-        //add TableHeader
+        //add TableHeader if needed
         if (pageNumber > 1 && configuration.isHeaderAtEveryPage()) {
-            int sumOfHashMapValues = 0;
-            for (int i: columnNameHashMap.values()) {
-                sumOfHashMapValues += i;
-            };
-            float cellWidth;
-            for (ColumnName columnName: ColumnName.values()){
-                if (columnNameHashMap.containsKey(columnName)) {
-                    cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
-                    addCellWithText(contentStream, columnName.toString(),
-                            configuration.getTextAlignInColumn().get(columnName), configuration.getHeadFillingColor(),
-                            Outline.OUTLINED, initX, initY, cellWidth);
-                    initX += cellWidth;
-                }
-            }
-            initX = configuration.getLeftMargin();
-            initY -= cellHeight;
+            addTableHeader(contentStream);
         }
 
         //add page number
         addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
         contentStream.close();
+    }
+
+    public void addTableHeader(PDPageContentStream contentStream) throws IOException {
+        //count sum of characters of all widths
+        int sumOfAllMaxWidth = 0;
+        for (int i: textLengths.values()) {
+            sumOfAllMaxWidth += i;
+        };
+
+        float cellWidth;
+        for (String string: columnNames){
+            cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
+            addCellWithText(contentStream, string,
+                    configuration.getTextAlignInColumn().get(string), configuration.getHeadFillingColor(),
+                    Outline.OUTLINED, initX, initY, cellWidth);
+            initX += cellWidth;
+        }
+        initX = configuration.getLeftMargin();
+        initY -= cellHeight;
     }
 
     public void addHeadOfTable() throws IOException {
@@ -134,10 +135,10 @@ public class Pdf {
 
 
         //Add base for grouping
-        if (configuration.getColumnsToGroupBy() != null && configuration.getColumnsToGroupBy().length > 0) {
-            String groupingBase = configuration.getColumnsToGroupBy()[0].toString();
-            for (int i = 1; i < configuration.getColumnsToGroupBy().length; i++) {
-                groupingBase = groupingBase.concat(" & " + configuration.getColumnsToGroupBy()[i]);
+        if (configuration.getColumnsToGroupBy() != null && configuration.getColumnsToGroupBy().size() > 0) {
+            String groupingBase = configuration.getColumnsToGroupBy().get(0);
+            for (int i = 1; i < configuration.getColumnsToGroupBy().size(); i++) {
+                groupingBase = groupingBase.concat(" & " + configuration.getColumnsToGroupBy().get(i));
             }
             addCellWithText(contentStream, "Grouping By " + groupingBase, TextAlign.LEFT, Color.WHITE, Outline.OUTLINED, initX, initY, tableWidth);
 
@@ -151,120 +152,100 @@ public class Pdf {
         addCellWithText(contentStream, localDate, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX+tableWidth-fontAverageWidth*localDate.length(), initY, fontAverageWidth*localDate.length());
         initY -= cellHeight;
 
-        int sumOfHashMapValues = 0;
-        for (int i: columnNameHashMap.values()) {
-            sumOfHashMapValues += i;
-        };
+        //Add table header
 
-        float cellWidth;
-        for (ColumnName columnName: ColumnName.values()){
-            if (columnNameHashMap.containsKey(columnName)) {
-                cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
-                addCellWithText(contentStream, columnName.toString(),
-                        configuration.getTextAlignInColumn().get(columnName), configuration.getHeadFillingColor(),
-                        Outline.OUTLINED, initX, initY, cellWidth);
-                initX += cellWidth;
-            }
-        }
+        addTableHeader(contentStream);
         contentStream.close();
-        initX = configuration.getLeftMargin();
-        initY -= cellHeight;
     }
 
     public void addTableRow(Transaction transaction) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
-        int sumOfHashMapValues = 0;
-        for (int i: columnNameHashMap.values()) {
-            sumOfHashMapValues += i;
-        };
+
+        //count sum of characters of all widths
+        int sumOfAllMaxWidth = 0;
+        for (int i: textLengths.values()) {
+            sumOfAllMaxWidth += i;
+        }
 
         float cellWidth;
         int quantityOfLinesOfText = howManyLinesInARow(transaction);
-//        if (doWeNeedToWrapTextInCell) {
-            for (ColumnName columnName: ColumnName.values()){
-                if (columnNameHashMap.containsKey(columnName)) {
-                    cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
-                    addCellWithMultipleTextLines(contentStream, transaction.getValue(columnName),
-                            configuration.getTextAlignInColumn().get(columnName), Color.WHITE, Outline.OUTLINED,
-                            initX, initY, cellWidth, quantityOfLinesOfText);
-                    initX += cellWidth;
-                }
-            }
-//        } else {
-//            for (ColumnName columnName: ColumnName.values()){
-//                if (columnNameHashMap.containsKey(columnName)) {
-//                    cellWidth = tableWidth * columnNameHashMap.get(columnName) / sumOfHashMapValues;
-//                    addCellWithText(contentStream, transaction.getValue(columnName),
-//                            configuration.getTextAlignInColumn().get(columnName), Color.WHITE, Outline.OUTLINED,
-//                            initX, initY, cellWidth);
-//                    initX += cellWidth;
-//                }
-//            }
-//        }
 
-        contentStream.close();
+        for (String string: columnNames){
+            cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
+            addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString().get(string),
+                    configuration.getTextAlignInColumn().get(string), Color.WHITE, Outline.OUTLINED,
+                    initX, initY, cellWidth, quantityOfLinesOfText);
+            initX += cellWidth;
+        }
+
         initX = configuration.getLeftMargin();
         initY -= cellHeight*quantityOfLinesOfText;
+
+        contentStream.close();
 
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
         }
     }
 
-    public void addGroupHead(ColumnName columnName, Transaction transaction) throws IOException {
+    public void addGroupHead(String columnName, Transaction transaction) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
-        int sumOfHashMapValues = 0;
-        for (int i: columnNameHashMap.values()) {
-            sumOfHashMapValues += i;
-        };
+
+        int sumOfAllMaxWidth = 0;
+        for (int i: textLengths.values()) {
+            sumOfAllMaxWidth += i;
+        }
 
         Color color = configuration.getGroupFillingColor();
         contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
 
-        String text = columnName.toString() + ": " + transaction.getValue(columnName);
+        String text = columnName + ": " + transaction.getAllValuesAsString().get(columnName);
         addCellWithText(contentStream, text, TextAlign.LEFT, color, Outline.OUTLINED, initX, initY, tableWidth);
 
-        contentStream.close();
 
         initX = configuration.getLeftMargin();
         initY -= cellHeight;
+
+        contentStream.close();
+
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
         }
     }
 
-    public void addSubtotalRow(ColumnName columnName, Transaction transaction) throws IOException {
+    public void addSubtotalRow(String columnName, Subtotal subtotal, HashMap<String, String> hashMapOfTypes) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
-        int sumOfHashMapValues = 0;
-        for (int i: columnNameHashMap.values()) {
-            sumOfHashMapValues += i;
-        };
+
+        int sumOfAllMaxWidth = 0;
+        for (int i: textLengths.values()) {
+            sumOfAllMaxWidth += i;
+        }
 
         Color color = configuration.getSubTotalFillingColor();
         contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
-        addCellWithText(contentStream, columnName.toString() + " Sub Total", TextAlign.LEFT, color, Outline.OUTLINED, initX, initY, tableWidth);
+        addCellWithText(contentStream, columnName + " Sub Total", TextAlign.LEFT, color, Outline.OUTLINED, initX, initY, tableWidth);
 
 
 
         float cellWidth;
-        for (ColumnName columnNameTemp: ColumnName.values()){
-            if (columnNameHashMap.containsKey(columnNameTemp)) {
-                cellWidth = tableWidth * columnNameHashMap.get(columnNameTemp) / sumOfHashMapValues;
-                String text;
-                if (columnNameTemp == ColumnName.Unit_Price_Local_Amt ||
-                        columnNameTemp == ColumnName.Net_Local_Amt ||
-                        columnNameTemp == ColumnName.Tax_Local_Amt) {
-                    text = transaction.getValue(columnNameTemp);
-                    addCellWithText(contentStream, text,
-                            configuration.getTextAlignInColumn().get(columnNameTemp),
-                            color, Outline.OUTLINED, initX, initY, cellWidth);
-                    initX += cellWidth;
-                } else {
-                    initX += cellWidth;
-                }
+        for (String tempColumnName: columnNames) {
+            cellWidth = tableWidth * textLengths.get(tempColumnName) / sumOfAllMaxWidth;
+            String text;
+
+            String type = hashMapOfTypes.get(tempColumnName);
+
+            if (type.equalsIgnoreCase("float")) {
+                text = subtotal.getNumberFields().get(tempColumnName).toString();
+                addCellWithText(contentStream, text,
+                        configuration.getTextAlignInColumn().get(tempColumnName),
+                        color, Outline.OUTLINED, initX, initY, cellWidth);
+                initX += cellWidth;
+            } else {
+                initX += cellWidth;
             }
         }
         contentStream.close();
+
 
         initX = configuration.getLeftMargin();
         initY -= cellHeight;
@@ -273,35 +254,38 @@ public class Pdf {
         }
     }
 
-    public void addGrandTotalRow(Transaction transaction) throws IOException {
+    public void addGrandTotalRow(Subtotal subtotal,  HashMap<String, String> hashMapOfTypes) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
-        int sumOfHashMapValues = 0;
-        for (int i: columnNameHashMap.values()) {
-            sumOfHashMapValues += i;
-        };
+
+        int sumOfAllMaxWidth = 0;
+        for (int i: textLengths.values()) {
+            sumOfAllMaxWidth += i;
+        }
+
         Color color = configuration.getSubTotalFillingColor();
 
         contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
         addCellWithText(contentStream, "Grand Total", TextAlign.LEFT, color, Outline.OUTLINED, initX, initY, tableWidth);
 
         float cellWidth;
-        for (ColumnName columnNameTemp: ColumnName.values()){
-            if (columnNameHashMap.containsKey(columnNameTemp)) {
-                cellWidth = tableWidth * columnNameHashMap.get(columnNameTemp) / sumOfHashMapValues;
-                String text;
-                if (columnNameTemp == ColumnName.Unit_Price_Local_Amt ||
-                        columnNameTemp == ColumnName.Net_Local_Amt ||
-                        columnNameTemp == ColumnName.Tax_Local_Amt) {
-                    text = transaction.getValue(columnNameTemp);
-                    addCellWithText(contentStream, text,
-                            configuration.getTextAlignInColumn().get(columnNameTemp),
-                            color, Outline.OUTLINED, initX, initY, cellWidth);
-                    initX += cellWidth;
-                } else {
-                    initX += cellWidth;
-                }
+
+        for (String tempColumnName: columnNames) {
+            cellWidth = tableWidth * textLengths.get(tempColumnName) / sumOfAllMaxWidth;
+            String text;
+
+            String type = hashMapOfTypes.get(tempColumnName);
+
+            if (type.equalsIgnoreCase("float")) {
+                text = subtotal.getNumberFields().get(tempColumnName).toString();
+                addCellWithText(contentStream, text,
+                        configuration.getTextAlignInColumn().get(tempColumnName),
+                        color, Outline.OUTLINED, initX, initY, cellWidth);
+                initX += cellWidth;
+            } else {
+                initX += cellWidth;
             }
         }
+
         contentStream.close();
 
         initX = configuration.getLeftMargin();
@@ -359,51 +343,50 @@ public class Pdf {
 
 
     public int howManyLinesInARow(Transaction transaction) {
+
+        //return one line by default
         int result = 1;
 
-        for (ColumnName columnName: ColumnName.values()){
-            if (columnNameHashMap.containsKey(columnName)) {
-                String text = transaction.getValue(columnName);
-                //if text is small enough, only one line
-                if (text.length() > configuration.getMaxCharactersInTextLine()) {
-                    LinkedList<String> textByLines = new LinkedList<>();
-                    String[] strings = text.split(" ");
-                    textByLines.addAll(Arrays.asList(strings));
+        for (String text: transaction.getAllValuesAsString().values()) {
+            if (text.length() > configuration.getMaxCharactersInTextLine()) {
+                LinkedList<String> textByLines = new LinkedList<>();
+                String[] strings = text.split(" ");
+                textByLines.addAll(Arrays.asList(strings));
 
-
-                    int size = textByLines.size();
-                    for (int i = 0; i < size-1; i++) {
-                        //divide word if it is too long
-                        int max = configuration.getMaxCharactersInTextLine();
-                        if (textByLines.get(i).length() > max) {
-                            String string = textByLines.get(i);
-                            textByLines.remove(i);
-                            int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
-                            for (int j = 0; j < numberOfParts-1; j++) {
-                                String part = string.substring(j*max, (j+1)*max);
-                                textByLines.add(i+j, part);
-                            }
-                            //add last part
-                            String part = string.substring(max*(numberOfParts-1));
-                            textByLines.add(i+numberOfParts-1, part);
+                int size = textByLines.size();
+                for (int i = 0; i < size-1; i++) {
+                    //divide word if it is too long
+                    int max = configuration.getMaxCharactersInTextLine();
+                    if (textByLines.get(i).length() > max) {
+                        String string = textByLines.get(i);
+                        textByLines.remove(i);
+                        int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
+                        for (int j = 0; j < numberOfParts-1; j++) {
+                            String part = string.substring(j*max, (j+1)*max);
+                            textByLines.add(i+j, part);
                         }
-                        while ((textByLines.get(i).length() + 1 + textByLines.get(i+1).length()) <= configuration.getMaxCharactersInTextLine()) {
-                            String newString = textByLines.get(i) + " " + textByLines.get(i+1);
-                            textByLines.set(i, newString);
-                            textByLines.remove(i+1);
-                            size--;
-
-                            if (i+1 == size) {
-                                break;
-                            }
-                        }
+                        //add last part
+                        String part = string.substring(max*(numberOfParts-1));
+                        textByLines.add(i+numberOfParts-1, part);
                     }
-                    if (textByLines.size() > result) {
-                        result = textByLines.size();
+                    while ((textByLines.get(i).length() + 1 + textByLines.get(i+1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                        String newString = textByLines.get(i) + " " + textByLines.get(i+1);
+                        textByLines.set(i, newString);
+                        textByLines.remove(i+1);
+                        size--;
+
+                        if (i+1 == size) {
+                            break;
+                        }
                     }
                 }
+                if (textByLines.size() > result) {
+                    result = textByLines.size();
+                }
             }
+
         }
+
         return result;
     }
 

@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -37,9 +38,9 @@ public class Configuration {
     int maxCharactersInTextLine = 100;
 //    boolean forceMaxCharactersInTextLine;
 
-    HashMap<ColumnName, Boolean> whatColumnsToShow;
-    ColumnName[] columnsToGroupBy = {Investment_Name, Asset_Type_Nm};
+    ArrayList<String> whatColumnsToHide;
+    ArrayList<String> columnsToGroupBy;
 
-    HashMap<ColumnName, TextAlign> textAlignInColumn;
+    HashMap<String, TextAlign> textAlignInColumn;
 
 }
