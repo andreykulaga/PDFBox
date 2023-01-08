@@ -25,8 +25,8 @@ public class Configuration {
     boolean pdfExport;
     String outputName;
     boolean printPageNumber;
-    PDRectangle printSize = PDRectangle.LETTER;
-    boolean changeOrientationToLandscape = false;
+    PDRectangle printSize;
+    boolean changeOrientationToLandscape;
     boolean headerAtEveryPage = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
     Color fontColor = Color.BLACK;
