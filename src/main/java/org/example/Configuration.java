@@ -3,6 +3,7 @@ package org.example;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
@@ -10,9 +11,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
-import static org.example.ColumnName.Investment_Name;
-import static org.example.ColumnName.Asset_Type_Nm;
 
 
 @Setter
@@ -22,6 +20,13 @@ import static org.example.ColumnName.Asset_Type_Nm;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public class Configuration {
+    boolean preview;
+    int numberOfPagesInPreview;
+    boolean pdfExport;
+    String outputName;
+    boolean printPageNumber;
+    PDRectangle printSize = PDRectangle.LETTER;
+    boolean changeOrientationToLandscape = false;
     boolean headerAtEveryPage = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
     Color fontColor = Color.BLACK;

@@ -19,7 +19,7 @@ public class Main {
         module.addDeserializer(Configuration.class, new ConfigurationDeserializer());
         mapper.registerModule(module);
 
-        Configuration configuration = new Configuration();
+        Configuration configuration;
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("./configuration.txt"))) {
             String line = bufferedReader.readLine();
@@ -83,7 +83,7 @@ public class Main {
         }
 
 
-        //clean textLengths from columns that are hided
+        //clean textLengths from columns that are hidden
         for (String string : configuration.getWhatColumnsToHide()) {
             textLengths.remove(string);
         }
@@ -99,80 +99,167 @@ public class Main {
         }
 
 
+        //create preview
+        if (configuration.isPreview()) {
+            try (PDDocument doc = new PDDocument()) {
+                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths);
+                pdf.addNewPage();
+                pdf.addHeadOfTable();
 
-        //create PDF document
+                if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
+                    Subtotal subtotal = new Subtotal(transactions.get(0));
+                    for (Transaction t : transactions) {
+                        if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
+                            pdf.addTableRow(t);
+                            subtotal.addToSubtotal(t);
+                        }
+                    }
+                    if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
+                        pdf.addGrandTotalRow(subtotal, hashMapOfTypes);
+                    }
+                    if (doc.getNumberOfPages() > configuration.getNumberOfPagesInPreview()) {
+                        doc.removePage(configuration.getNumberOfPagesInPreview());
+                    }
+                } else {
+                    //Create custom comparator with needed columns
+                    TransactionComparator transactionComparator = new TransactionComparator(configuration.getColumnsToGroupBy(), hashMapOfTypes);
+                    transactions.sort(transactionComparator);
 
-        try (PDDocument doc = new PDDocument()) {
-            Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths);
-            pdf.addNewPage();
-            pdf.addHeadOfTable();
+                    //Create array of transaction to store subtotals and grand total
+                    Subtotal[] subtotals = new Subtotal[configuration.getColumnsToGroupBy().size() + 1];
+                    for (int j = 0; j < configuration.getColumnsToGroupBy().size() + 1; j++) {
+                        subtotals[j] = new Subtotal(transactions.get(0));
+                    }
 
-            if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
-                Subtotal subtotal = new Subtotal(transactions.get(0));
-                for (Transaction t : transactions) {
-                    pdf.addTableRow(t);
-                    subtotal.addToSubtotal(t);
+                    //add header for the first grouping
+                    for (int k = 0; k < configuration.getColumnsToGroupBy().size(); k++) {
+                        pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0));
+                    }
+
+                    for (int j = 0; j < transactions.size() - 1; j++) {
+                        //for every transaction add values to all subtotals
+                        for (Subtotal subtotalTransaction : subtotals) {
+                            subtotalTransaction.addToSubtotal(transactions.get(j));
+                        }
+                        //print transaction
+                        if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
+                            pdf.addTableRow(transactions.get(j));
+                        }
+
+                        //if next transaction has not equal some fields that we are grouping by
+                        if (transactions.get(j).isFieldChanged(transactions.get(j + 1), configuration)
+                                && doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
+                            int positionOfChangedField = transactions.get(j).whatFieldIsChanged(transactions.get(j + 1), configuration);
+                            int columnPlace = subtotals.length - 2 - positionOfChangedField;
+                            //add subtotals
+                            for (int k = 0; k <= columnPlace; k++) {
+                                pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                                subtotals[k] = new Subtotal(transactions.get(0));
+                            }
+                            //add header for next grouping
+                            for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
+                                pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1));
+                            }
+
+                        }
+                    }
+                    //add the last transaction
+                    if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
+                        int j = transactions.size() - 1;
+                        for (Subtotal subtotalTransaction : subtotals) {
+                            subtotalTransaction.addToSubtotal(transactions.get(j));
+                        }
+                        pdf.addTableRow(transactions.get(j));
+                        for (int k = 0; k < subtotals.length - 1; k++) {
+                            pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                        }
+                    }
+                    //add total
+                    if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
+                        pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
+                    }
+                    if (doc.getNumberOfPages() > configuration.getNumberOfPagesInPreview()) {
+                        doc.removePage(configuration.getNumberOfPagesInPreview());
+                    }
                 }
-                pdf.addGrandTotalRow(subtotal, hashMapOfTypes);
-            } else {
-                //Create custom comparator with needed columns
-                TransactionComparator transactionComparator = new TransactionComparator(configuration.getColumnsToGroupBy(), hashMapOfTypes);
-                transactions.sort(transactionComparator);
+                doc.save("preview.pdf");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-                //Create array of transaction to store subtotals and grand total
-                Subtotal[] subtotals = new Subtotal[configuration.getColumnsToGroupBy().size() + 1];
-                for (int j = 0; j < configuration.getColumnsToGroupBy().size() + 1; j++) {
-                    subtotals[j] = new Subtotal(transactions.get(0));
-                }
+        //create result PDF document
+        if (configuration.isPdfExport()) {
+            try (PDDocument doc = new PDDocument()) {
+                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths);
+                pdf.addNewPage();
+                pdf.addHeadOfTable();
+
+                if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
+                    Subtotal subtotal = new Subtotal(transactions.get(0));
+                    for (Transaction t : transactions) {
+                        pdf.addTableRow(t);
+                        subtotal.addToSubtotal(t);
+                    }
+                    pdf.addGrandTotalRow(subtotal, hashMapOfTypes);
+                } else {
+                    //Create custom comparator with needed columns
+                    TransactionComparator transactionComparator = new TransactionComparator(configuration.getColumnsToGroupBy(), hashMapOfTypes);
+                    transactions.sort(transactionComparator);
+
+                    //Create array of transaction to store subtotals and grand total
+                    Subtotal[] subtotals = new Subtotal[configuration.getColumnsToGroupBy().size() + 1];
+                    for (int j = 0; j < configuration.getColumnsToGroupBy().size() + 1; j++) {
+                        subtotals[j] = new Subtotal(transactions.get(0));
+                    }
 
 
-                //add header for the first grouping
-                for (int k = 0; k < configuration.getColumnsToGroupBy().size(); k++) {
-                    pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0));
-                    //TODO why it was 1 ?
-                }
+                    //add header for the first grouping
+                    for (int k = 0; k < configuration.getColumnsToGroupBy().size(); k++) {
+                        pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0));
+                    }
 
-                for (int j = 0; j < transactions.size() - 1; j++) {
-                    //for every transaction add values to all subtotals
+                    for (int j = 0; j < transactions.size() - 1; j++) {
+                        //for every transaction add values to all subtotals
+                        for (Subtotal subtotalTransaction : subtotals) {
+                            subtotalTransaction.addToSubtotal(transactions.get(j));
+                        }
+                        //print transaction
+                        pdf.addTableRow(transactions.get(j));
+
+                        //if next transaction has not equal some fields that we are grouping by
+                        if (transactions.get(j).isFieldChanged(transactions.get(j + 1), configuration)) {
+                            int positionOfChangedField = transactions.get(j).whatFieldIsChanged(transactions.get(j + 1), configuration);
+                            int columnPlace = subtotals.length - 2 - positionOfChangedField;
+                            //add subtotals
+                            for (int k = 0; k <= columnPlace; k++) {
+                                pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                                subtotals[k] = new Subtotal(transactions.get(0));
+                            }
+                            //add header for next grouping
+                            for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
+                                pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1));
+                            }
+
+                        }
+                    }
+                    //add the last transaction
+                    int j = transactions.size() - 1;
                     for (Subtotal subtotalTransaction : subtotals) {
                         subtotalTransaction.addToSubtotal(transactions.get(j));
                     }
-                    //print transaction
                     pdf.addTableRow(transactions.get(j));
-
-                    //if next transaction has not equal some fields that we are grouping by
-                    if (transactions.get(j).isFieldChanged(transactions.get(j + 1), configuration)) {
-                        int positionOfChangedField = transactions.get(j).whatFieldIsChanged(transactions.get(j + 1), configuration);
-                        int columnPlace = subtotals.length - 2 - positionOfChangedField;
-                        //add subtotals
-                        for (int k = 0; k <= columnPlace; k++) {
-                            pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
-                            subtotals[k] = new Subtotal(transactions.get(0));
-                        }
-                        //add header for next grouping
-                        for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
-                            pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1));
-                        }
-
+                    for (int k = 0; k < subtotals.length - 1; k++) {
+                        pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
                     }
-                }
-                //add the last transaction
-                int j = transactions.size() - 1;
-                for (Subtotal subtotalTransaction : subtotals) {
-                    subtotalTransaction.addToSubtotal(transactions.get(j));
-                }
-                pdf.addTableRow(transactions.get(j));
-                for (int k = 0; k < subtotals.length - 1; k++) {
-                    pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
-                }
-                //add total
-                pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
+                    //add total
+                    pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
 
+                }
+                doc.save(configuration.getOutputName() + ".pdf");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-            doc.save("./result.pdf");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

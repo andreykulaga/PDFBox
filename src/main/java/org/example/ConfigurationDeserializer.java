@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
@@ -12,9 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import static org.example.ColumnName.*;
-import static org.example.ColumnName.Create_Date;
 
 class ConfigurationDeserializer extends StdDeserializer<Configuration> {
 
@@ -79,13 +77,52 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
             return PDType1Font.TIMES_ROMAN;
         }
     }
+
+    PDRectangle printSizeFromString(String string) {
+        PDRectangle result;
+        if (string.equalsIgnoreCase("a0")) {
+            result = PDRectangle.A0;
+        }
+        if (string.equalsIgnoreCase("a1")) {
+            result = PDRectangle.A1;
+        }
+        if (string.equalsIgnoreCase("a2")) {
+            result = PDRectangle.A2;
+        }
+        if (string.equalsIgnoreCase("a3")) {
+            result = PDRectangle.A3;
+        }
+        if (string.equalsIgnoreCase("a4")) {
+            result = PDRectangle.A4;
+        }
+        if (string.equalsIgnoreCase("a5")) {
+            result = PDRectangle.A5;
+        }
+        if (string.equalsIgnoreCase("a6")) {
+            result = PDRectangle.A6;
+        }
+        if (string.equalsIgnoreCase("legal")) {
+            result = PDRectangle.LEGAL;
+        } else {
+            result = PDRectangle.LETTER;
+        }
+        return result;
+    }
+    
     @Override
     public Configuration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         String font1 = node.get("font").textValue();
         PDFont font = fontFromString(font1);
-
+        boolean preview = node.get("preview").asBoolean(true);
+        int numberOfPagesInPreview = node.get("number of pages in preview").asInt(1);
+        boolean pdfExport = node.get("pdf export").asBoolean(true);
+        String outputName = node.get("output name").asText("result");
+        boolean printPageNumber = node.get("print page number").asBoolean(true);
+        boolean changeOrientationToLandscape = node.get("orientation").asText("portrait").equalsIgnoreCase("landscape");
+        PDRectangle printSize = printSizeFromString(node.get("print size").asText());
+        
         boolean headerAtEveryPage = node.get("HeaderAtEveryPage").booleanValue();
 
         String fontColor1 = node.get("fontColor").textValue();
@@ -111,7 +148,6 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         float bottomMargin = node.get("bottomMargin").floatValue();
 
         int maxCharactersInTextLine = node.get("max characters in text line").intValue();
-//        boolean forceMaxCharactersInTextLine = node.get("force max characters in text line").booleanValue();
 
         JsonNode columnsToHideAsNode = node.get("whatColumnsToHide");
         ArrayList<String> whatColumnsToHide = new ArrayList<>();
@@ -135,7 +171,9 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
 
         }
 
-        return new Configuration(headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
+        return new Configuration(preview, numberOfPagesInPreview, pdfExport, outputName,
+                printPageNumber, printSize, changeOrientationToLandscape,
+                headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
                 subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
                 maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy, textAlignHashMap);
     }

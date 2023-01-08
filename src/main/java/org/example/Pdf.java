@@ -42,7 +42,6 @@ public class Pdf {
     float pageXSize;
     float pageYSize;
     float fontSize;
-//    boolean doWeNeedToWrapTextInCell;
 
     HashMap<String, Integer> textLengths;
     ArrayList<String> columnNames;
@@ -56,9 +55,14 @@ public class Pdf {
         this.textLengths = textLengths;
 
 
-        pageXSize = PDRectangle.A3.getWidth();
-        pageYSize = PDRectangle.A3.getHeight();
-        PDPage page = new PDPage(new PDRectangle(pageYSize, pageXSize));
+        if (configuration.isChangeOrientationToLandscape()) {
+            pageXSize = configuration.getPrintSize().getHeight();
+            pageYSize = configuration.getPrintSize().getWidth();
+        } else {
+            pageXSize = configuration.getPrintSize().getWidth();
+            pageYSize = configuration.getPrintSize().getHeight();
+        }
+        PDPage page = new PDPage(new PDRectangle(pageXSize, pageYSize));
 
         pageHeight = page.getTrimBox().getHeight();
         pageWidth = page.getTrimBox().getWidth();
@@ -86,7 +90,7 @@ public class Pdf {
 
 
     public void addNewPage() throws IOException {
-        PDPage page = new PDPage(new PDRectangle(pageYSize, pageXSize));
+        PDPage page = new PDPage(new PDRectangle(pageXSize, pageYSize));
         int pageNumber = document.getNumberOfPages()+1;
 
         document.addPage(page);
@@ -103,7 +107,9 @@ public class Pdf {
         }
 
         //add page number
-        addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
+        if (configuration.isPrintPageNumber()) {
+            addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
+        }
         contentStream.close();
     }
 
