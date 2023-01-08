@@ -20,13 +20,13 @@ import java.util.HashMap;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public class Configuration {
-    boolean preview;
-    int numberOfPagesInPreview;
-    boolean pdfExport;
-    String outputName;
-    boolean printPageNumber;
-    PDRectangle printSize;
-    boolean changeOrientationToLandscape;
+    boolean preview = true;
+    int numberOfPagesInPreview = 1;
+    boolean pdfExport = true;
+    String outputName = "result";
+    boolean printPageNumber = true;
+    PDRectangle printSize = PDRectangle.LETTER;
+    boolean changeOrientationToLandscape = false;
     boolean headerAtEveryPage = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
     Color fontColor = Color.BLACK;
