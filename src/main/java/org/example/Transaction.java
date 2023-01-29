@@ -40,7 +40,7 @@ public class Transaction {
             result.put(st, numberFields.get(st).toString());
         }
         for (String st: dateTimeFields.keySet()) {
-            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a")));
+            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         }
       return result;
     }

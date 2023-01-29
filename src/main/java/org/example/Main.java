@@ -69,9 +69,17 @@ public class Main {
 
                 String[] strings = line.split("\\|");
 
+                //change text length for LocalDate columns to be not less than 10 characters to display in format MM/dd/YYYY
+                for (String string: textLengths.keySet()) {
+                    if (hashMapOfTypes.get(string).equalsIgnoreCase("LocalDateTime") && textLengths.get(string)<10) {
+                        textLengths.replace(string, 10);
+                    }
+                }
                 //check length and keep the biggest one to calculate cell width latter
                 for (int i = 0; i < strings.length; i++) {
-                    if (strings[i].length() > textLengths.get(columnNames.get(i))) {
+                    if (strings[i].length() > textLengths.get(columnNames.get(i)) &&
+                            //as we don't want to change length of LocalDateTime cause we will not display time stamp
+                            !hashMapOfTypes.get(columnNames.get(i)).equalsIgnoreCase("LocalDateTime")) {
                         textLengths.put(columnNames.get(i), strings[i].length());
                     }
                 }
@@ -95,6 +103,7 @@ public class Main {
         for (String string : configuration.getWhatColumnsToHide()) {
             textLengths.remove(string);
         }
+
 
         //clean array list of column names from hidden columns
         for (String string : configuration.getWhatColumnsToHide()) {
