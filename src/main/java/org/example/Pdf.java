@@ -45,14 +45,16 @@ public class Pdf {
 
     HashMap<String, Integer> textLengths;
     ArrayList<String> columnNames;
+    HashMap<String, String> hashMapOfTypes;
 
 
 
-    public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, HashMap<String, Integer> textLengths) {
+    public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, HashMap<String, Integer> textLengths, HashMap<String, String> hashMapOfTypes) {
         this.document = document;
         this.configuration = configuration;
         this.columnNames = columnNames;
         this.textLengths = textLengths;
+        this.hashMapOfTypes = hashMapOfTypes;
 
 
         if (configuration.isChangeOrientationToLandscape()) {
@@ -72,7 +74,6 @@ public class Pdf {
         int rowCharacterLength = 0;
         for (String string : textLengths.keySet()) {
             rowCharacterLength += (textLengths.get(string) + 2); // +2 - is one space before and after text
-
         }
 
         //define font size
@@ -123,14 +124,8 @@ public class Pdf {
         float cellWidth;
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
-            TextAlign textAlign;
-            if (configuration.getTextAlignInColumn().containsKey(string)) {
-                textAlign = configuration.getTextAlignInColumn().get(string);
-            } else {
-                textAlign = configuration.getTextAlignInColumn().get("Default");
-            }
             addCellWithText(contentStream, string,
-                    textAlign, configuration.getHeadFillingColor(),
+                    TextAlign.CENTER, configuration.getHeadFillingColor(),
                     Outline.OUTLINED, initX, initY, cellWidth);
             initX += cellWidth;
         }
@@ -185,10 +180,10 @@ public class Pdf {
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
             TextAlign textAlign;
-            if (configuration.getTextAlignInColumn().containsKey(string)) {
-                textAlign = configuration.getTextAlignInColumn().get(string);
+            if (hashMapOfTypes.get(string).equalsIgnoreCase("float")) {
+                textAlign = TextAlign.RIGHT;
             } else {
-                textAlign = configuration.getTextAlignInColumn().get("Default");
+                textAlign = TextAlign.LEFT;
             }
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString().get(string),
                     textAlign, Color.WHITE, Outline.OUTLINED,
@@ -254,14 +249,8 @@ public class Pdf {
 
             if (type.equalsIgnoreCase("float")) {
                 text = subtotal.getNumberFields().get(tempColumnName).toString();
-                TextAlign textAlign;
-                if (configuration.getTextAlignInColumn().containsKey(tempColumnName)) {
-                    textAlign = configuration.getTextAlignInColumn().get(tempColumnName);
-                } else {
-                    textAlign = configuration.getTextAlignInColumn().get("Default");
-                }
                 addCellWithText(contentStream, text,
-                        textAlign,
+                        TextAlign.RIGHT,
                         color, Outline.OUTLINED, initX, initY, cellWidth);
                 initX += cellWidth;
             } else {
@@ -302,14 +291,8 @@ public class Pdf {
             if (type.equalsIgnoreCase("float")) {
                 text = subtotal.getNumberFields().get(tempColumnName).toString();
 
-                TextAlign textAlign;
-                if (configuration.getTextAlignInColumn().containsKey(tempColumnName)) {
-                    textAlign = configuration.getTextAlignInColumn().get(tempColumnName);
-                } else {
-                    textAlign = configuration.getTextAlignInColumn().get("Default");
-                }
                 addCellWithText(contentStream, text,
-                        textAlign,
+                        TextAlign.RIGHT,
                         color, Outline.OUTLINED, initX, initY, cellWidth);
                 initX += cellWidth;
             } else {

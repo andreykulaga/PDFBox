@@ -120,7 +120,7 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         boolean pdfExport = node.get("pdf export").asBoolean(true);
         String outputName = node.get("output name").asText("result");
         boolean printPageNumber = node.get("print page number").asBoolean(true);
-        boolean changeOrientationToLandscape = node.get("orientation").asText("portrait").equalsIgnoreCase("landscape");
+        boolean changeOrientationToLandscape = node.get("orientation").asText("landscape").equalsIgnoreCase("landscape");
         PDRectangle printSize = printSizeFromString(node.get("print size").asText());
         
         boolean headerAtEveryPage = node.get("HeaderAtEveryPage").booleanValue();
@@ -158,23 +158,25 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         JsonNode columnsToGroupByAsNode = node.get("columnsToGroupBy");
         ArrayList<String> columnsToGroupBy = new ArrayList<>();
         for (JsonNode objNode: columnsToGroupByAsNode) {
-            columnsToGroupBy.add(objNode.asText());
+            String tempString = objNode.asText().replaceAll("_", " ").toLowerCase();
+            tempString = tempString.substring(0,1).toUpperCase().concat(tempString.substring(1));
+            columnsToGroupBy.add(tempString);
         }
 
-        JsonNode textAlignAsNode = node.get("textAlignInColumn");
-        HashMap<String, TextAlign> textAlignHashMap = new HashMap<>();
-        for (Iterator<String> it = textAlignAsNode.fieldNames(); it.hasNext(); ) {
-            String string = it.next();
-            String child = textAlignAsNode.get(string).textValue();
-            TextAlign newTextAlign = TextAlign.fromStringToTextAlign(child);
-            textAlignHashMap.put(string, newTextAlign);
-
-        }
+//        JsonNode textAlignAsNode = node.get("textAlignInColumn");
+//        HashMap<String, TextAlign> textAlignHashMap = new HashMap<>();
+//        for (Iterator<String> it = textAlignAsNode.fieldNames(); it.hasNext(); ) {
+//            String string = it.next();
+//            String child = textAlignAsNode.get(string).textValue();
+//            TextAlign newTextAlign = TextAlign.fromStringToTextAlign(child);
+//            textAlignHashMap.put(string, newTextAlign);
+//
+//        }
 
         return new Configuration(preview, numberOfPagesInPreview, pdfExport, outputName,
                 printPageNumber, printSize, changeOrientationToLandscape,
                 headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
                 subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
-                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy, textAlignHashMap);
+                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy);
     }
 }

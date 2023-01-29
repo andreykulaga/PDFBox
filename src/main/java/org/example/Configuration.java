@@ -26,7 +26,7 @@ public class Configuration {
     String outputName = "result";
     boolean printPageNumber = true;
     PDRectangle printSize = PDRectangle.LETTER;
-    boolean changeOrientationToLandscape = false;
+    boolean changeOrientationToLandscape = true;
     boolean headerAtEveryPage = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
     Color fontColor = Color.BLACK;
@@ -46,6 +46,6 @@ public class Configuration {
     ArrayList<String> whatColumnsToHide;
     ArrayList<String> columnsToGroupBy;
 
-    HashMap<String, TextAlign> textAlignInColumn;
+//    HashMap<String, TextAlign> textAlignInColumn;
 
 }

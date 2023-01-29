@@ -45,6 +45,14 @@ public class Main {
             String[] firstLine = bufferedReader.readLine().split("\\|");
             columnNames.addAll(Arrays.asList(firstLine));
 
+            //convert column names to sentence cased
+            for (int i=0; i< columnNames.size(); i++) {
+                String tempString = columnNames.get(i);
+                tempString = tempString.toLowerCase().replaceAll("_", " ");
+                tempString = tempString.substring(0,1).toUpperCase().concat(tempString.substring(1));
+                columnNames.set(i, tempString);
+            }
+
             //fill array that we will need to calculate cell width
             for (int i = 0; i < columnNames.size(); i++) {
                 textLengths.put(columnNames.get(i), columnNames.get(i).length());
@@ -102,7 +110,7 @@ public class Main {
         //create preview
         if (configuration.isPreview()) {
             try (PDDocument doc = new PDDocument()) {
-                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths);
+                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes);
                 pdf.addNewPage();
                 pdf.addHeadOfTable();
 
@@ -191,7 +199,7 @@ public class Main {
         //create result PDF document
         if (configuration.isPdfExport()) {
             try (PDDocument doc = new PDDocument()) {
-                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths);
+                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes);
                 pdf.addNewPage();
                 pdf.addHeadOfTable();
 
