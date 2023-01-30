@@ -162,6 +162,7 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
             tempString = tempString.substring(0,1).toUpperCase().concat(tempString.substring(1));
             columnsToGroupBy.add(tempString);
         }
+        String reportId = node.get("reportId").textValue();
 
 //        JsonNode textAlignAsNode = node.get("textAlignInColumn");
 //        HashMap<String, TextAlign> textAlignHashMap = new HashMap<>();
@@ -177,6 +178,6 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
                 printPageNumber, printSize, changeOrientationToLandscape,
                 headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
                 subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
-                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy);
+                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy, reportId);
     }
 }

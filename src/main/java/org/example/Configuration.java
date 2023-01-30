@@ -45,6 +45,7 @@ public class Configuration {
 
     ArrayList<String> whatColumnsToHide;
     ArrayList<String> columnsToGroupBy;
+    String reportId;
 
 //    HashMap<String, TextAlign> textAlignInColumn;
 

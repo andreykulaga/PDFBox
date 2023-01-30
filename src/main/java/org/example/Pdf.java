@@ -11,6 +11,10 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -107,11 +111,45 @@ public class Pdf {
             addTableHeader(contentStream);
         }
 
-        //add page number
-        if (configuration.isPrintPageNumber()) {
-            addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
-        }
+//        //add page number
+//        if (configuration.isPrintPageNumber()) {
+//            addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
+//        }
         contentStream.close();
+    }
+
+    public void addFooters() throws IOException {
+
+        //prepare text for time creation stamp
+        OffsetDateTime offsetDateTime = OffsetDateTime.now();
+        String text = offsetDateTime.format(DateTimeFormatter.ofPattern("mm/DD/yyyy h:mm:ss a O"));
+
+        for (int i=0; i< document.getNumberOfPages(); i++) {
+            PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(i), PDPageContentStream.AppendMode.APPEND, true);
+
+
+            //add report ID
+            addCellWithText(contentStream, configuration.getReportId(),
+                    TextAlign.LEFT, Color.WHITE, Outline.NOTOUTLINED,
+                    configuration.getLeftMargin(), configuration.getBottomMargin(), tableWidth);
+
+
+            //add page number
+            if (configuration.isPrintPageNumber()) {
+                addCellWithText(contentStream, "Page " + (i+1) + " of " + document.getNumberOfPages(),
+                        TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED,
+                        configuration.getLeftMargin()+tableWidth/2, configuration.getBottomMargin(), tableWidth/2);
+            }
+
+            //add report creation date and time
+            addCellWithText(contentStream, text,
+                    TextAlign.LEFT, Color.WHITE, Outline.NOTOUTLINED,
+                    configuration.getLeftMargin(), configuration.getBottomMargin() - cellHeight, tableWidth);
+
+            contentStream.close();
+        }
+
+
     }
 
     public void addTableHeader(PDPageContentStream contentStream) throws IOException {

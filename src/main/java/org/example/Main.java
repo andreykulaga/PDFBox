@@ -199,6 +199,7 @@ public class Main {
                         doc.removePage(configuration.getNumberOfPagesInPreview());
                     }
                 }
+                pdf.addFooters();
                 doc.save("preview.pdf");
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -273,6 +274,7 @@ public class Main {
                     pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
 
                 }
+                pdf.addFooters();
                 doc.save(configuration.getOutputName() + ".pdf");
             } catch (IOException e) {
                 throw new RuntimeException(e);
