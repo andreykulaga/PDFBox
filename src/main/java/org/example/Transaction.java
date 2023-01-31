@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Setter
@@ -37,10 +38,12 @@ public class Transaction {
         HashMap<String, String> result = new HashMap<>(textFields);
 
         for (String st: numberFields.keySet()) {
-            result.put(st, numberFields.get(st).toString());
+            float fl = numberFields.get(st);
+            String floatAsString = FloatFormatter.format(fl);
+            result.put(st, floatAsString);
         }
         for (String st: dateTimeFields.keySet()) {
-            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
         }
       return result;
     }
@@ -51,6 +54,21 @@ public class Transaction {
         Transaction newTransaction = new Transaction();
         newTransaction.setNumberFields(newNumberFields);
         return newTransaction;
+    }
+
+    public static Transaction createTransactionFromColumnNames(ArrayList<String> columnNames) {
+        Transaction transaction = new Transaction();
+        HashMap<String, String> textFileds = new HashMap<>();
+        HashMap<String, Float> numberFields = new HashMap<>();
+        HashMap<String, LocalDateTime> dateFileds = new HashMap<>();
+        for (String string: columnNames) {
+            textFileds.put(string, string);
+        }
+        transaction.setTextFields(textFileds);
+        transaction.setNumberFields(numberFields);
+        transaction.setDateTimeFields(dateFileds);
+        transaction.setNumberOfTransaction(-1);
+        return transaction;
     }
 
 

@@ -32,20 +32,23 @@ public class Configuration {
     Color fontColor = Color.BLACK;
     Color strokingColor = Color.DARK_GRAY;
     Color headFillingColor = Color.GRAY;
-    Color subTotalFillingColor = Color.ORANGE;
+//    Color subTotalFillingColor = Color.ORANGE;
     Color groupFillingColor = Color.CYAN;
+    Color colorOfNegativeNumbers = Color.RED;
     float lineWidth = 1;
     String reportName = "Investment PDF Report";
     float leftMargin = 50;
     float rightMargin = 50;
     float topMargin = 50;
     float bottomMargin = 50;
-    int maxCharactersInTextLine = 100;
+    int maxCharactersInTextLine;
 //    boolean forceMaxCharactersInTextLine;
 
     ArrayList<String> whatColumnsToHide;
     ArrayList<String> columnsToGroupBy;
     String reportId;
+    boolean onlyVerticalCellBoards;
+
 
 //    HashMap<String, TextAlign> textAlignInColumn;
 

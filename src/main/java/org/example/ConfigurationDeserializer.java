@@ -134,11 +134,14 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         String headFillingColor1 = node.get("headFillingColor").textValue();
         Color headFillingColor = colorFromString(headFillingColor1);
 
-        String subTotalFillingColor1 = node.get("subTotalFillingColor").textValue();
-        Color subTotalFillingColor = colorFromString(subTotalFillingColor1);
+//        String subTotalFillingColor1 = node.get("subTotalFillingColor").textValue();
+//        Color subTotalFillingColor = colorFromString(subTotalFillingColor1);
 
         String groupFillingColor1 = node.get("groupFillingColor").textValue();
         Color groupFillingColor = colorFromString(groupFillingColor1);
+
+        String colorOfNegativeNumbers1 = node.get("colorOfNegativeNumbers").textValue();
+        Color colorOfNegativeNumbers = colorFromString(colorOfNegativeNumbers1);
 
         float lineWidth = node.get("lineWidth").floatValue();
         String reportName = node.get("reportName").textValue();
@@ -164,6 +167,8 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
         }
         String reportId = node.get("reportId").textValue();
 
+        boolean onlyVerticalCellBoards = node.get("onlyVerticalCellBoards").asBoolean(false);
+
 //        JsonNode textAlignAsNode = node.get("textAlignInColumn");
 //        HashMap<String, TextAlign> textAlignHashMap = new HashMap<>();
 //        for (Iterator<String> it = textAlignAsNode.fieldNames(); it.hasNext(); ) {
@@ -176,8 +181,8 @@ class ConfigurationDeserializer extends StdDeserializer<Configuration> {
 
         return new Configuration(preview, numberOfPagesInPreview, pdfExport, outputName,
                 printPageNumber, printSize, changeOrientationToLandscape,
-                headerAtEveryPage, font, fontColor, strokingColor, headFillingColor,
-                subTotalFillingColor, groupFillingColor, lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
-                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy, reportId);
+                headerAtEveryPage, font, fontColor, strokingColor, headFillingColor, groupFillingColor, colorOfNegativeNumbers,
+                lineWidth, reportName, leftMargin, rightMargin, topMargin, bottomMargin,
+                maxCharactersInTextLine, whatColumnsToHide, columnsToGroupBy, reportId, onlyVerticalCellBoards);
     }
 }

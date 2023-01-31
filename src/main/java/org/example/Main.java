@@ -55,7 +55,11 @@ public class Main {
 
             //fill array that we will need to calculate cell width
             for (int i = 0; i < columnNames.size(); i++) {
-                textLengths.put(columnNames.get(i), columnNames.get(i).length());
+                if (columnNames.get(i).length() > configuration.getMaxCharactersInTextLine()) {
+                    textLengths.put(columnNames.get(i), configuration.getMaxCharactersInTextLine());
+                } else {
+                    textLengths.put(columnNames.get(i), columnNames.get(i).length());
+                }
             }
 
             //define fields types
@@ -69,24 +73,16 @@ public class Main {
 
                 String[] strings = line.split("\\|");
 
-                //change text length for LocalDate columns to be not less than 10 characters to display in format MM/dd/YYYY
-                for (String string: textLengths.keySet()) {
-                    if (hashMapOfTypes.get(string).equalsIgnoreCase("LocalDateTime") && textLengths.get(string)<10) {
-                        textLengths.replace(string, 10);
-                    }
-                }
-                //check length and keep the biggest one to calculate cell width latter
-                for (int i = 0; i < strings.length; i++) {
-                    if (strings[i].length() > textLengths.get(columnNames.get(i)) &&
-                            //as we don't want to change length of LocalDateTime cause we will not display time stamp
-                            !hashMapOfTypes.get(columnNames.get(i)).equalsIgnoreCase("LocalDateTime")) {
-                        textLengths.put(columnNames.get(i), strings[i].length());
-                    }
-                }
-                //fill arraylist with a transaction
                 try {
                     Transaction transaction = TransactionParser.parseTextLineIntoTransaction(transactionNumber, line, hashMapOfTypes, columnNames, configuration.getWhatColumnsToHide());
                     transactions.add(transaction);
+                    //check length and keep the biggest one to calculate cell width latter
+                    for (String string:columnNames) {
+                        int length = transaction.getAllValuesAsString().get(string).length();
+                        if (length > textLengths.get(string) && length <= configuration.getMaxCharactersInTextLine()) {
+                            textLengths.replace(string, length);
+                        }
+                    }
                 } catch (ArrayIndexOutOfBoundsException | DateTimeParseException e) {
                     throw new RuntimeException("check the line number " + transactionNumber + ". It has not the same quantity of fields as the first one or some fields has other type");
                 }
@@ -150,7 +146,7 @@ public class Main {
 
                     //add header for the first grouping
                     for (int k = 0; k < configuration.getColumnsToGroupBy().size(); k++) {
-                        pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0));
+                        pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0), k+1);
                     }
 
                     for (int j = 0; j < transactions.size() - 1; j++) {
@@ -170,12 +166,15 @@ public class Main {
                             int columnPlace = subtotals.length - 2 - positionOfChangedField;
                             //add subtotals
                             for (int k = 0; k <= columnPlace; k++) {
-                                pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                                //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
+                                String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
+                                pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString().get(subgroupForSubtotal),
+                                        subtotals[k], hashMapOfTypes);
                                 subtotals[k] = new Subtotal(transactions.get(0));
                             }
                             //add header for next grouping
                             for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
-                                pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1));
+                                pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1), k+1);
                             }
 
                         }
@@ -188,7 +187,10 @@ public class Main {
                         }
                         pdf.addTableRow(transactions.get(j));
                         for (int k = 0; k < subtotals.length - 1; k++) {
-                            pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                            //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
+                            String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
+                            pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString().get(subgroupForSubtotal),
+                                    subtotals[k], hashMapOfTypes);
                         }
                     }
                     //add total
@@ -234,7 +236,7 @@ public class Main {
 
                     //add header for the first grouping
                     for (int k = 0; k < configuration.getColumnsToGroupBy().size(); k++) {
-                        pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0));
+                        pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(0), k+1);
                     }
 
                     for (int j = 0; j < transactions.size() - 1; j++) {
@@ -247,16 +249,21 @@ public class Main {
 
                         //if next transaction has not equal some fields that we are grouping by
                         if (transactions.get(j).isFieldChanged(transactions.get(j + 1), configuration)) {
+                            //define what field is changed. The result is a position of changed field in array configuration.columnsToGroupBy
                             int positionOfChangedField = transactions.get(j).whatFieldIsChanged(transactions.get(j + 1), configuration);
+//                            int columnPlace = positionOfChangedField;
                             int columnPlace = subtotals.length - 2 - positionOfChangedField;
                             //add subtotals
                             for (int k = 0; k <= columnPlace; k++) {
-                                pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                                //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
+                                String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
+                                pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString().get(subgroupForSubtotal),
+                                        subtotals[k], hashMapOfTypes);
                                 subtotals[k] = new Subtotal(transactions.get(0));
                             }
                             //add header for next grouping
                             for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
-                                pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1));
+                                pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1), k+1);
                             }
 
                         }
@@ -268,7 +275,10 @@ public class Main {
                     }
                     pdf.addTableRow(transactions.get(j));
                     for (int k = 0; k < subtotals.length - 1; k++) {
-                        pdf.addSubtotalRow(configuration.getColumnsToGroupBy().get(k), subtotals[k], hashMapOfTypes);
+                        //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
+                        String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
+                        pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString().get(subgroupForSubtotal),
+                                subtotals[k], hashMapOfTypes);
                     }
                     //add total
                     pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
