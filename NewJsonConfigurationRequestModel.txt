@@ -1,0 +1,186 @@
+{
+	"HeaderAtEveryPage": true,
+	"maxCharactersInTextLine": 20,
+	"MaxColumnsAllowed": 20,
+	"linewidth": 1,
+	"leftMargin": "50",
+	"rightMargin": "50",
+	"topMargin": "50",
+	"bottomMargin": "50",
+	"whatColumnsToHide": [{
+		"field": "Client_Product_Id",
+		"type": "string"
+	}],
+	"fields": [{
+			"field": "Client_Product_Id",
+			"type": "string",
+			"textFormat": "text",
+			"textAlignment": "Left",
+			"textColor": "Black",
+			"NegativeValueColor": ""
+		}, {
+			"field": "product_Nm",
+			"type": "string",
+			"textFormat": "text",
+			"textAlignment": "Left",
+			"textColor": "Black",
+			"NegativeValueColor": ""
+		}, {
+			"field": "Investment_Nm",
+			"type": "string",
+			"textFormat": "text",
+			"textAlignment": "Left",
+			"textColor": "Black",
+			"NegativeValueColor": ""
+		},
+		{
+			"field": "Alt_Src_Sys_Investment_Id",
+			"type": "string",
+			"textFormat": "text",
+			"textAlignment": "Left",
+			"textColor": "Black",
+			"NegativeValueColor": ""
+		},
+		{
+			"field": "TICKER_Id",
+			"type": "string",
+			"textFormat": "text",
+			"textAlignment": "right",
+			"textColor": "Black",
+			"NegativeValueColor": ""
+		},
+		{
+			"field": "Original_Share_Qty",
+			"type": "number",
+			"textFormat": "#,##0.00",
+			"textAlignment": "right",
+			"textColor": "Black",
+			"NegativeValueColor": "Red"
+		},
+		{
+			"field": "unit_price_Base_Amt",
+			"type": "number",
+			"textFormat": "#,##0.00",
+			"textAlignment": "right",
+			"textColor": "Black",
+			"NegativeValueColor": "Red"
+		},
+		{
+			"field": "Market_Value_Base_Amt",
+			"type": "number",
+			"textFormat": "#,##0.000",
+			"textAlignment": "right",
+			"textColor": "Black",
+			"NegativeValueColor": "Red"
+
+		},
+		{
+			"field": "Unit_Original_Cost_Base_Amt",
+			"type": "number",
+			"textFormat": "#,##0.00",
+			"textAlignment": "right",
+			"textColor": "Black",
+			"NegativeValueColor": "Red"
+		},
+		{
+			"field": "Original_Cost_Base_Amt",
+			"type": "number",
+			"textFormat": "#,##0.00",
+			"textAlignment": "right",
+			"textColor": "Black",
+			"NegativeValueColor": "Red"
+		},
+		{
+			"field": "CreateDt",
+			"type": "Datetime",
+			"textFormat": "MM/DD/YYYY",
+			"textAlignment": "Left",
+			"textColor": "Black",
+			"NegativeValueColor": "Red"
+		}
+	],
+	"columnsToGroupBy": [{
+			"field": "TICKER_Id",
+			"type": "string"
+		},
+		{
+			"field": "TICKER_Id",
+			"type": "string"
+		}
+	],
+	"ColumnsToAggregate": [{
+		"field": "Investment_Nm",
+		"aggregate": "CNT"
+	}, {
+		"field": "Original_Share_Qty",
+		"aggregate": "SUM"
+	}, {
+		"field": "Original_Share_Qty",
+		"aggregate": "AVG"
+	}],
+	"pageHeader": [{
+			"Font Size": "24",
+			"Text Color": "white",
+			"BackGroundColor": "BLUE",
+			"Data": [
+				{
+					"field": "",
+					"value": "Transaction Detail"
+				}
+			]
+		},
+		{
+			"Font Size": "3",
+			"Text Color": "white",
+			"BackGroundColor": "green",
+			"Data": [
+				{
+					"field": "",
+					"value": " "
+				}
+			]
+		},
+		{
+			"Font Size": "10",
+			"Text Color": "black",
+			"BackGroundColor": "white",
+			"Data": [
+				{
+					"field": "ReportClient",
+					"value": "1575-3-001a"
+				},
+				{
+					"field": "FromDate",
+					"value": "12/30/2022"
+				},
+				{
+					"field": "ToDate",
+					"value": "03/15/2023"
+				},
+				{
+					"field": "Report Basis",
+					"value": "Daily Investment"
+				},
+				{
+					"field": "DateType",
+					"value": "Payable"
+				}
+			]
+		}
+	],
+	"PageFooter": {
+		"Font Size": "8",
+		"Text Color": "red",
+		"BackGroundColor": "white",
+		"PageNumberFlag": true,
+		"Data": [{
+				"field": "ReportId",
+				"value": "2211"
+			},
+			{
+				"field": "ReportCreated",
+				"value": "03/20/2023 07:57:21 EST"
+			}
+		]
+	}
+}
