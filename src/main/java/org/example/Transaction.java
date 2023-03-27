@@ -3,10 +3,13 @@ package org.example;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 @Setter
 @Getter
@@ -34,17 +37,27 @@ public class Transaction {
         }
     }
 
-    public HashMap<String, String> getAllValuesAsString() {
+    public HashMap<String, String> getAllValuesAsString(Configuration configuration) {
         HashMap<String, String> result = new HashMap<>(textFields);
 
         for (String st: numberFields.keySet()) {
             float fl = numberFields.get(st);
-            String floatAsString = FloatFormatter.format(fl);
+            // String floatAsString = FloatFormatter.format(fl);
+            // String floatAsString = String.format(configuration.getTextFormat().get(st), fl);
+
+            String floatAsString = new DecimalFormat(configuration.getTextFormat().get(st), new DecimalFormatSymbols(Locale.ENGLISH)).format(fl);
+
+            if (fl < 0) {
+                floatAsString = floatAsString.replaceAll("-", "(").concat(")");
+            }
+
+
             result.put(st, floatAsString);
         }
         for (String st: dateTimeFields.keySet()) {
-            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(st))));
         }
+        
       return result;
     }
 
@@ -56,17 +69,19 @@ public class Transaction {
         return newTransaction;
     }
 
-    public static Transaction createTransactionFromColumnNames(ArrayList<String> columnNames) {
+    public static Transaction createTransactionFromColumnNames(ArrayList<String> columnNames, HashMap<String, String> columnNamesForTableHead) {
         Transaction transaction = new Transaction();
-        HashMap<String, String> textFileds = new HashMap<>();
+        HashMap<String, String> textFields = new HashMap<>();
         HashMap<String, Float> numberFields = new HashMap<>();
-        HashMap<String, LocalDateTime> dateFileds = new HashMap<>();
+        HashMap<String, LocalDateTime> dateFields = new HashMap<>();
+
         for (String string: columnNames) {
-            textFileds.put(string, string);
+            textFields.put(string, columnNamesForTableHead.get(string));
         }
-        transaction.setTextFields(textFileds);
+
+        transaction.setTextFields(textFields);
         transaction.setNumberFields(numberFields);
-        transaction.setDateTimeFields(dateFileds);
+        transaction.setDateTimeFields(dateFields);
         transaction.setNumberOfTransaction(-1);
         return transaction;
     }
@@ -87,7 +102,7 @@ public class Transaction {
 //
     public boolean isFieldChanged(Transaction transactionToCompare, Configuration configuration) {
         for (String columnName: configuration.getColumnsToGroupBy()) {
-            if (!getAllValuesAsString().get(columnName).equals(transactionToCompare.getAllValuesAsString().get(columnName))) {
+            if (!getAllValuesAsString(configuration).get(columnName).equals(transactionToCompare.getAllValuesAsString(configuration).get(columnName))) {
                 return true;
             }
         }
@@ -96,7 +111,7 @@ public class Transaction {
     public int whatFieldIsChanged(Transaction transactionToCompare, Configuration configuration) {
         int i = 0;
         String result = configuration.getColumnsToGroupBy().get(i);
-        while (getAllValuesAsString().get(result).equals(transactionToCompare.getAllValuesAsString().get(result))) {
+        while (getAllValuesAsString(configuration).get(result).equals(transactionToCompare.getAllValuesAsString(configuration).get(result))) {
             i++;
             result = configuration.getColumnsToGroupBy().get(i);
         }

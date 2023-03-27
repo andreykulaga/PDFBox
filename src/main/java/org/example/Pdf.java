@@ -10,6 +10,9 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Locale;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Pdf {
@@ -49,16 +53,19 @@ public class Pdf {
 
     HashMap<String, Integer> textLengths;
     ArrayList<String> columnNames;
+    HashMap<String, String> columnNamesForTableHead;
     HashMap<String, String> hashMapOfTypes;
 
 
 
-    public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, HashMap<String, Integer> textLengths, HashMap<String, String> hashMapOfTypes) {
+    public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, 
+    HashMap<String, Integer> textLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead) {
         this.document = document;
         this.configuration = configuration;
         this.columnNames = columnNames;
         this.textLengths = textLengths;
         this.hashMapOfTypes = hashMapOfTypes;
+        this.columnNamesForTableHead = columnNamesForTableHead;
 
 
         if (configuration.isChangeOrientationToLandscape()) {
@@ -121,34 +128,54 @@ public class Pdf {
 
     public void addFooters() throws IOException {
 
-        //prepare text for time creation stamp
-        OffsetDateTime offsetDateTime = OffsetDateTime.now();
-        String text = offsetDateTime.format(DateTimeFormatter.ofPattern("mm/DD/yyyy h:mm:ss a O"));
+        //define cell height by font and it's size
+
+        float footerFontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontAscent = configuration.getFont().getFontDescriptor().getAscent() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontDescent = configuration.getFont().getFontDescriptor().getDescent() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontLeading = configuration.getFont().getFontDescriptor().getLeading() * configuration.getPageFooterFontSize() / 1000;
+        float footerCellHeight = footerFontCapHeight + footerFontAscent - footerFontDescent + footerFontLeading;
+
+
+        //change global cell height and fontDescent
+        float tempCellHeight = cellHeight;
+        float tempFontDescent = fontDescent;
+        fontDescent = footerFontDescent;
+        cellHeight = footerCellHeight;
 
         for (int i=0; i< document.getNumberOfPages(); i++) {
             PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(i), PDPageContentStream.AppendMode.APPEND, true);
 
-
-            //add report ID
-            addCellWithText(contentStream, configuration.getReportId(),
-                    TextAlign.LEFT, Color.WHITE, configuration.getFontColor(), Outline.NOTOUTLINED,
-                    configuration.getLeftMargin(), configuration.getBottomMargin(), tableWidth);
-
-
             //add page number
-            if (configuration.isPrintPageNumber()) {
+            if (configuration.isPageNumberFlag()) {
+                
+                
                 addCellWithText(contentStream, "Page " + (i+1) + " of " + document.getNumberOfPages(),
-                        TextAlign.RIGHT, Color.WHITE, configuration.getFontColor(), Outline.NOTOUTLINED,
-                        configuration.getLeftMargin()+tableWidth/2, configuration.getBottomMargin(), tableWidth/2);
+                TextAlign.CENTER, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
+                configuration.getLeftMargin(),
+                configuration.getBottomMargin() - (footerCellHeight * (configuration.getLinesOfPageFooter().size()-1))/2, 
+                tableWidth, configuration.getPageFooterFontSize());
             }
-
-            //add report creation date and time
-            addCellWithText(contentStream, text,
-                    TextAlign.LEFT, Color.WHITE, configuration.getFontColor(), Outline.NOTOUTLINED,
-                    configuration.getLeftMargin(), configuration.getBottomMargin() - cellHeight, tableWidth);
+            //add text lines
+            float tab = 0;
+            float footerFontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * configuration.getPageFooterFontSize() / 1000;
+            for (int j=0; j < configuration.getLinesOfPageFooter().size(); j++) {
+                String st = configuration.getLinesOfPageFooter().get(j);
+                //count the longest line to tabulate page number to prevent overlap
+                if (st.length() > tab) {
+                    tab = st.length();
+                }
+                addCellWithText(contentStream, st,
+                TextAlign.LEFT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
+                configuration.getLeftMargin(), configuration.getBottomMargin() - (footerCellHeight * j), (tab+1) * footerFontAverageWidth, configuration.getPageFooterFontSize());
+            }
 
             contentStream.close();
         }
+
+        //change global cell height and font descendtback
+        cellHeight = tempCellHeight;
+        fontDescent = tempFontDescent;
 
 
     }
@@ -161,7 +188,7 @@ public class Pdf {
         };
 
         //create fake transaction from column names to count how many lines need for table header
-        Transaction transaction = Transaction.createTransactionFromColumnNames(columnNames);
+        Transaction transaction = Transaction.createTransactionFromColumnNames(columnNames, columnNamesForTableHead);
         int quantityOfLines = howManyLinesInARow(transaction);
 
 
@@ -169,9 +196,11 @@ public class Pdf {
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
 
-            addCellWithMultipleTextLines(contentStream, string,
+            String text = transaction.getAllValuesAsString(configuration).get(string);
+
+            addCellWithMultipleTextLines(contentStream, text,
                     TextAlign.CENTER, configuration.getHeadFillingColor(),
-                    configuration.getFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
+                    configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
             initX += cellWidth;
         }
         initX = configuration.getLeftMargin();
@@ -181,32 +210,102 @@ public class Pdf {
     public void addHeadOfTable() throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(0), PDPageContentStream.AppendMode.APPEND, true);
 
-        //Add report name
-        addCellWithText(contentStream, configuration.getReportName(), TextAlign.CENTER, configuration.getHeadFillingColor(),
-                configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth);
-        initY -= cellHeight;
+        //add all lines of Header line by line
 
+        for (int i=0; i<configuration.getPageHeaderConfiguration().size(); i++) {
+            //define font size
+            float pageHeaderFontSize = Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
 
-        //Add base for grouping
-        if (configuration.getColumnsToGroupBy() != null && configuration.getColumnsToGroupBy().size() > 0) {
-            String groupingBase = configuration.getColumnsToGroupBy().get(0);
-            for (int i = 1; i < configuration.getColumnsToGroupBy().size(); i++) {
-                groupingBase = groupingBase.concat(" & " + configuration.getColumnsToGroupBy().get(i));
+            //define font color
+            Color pageHeaderFontColor;
+            String fontColorName = configuration.getPageHeaderConfiguration().get(i).get("textColor").toLowerCase();
+            try {
+                Field field = Class.forName("java.awt.Color").getField(fontColorName);
+                pageHeaderFontColor = (Color)field.get(null);
+            } catch (Exception e) {
+                pageHeaderFontColor = Color.black; // Not defined
             }
-            addCellWithText(contentStream, "Grouping By " + groupingBase, TextAlign.LEFT, Color.WHITE,
-                    configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth);
+            
+            //define background color
+            Color pageHeaderBackGroundColor;
+            String backgroundColorName = configuration.getPageHeaderConfiguration().get(i).get("backGroundColor").toLowerCase();
+            try {
+                Field field = Class.forName("java.awt.Color").getField(backgroundColorName);
+                pageHeaderBackGroundColor = (Color)field.get(null);
+            } catch (Exception e) {
+                pageHeaderBackGroundColor = Color.white; // Not defined
+            }
 
-        } else {
-            addCellWithText(contentStream, "", TextAlign.LEFT, Color.WHITE,
-                    configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth);
+            //define cell height by font and it's size
+            float headerFontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * pageHeaderFontSize / 1000;
+            float headerFontAscent = configuration.getFont().getFontDescriptor().getAscent() * pageHeaderFontSize / 1000;
+            float headerFontDescent = configuration.getFont().getFontDescriptor().getDescent() * pageHeaderFontSize / 1000;
+            float headerFontLeading = configuration.getFont().getFontDescriptor().getLeading() * pageHeaderFontSize / 1000;
+            float headerCellHeight = headerFontCapHeight + headerFontAscent - headerFontDescent + headerFontLeading;
+
+            //change global cell height and font descent
+            Float tempCellHeight = cellHeight;
+            Float tempFontDescent = fontDescent;
+            cellHeight = headerCellHeight;
+            fontDescent = headerFontDescent;
+
+            //count all cell lengths
+            ArrayList<Integer> cellLengths = new ArrayList<>();
+            int allLengths = 0;
+            for (int z=0; z < configuration.getPageHeaderLines().get(i).size(); z++) {
+                int l = configuration.getPageHeaderLines().get(i).get(z).length();
+                cellLengths.add(l);
+                allLengths += l;
+            }
+            //draw the line by drawing each part of it's data
+            for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j++) {
+                String text = configuration.getPageHeaderLines().get(i).get(j);
+
+                TextAlign textAlign;
+                if (j==1 || j%2 !=0 ) {
+                    textAlign = TextAlign.LEFT;
+                } else {
+                    textAlign = TextAlign.RIGHT;
+                    text = text.concat(":");
+                }
+                //if the previous text was empty, then text align center
+                if (j > 0 && configuration.getPageHeaderLines().get(i).get(j-1).length() ==0 ) {
+    
+                    textAlign = TextAlign.CENTER;
+                }
+
+                float cellWidth = tableWidth * cellLengths.get(j) / allLengths;
+
+                addCellWithText(contentStream, text,
+                textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+                initX, initY, cellWidth, pageHeaderFontSize);
+                initX += cellWidth;
+            }
+            initX = configuration.getLeftMargin();
+            initY -= headerCellHeight;
+
+            //change global cell height and font descent back
+            cellHeight = tempCellHeight;
+            fontDescent = tempFontDescent;
 
         }
 
-        //Add today date in the same row
-        String localDate = "Date:  " + LocalDate.now();
-        addCellWithText(contentStream, localDate, TextAlign.RIGHT, Color.WHITE,
-                configuration.getFontColor(), Outline.NOTOUTLINED, initX+tableWidth-fontAverageWidth*localDate.length(), initY, fontAverageWidth*localDate.length());
-        initY -= cellHeight;
+        
+        // //Add base for grouping
+        // if (configuration.getColumnsToGroupBy() != null && configuration.getColumnsToGroupBy().size() > 0) {
+        //     String groupingBase = configuration.getColumnsToGroupBy().get(0);
+        //     for (int i = 1; i < configuration.getColumnsToGroupBy().size(); i++) {
+        //         groupingBase = groupingBase.concat(" & " + configuration.getColumnsToGroupBy().get(i));
+        //     }
+        //     addCellWithText(contentStream, "Grouping By " + groupingBase, TextAlign.LEFT, Color.WHITE,
+        //             configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
+
+        // } else {
+        //     addCellWithText(contentStream, "", TextAlign.LEFT, Color.WHITE,
+        //             configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
+
+        // }
+        // initY -= cellHeight;
 
         //Add table header
 
@@ -228,19 +327,17 @@ public class Pdf {
 
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
-            TextAlign textAlign;
-            Color fontColor = configuration.getFontColor();
-            if (hashMapOfTypes.get(string).equalsIgnoreCase("float")) {
-                textAlign = TextAlign.RIGHT;
+            TextAlign textAlign = configuration.getTextAlignment().get(string);
+            Color fontColor = configuration.getTextColor().get(string);
+
+            if (hashMapOfTypes.get(string).equalsIgnoreCase("number")) {
                 //change font color if it is negative
                 if (transaction.getNumberFields().get(string) < 0) {
-                    fontColor = configuration.getColorOfNegativeNumbers();
+                    fontColor = configuration.getNegativeValueColor().get(string);
                 }
-            } else {
-                textAlign = TextAlign.LEFT;
             }
 
-            addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString().get(string),
+            addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
                     initX, initY, cellWidth, quantityOfLinesOfText, configuration.isOnlyVerticalCellBoards());
             initX += cellWidth;
@@ -281,14 +378,14 @@ public class Pdf {
 
         contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
 
-        String text = columnName + ": " + transaction.getAllValuesAsString().get(columnName);
+        String text = columnName + ": " + transaction.getAllValuesAsString(configuration).get(columnName);
         if (level <= 2) {
             addCellWithText(contentStream, text, TextAlign.LEFT, color,
-                    configuration.getFontColor(), Outline.OUTLINED,
-                    initX, initY, tableWidth);
+                    configuration.getDefaultFontColor(), Outline.OUTLINED,
+                    initX, initY, tableWidth, fontSize);
         } else {
             addCellWithTextWithTabulation(contentStream, text, TextAlign.LEFT, color,
-                    configuration.getFontColor(), Outline.OUTLINED,
+                    configuration.getDefaultFontColor(), Outline.OUTLINED,
                     initX, initY, tableWidth, level-2);
         }
 
@@ -312,11 +409,10 @@ public class Pdf {
             sumOfAllMaxWidth += i;
         }
 
-//        Color color = configuration.getSubTotalFillingColor();
-        Color color = Color.WHITE;
+        Color color = configuration.getSubTotalFillingColor();
         contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
         addCellWithText(contentStream, "Sub-total: " + columnName, TextAlign.LEFT, color,
-                configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth);
+                configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
 
 
 
@@ -326,18 +422,22 @@ public class Pdf {
             String text;
             String type = hashMapOfTypes.get(tempColumnName);
 
-            if (type.equalsIgnoreCase("float")) {
+            if (type.equalsIgnoreCase("number")) {
                 float fl = subtotal.getNumberFields().get(tempColumnName);
-                text = FloatFormatter.format(fl);
+                text = new DecimalFormat(configuration.getTextFormat().get(tempColumnName), new DecimalFormatSymbols(Locale.ENGLISH)).format(fl);
+                if (fl < 0) {
+                    text = text.replaceAll("-", "(").concat(")");
+                }
+
                 //change color if number is negative
                 if (fl < 0) {
                     addCellWithText(contentStream, text,
-                            TextAlign.RIGHT, color,
-                            configuration.getColorOfNegativeNumbers(), Outline.OUTLINED, initX, initY, cellWidth);
+                    configuration.getTextAlignment().get(tempColumnName), color,
+                            configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
                 } else {
                     addCellWithText(contentStream, text,
-                            TextAlign.RIGHT, color,
-                            configuration.getFontColor(), Outline.OUTLINED, initX, initY, cellWidth);
+                    configuration.getTextAlignment().get(tempColumnName), color,
+                    configuration.getTextColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
                 }
                 initX += cellWidth;
             } else {
@@ -366,7 +466,7 @@ public class Pdf {
 
         contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
         addCellWithText(contentStream, "Grand Total", TextAlign.LEFT, color,
-                configuration.getFontColor(), Outline.OUTLINED, initX, initY, tableWidth);
+                configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
 
         float cellWidth;
 
@@ -376,18 +476,23 @@ public class Pdf {
 
             String type = hashMapOfTypes.get(tempColumnName);
 
-            if (type.equalsIgnoreCase("float")) {
+            if (type.equalsIgnoreCase("number")) {
                 float fl = subtotal.getNumberFields().get(tempColumnName);
-                text = FloatFormatter.format(fl);
+
+                text = new DecimalFormat(configuration.getTextFormat().get(tempColumnName), new DecimalFormatSymbols(Locale.ENGLISH)).format(fl);
+                if (fl < 0) {
+                    text = text.replaceAll("-", "(").concat(")");
+                }
+
                 //change color if number is negative
                 if (fl < 0) {
                     addCellWithText(contentStream, text,
-                            TextAlign.RIGHT, color,
-                            configuration.getColorOfNegativeNumbers(), Outline.OUTLINED, initX, initY, cellWidth);
+                    configuration.getTextAlignment().get(tempColumnName), color,
+                    configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
                 } else {
                     addCellWithText(contentStream, text,
-                            TextAlign.RIGHT, color,
-                            configuration.getFontColor(), Outline.OUTLINED, initX, initY, cellWidth);
+                    configuration.getTextAlignment().get(tempColumnName), color,
+                    configuration.getTextColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
                 }
                 text = FloatFormatter.format(subtotal.getNumberFields().get(tempColumnName));
 
@@ -408,7 +513,7 @@ public class Pdf {
 
     public void addCellWithText(PDPageContentStream contentStream, String text,
                                 TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
-                                float initX, float initY, float cellWidth) throws IOException {
+                                float initX, float initY, float cellWidth, float sizeOfFont) throws IOException {
 
         //set color and draw stroke rectangle
         if (outline == Outline.OUTLINED) {
@@ -433,7 +538,7 @@ public class Pdf {
         float textInitX = 0;
 
         //calculate string length in points
-        float stringWidth = configuration.getFont().getStringWidth(text) / 1000 * fontSize;
+        float stringWidth = configuration.getFont().getStringWidth(text) / 1000 * sizeOfFont;
 
         if (textAlign == TextAlign.LEFT) {
             textInitX = initX + fontAverageWidth;
@@ -448,7 +553,7 @@ public class Pdf {
         //add text
         contentStream.beginText();
         contentStream.newLineAtOffset(textInitX, textInitY);
-        contentStream.setFont(configuration.getFont(), fontSize);
+        contentStream.setFont(configuration.getFont(), sizeOfFont);
         contentStream.showText(text);
         contentStream.endText();
 
@@ -505,7 +610,7 @@ public class Pdf {
         //return one line by default
         int result = 1;
 
-        for (String text : transaction.getAllValuesAsString().values()){
+        for (String text : transaction.getAllValuesAsString(configuration).values()){
             //create linked list of all words in text
             LinkedList<String> textByLines = new LinkedList<>();
             //if text is small enough, add only one line
