@@ -99,17 +99,16 @@ public class Configuration {
 
         //PageFooter Configuration
         pageFooterFontSize = Float.parseFloat(nJCR.pageFooter.fontSize);
+
         try {
-            Field field = Class.forName("java.awt.Color").getField(nJCR.pageFooter.textColor.toLowerCase());
-            pageFooterFontColor = (Color)field.get(null);
-        } catch (Exception e) {
-            pageFooterFontColor = Color.black; // Not defined
+            pageFooterFontColor = Color.decode(nJCR.pageFooter.textColor);
+        } catch (NumberFormatException e) {
+            pageFooterFontColor = Color.BLACK;
         }
         try {
-            Field field = Class.forName("java.awt.Color").getField(nJCR.pageFooter.backGroundColor.toLowerCase());
-            pageFooterBackGroundColor = (Color)field.get(null);
-        } catch (Exception e) {
-            pageFooterBackGroundColor = Color.black; // Not defined
+            pageFooterBackGroundColor = Color.decode(nJCR.pageFooter.backGroundColor);
+        } catch (NumberFormatException e) {
+            pageFooterBackGroundColor = Color.WHITE;
         }
         pageNumberFlag = nJCR.pageFooter.pageNumberFlag;
 
@@ -147,22 +146,17 @@ public class Configuration {
 
             negativeAsParenthesesHashMap.put(columnName, nJCR.getFields().get(i).negativeAsParentheses);
 
-            Color temp;
             try {
-                Field field = Class.forName("java.awt.Color").getField(nJCR.getFields().get(i).textColor.toLowerCase());
-                temp = (Color)field.get(null);
-            } catch (Exception e) {
-                temp = Color.black; // Not defined
+                textColor.put(columnName, Color.decode(nJCR.getFields().get(i).textColor));
+            } catch (NumberFormatException e) {
+                textColor.put(columnName, Color.BLACK);
             }
-            textColor.put(columnName, temp);
 
             try {
-                Field field = Class.forName("java.awt.Color").getField(nJCR.getFields().get(i).negativeValueColor.toLowerCase());
-                temp = (Color)field.get(null);
-            } catch (Exception e) {
-                temp = Color.black; // Not defined
+                negativeValueColor.put(columnName, Color.decode(nJCR.getFields().get(i).negativeValueColor));
+            } catch (NumberFormatException e) {
+                negativeValueColor.put(columnName, Color.BLACK);
             }
-            negativeValueColor.put(columnName, temp);
             
         }
         

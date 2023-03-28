@@ -16,7 +16,7 @@
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
-			"textColor": "Black",
+			"textColor": "#000000",
 			"NegativeValueColor": "",
 			"NegativeAsParentheses": ""
 		}, {
@@ -24,7 +24,7 @@
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
-			"textColor": "Black",
+			"textColor": "#000000",
 			"NegativeValueColor": "",
 			"NegativeAsParentheses": ""
 		}, {
@@ -32,7 +32,7 @@
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
-			"textColor": "Black",
+			"textColor": "#000000",
 			"NegativeValueColor": "",
 			"NegativeAsParentheses": ""
 		},
@@ -41,7 +41,7 @@
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
-			"textColor": "Black",
+			"textColor": "#000000",
 			"NegativeValueColor": "",
 			"NegativeAsParentheses": ""
 		},
@@ -50,7 +50,7 @@
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "right",
-			"textColor": "Black",
+			"textColor": "#000000",
 			"NegativeValueColor": "",
 			"NegativeAsParentheses": ""
 		},
@@ -59,8 +59,8 @@
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
-			"textColor": "Black",
-			"NegativeValueColor": "Red",
+			"textColor": "#000000",
+			"NegativeValueColor": "#FF0000",
 			"NegativeAsParentheses": true
 		},
 		{
@@ -68,8 +68,8 @@
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
-			"textColor": "Black",
-			"NegativeValueColor": "Red",
+			"textColor": "#000000",
+			"NegativeValueColor": "#FF0000",
 			"NegativeAsParentheses": true
 		},
 		{
@@ -77,8 +77,8 @@
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
-			"textColor": "Black",
-			"NegativeValueColor": "Red",
+			"textColor": "#000000",
+			"NegativeValueColor": "#FF0000",
 			"NegativeAsParentheses": true
 
 		},
@@ -87,8 +87,8 @@
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
-			"textColor": "Black",
-			"NegativeValueColor": "Red",
+			"textColor": "#000000",
+			"NegativeValueColor": "#FF0000",
 			"NegativeAsParentheses": true
 		},
 		{
@@ -96,8 +96,8 @@
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
-			"textColor": "Black",
-			"NegativeValueColor": "Red",
+			"textColor": "#000000",
+			"NegativeValueColor": "#FF0000",
 			"NegativeAsParentheses": true
 		},
 		{
@@ -105,8 +105,8 @@
 			"type": "Datetime",
 			"textFormat": "MM/DD/YYYY",
 			"textAlignment": "Left",
-			"textColor": "Black",
-			"NegativeValueColor": "Red",
+			"textColor": "#000000",
+			"NegativeValueColor": "#FF0000",
 			"NegativeAsParentheses": ""
 		}
 	],
@@ -131,8 +131,8 @@
 	}],
 	"pageHeader": [{
 			"Font Size": "24",
-			"Text Color": "white",
-			"BackGroundColor": "BLUE",
+			"Text Color": "#ffffff",
+			"BackGroundColor": "# ",
 			"Data": [
 				{
 					"field": "",
@@ -142,8 +142,8 @@
 		},
 		{
 			"Font Size": "3",
-			"Text Color": "white",
-			"BackGroundColor": "green",
+			"Text Color": "#ffffff",
+			"BackGroundColor": "#27b01a",
 			"Data": [
 				{
 					"field": "",
@@ -153,8 +153,8 @@
 		},
 		{
 			"Font Size": "10",
-			"Text Color": "black",
-			"BackGroundColor": "white",
+			"Text Color": "#000000",
+			"BackGroundColor": "#ffffff",
 			"Data": [
 				{
 					"field": "ReportClient",
@@ -181,8 +181,8 @@
 	],
 	"PageFooter": {
 		"Font Size": "8",
-		"Text Color": "red",
-		"BackGroundColor": "white",
+		"Text Color": "#9e7911",
+		"BackGroundColor": "#ffffff",
 		"PageNumberFlag": true,
 		"Data": [{
 				"field": "ReportId",

@@ -220,20 +220,18 @@ public class Pdf {
             Color pageHeaderFontColor;
             String fontColorName = configuration.getPageHeaderConfiguration().get(i).get("textColor").toLowerCase();
             try {
-                Field field = Class.forName("java.awt.Color").getField(fontColorName);
-                pageHeaderFontColor = (Color)field.get(null);
-            } catch (Exception e) {
-                pageHeaderFontColor = Color.black; // Not defined
+                pageHeaderFontColor = Color.decode(fontColorName);
+            } catch (NumberFormatException e) {
+                pageHeaderFontColor = Color.black;
             }
             
             //define background color
             Color pageHeaderBackGroundColor;
             String backgroundColorName = configuration.getPageHeaderConfiguration().get(i).get("backGroundColor").toLowerCase();
             try {
-                Field field = Class.forName("java.awt.Color").getField(backgroundColorName);
-                pageHeaderBackGroundColor = (Color)field.get(null);
-            } catch (Exception e) {
-                pageHeaderBackGroundColor = Color.white; // Not defined
+                pageHeaderBackGroundColor = Color.decode(backgroundColorName);
+            } catch (NumberFormatException e) {
+                pageHeaderBackGroundColor = Color.white;
             }
 
             //define cell height by font and it's size
