@@ -41,16 +41,9 @@ public class Transaction {
         HashMap<String, String> result = new HashMap<>(textFields);
 
         for (String st: numberFields.keySet()) {
+
             float fl = numberFields.get(st);
-            // String floatAsString = FloatFormatter.format(fl);
-            // String floatAsString = String.format(configuration.getTextFormat().get(st), fl);
-
-            String floatAsString = new DecimalFormat(configuration.getTextFormat().get(st), new DecimalFormatSymbols(Locale.ENGLISH)).format(fl);
-
-            if (fl < 0) {
-                floatAsString = floatAsString.replaceAll("-", "(").concat(")");
-            }
-
+            String floatAsString = FloatFormatter.format(fl, st, configuration);
 
             result.put(st, floatAsString);
         }

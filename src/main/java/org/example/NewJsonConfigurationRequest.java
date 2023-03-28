@@ -63,6 +63,8 @@ public class NewJsonConfigurationRequest {
         public String textColor;
         @JsonProperty("NegativeValueColor") 
         public String negativeValueColor;
+        @JsonProperty("NegativeAsParentheses") 
+        public boolean negativeAsParentheses;
     }
     
     public static class PageFooter{

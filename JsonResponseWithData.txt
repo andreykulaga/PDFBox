@@ -61,7 +61,7 @@
 				"Alt_Src_Sys_Investment_Id": "BRL",
 				"TICKER_Id": "BRL",
 				"Original_Share_Qty": 1.0000000,
-				"Unit_Price_Base_Amt": -1.750000,
+				"Unit_Price_Base_Amt": -10.750000,
 				"Market_Value_Base_Amt": 0.000000,
 				"Unit_Original_Cost_Base_Amt": 0.23456,
 				"Original_Cost_Base_Amt": 3.24555,

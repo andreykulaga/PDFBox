@@ -17,21 +17,24 @@
 			"textFormat": "text",
 			"textAlignment": "Left",
 			"textColor": "Black",
-			"NegativeValueColor": ""
+			"NegativeValueColor": "",
+			"NegativeAsParentheses": ""
 		}, {
 			"field": "product_Nm",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
 			"textColor": "Black",
-			"NegativeValueColor": ""
+			"NegativeValueColor": "",
+			"NegativeAsParentheses": ""
 		}, {
 			"field": "Investment_Nm",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
 			"textColor": "Black",
-			"NegativeValueColor": ""
+			"NegativeValueColor": "",
+			"NegativeAsParentheses": ""
 		},
 		{
 			"field": "Alt_Src_Sys_Investment_Id",
@@ -39,7 +42,8 @@
 			"textFormat": "text",
 			"textAlignment": "Left",
 			"textColor": "Black",
-			"NegativeValueColor": ""
+			"NegativeValueColor": "",
+			"NegativeAsParentheses": ""
 		},
 		{
 			"field": "TICKER_Id",
@@ -47,7 +51,8 @@
 			"textFormat": "text",
 			"textAlignment": "right",
 			"textColor": "Black",
-			"NegativeValueColor": ""
+			"NegativeValueColor": "",
+			"NegativeAsParentheses": ""
 		},
 		{
 			"field": "Original_Share_Qty",
@@ -55,7 +60,8 @@
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
 			"textColor": "Black",
-			"NegativeValueColor": "Red"
+			"NegativeValueColor": "Red",
+			"NegativeAsParentheses": true
 		},
 		{
 			"field": "unit_price_Base_Amt",
@@ -63,15 +69,17 @@
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
 			"textColor": "Black",
-			"NegativeValueColor": "Red"
+			"NegativeValueColor": "Red",
+			"NegativeAsParentheses": true
 		},
 		{
 			"field": "Market_Value_Base_Amt",
 			"type": "number",
-			"textFormat": "#,##0.000",
+			"textFormat": "#,##0.00",
 			"textAlignment": "right",
 			"textColor": "Black",
-			"NegativeValueColor": "Red"
+			"NegativeValueColor": "Red",
+			"NegativeAsParentheses": true
 
 		},
 		{
@@ -80,7 +88,8 @@
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
 			"textColor": "Black",
-			"NegativeValueColor": "Red"
+			"NegativeValueColor": "Red",
+			"NegativeAsParentheses": true
 		},
 		{
 			"field": "Original_Cost_Base_Amt",
@@ -88,7 +97,8 @@
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
 			"textColor": "Black",
-			"NegativeValueColor": "Red"
+			"NegativeValueColor": "Red",
+			"NegativeAsParentheses": true
 		},
 		{
 			"field": "CreateDt",
@@ -96,7 +106,8 @@
 			"textFormat": "MM/DD/YYYY",
 			"textAlignment": "Left",
 			"textColor": "Black",
-			"NegativeValueColor": "Red"
+			"NegativeValueColor": "Red",
+			"NegativeAsParentheses": ""
 		}
 	],
 	"columnsToGroupBy": [{

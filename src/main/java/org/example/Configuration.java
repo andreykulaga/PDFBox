@@ -69,6 +69,7 @@ public class Configuration {
     HashMap<String, TextAlign> textAlignment = new HashMap<>();
     HashMap<String, Color> textColor = new HashMap<>();
     HashMap<String, Color> negativeValueColor = new HashMap<>();
+    HashMap<String, Boolean> negativeAsParenthesesHashMap = new HashMap<>();
 
 
     String reportName;
@@ -143,6 +144,8 @@ public class Configuration {
             textFormat.put(columnName, nJCR.getFields().get(i).textFormat);
 
             textAlignment.put(columnName, TextAlign.fromStringToTextAlign(nJCR.getFields().get(i).textAlignment));
+
+            negativeAsParenthesesHashMap.put(columnName, nJCR.getFields().get(i).negativeAsParentheses);
 
             Color temp;
             try {

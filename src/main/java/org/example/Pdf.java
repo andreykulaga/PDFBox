@@ -424,10 +424,8 @@ public class Pdf {
 
             if (type.equalsIgnoreCase("number")) {
                 float fl = subtotal.getNumberFields().get(tempColumnName);
-                text = new DecimalFormat(configuration.getTextFormat().get(tempColumnName), new DecimalFormatSymbols(Locale.ENGLISH)).format(fl);
-                if (fl < 0) {
-                    text = text.replaceAll("-", "(").concat(")");
-                }
+                
+                text = FloatFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration); 
 
                 //change color if number is negative
                 if (fl < 0) {
@@ -479,10 +477,7 @@ public class Pdf {
             if (type.equalsIgnoreCase("number")) {
                 float fl = subtotal.getNumberFields().get(tempColumnName);
 
-                text = new DecimalFormat(configuration.getTextFormat().get(tempColumnName), new DecimalFormatSymbols(Locale.ENGLISH)).format(fl);
-                if (fl < 0) {
-                    text = text.replaceAll("-", "(").concat(")");
-                }
+                text = FloatFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration);
 
                 //change color if number is negative
                 if (fl < 0) {
@@ -494,7 +489,6 @@ public class Pdf {
                     configuration.getTextAlignment().get(tempColumnName), color,
                     configuration.getTextColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
                 }
-                text = FloatFormatter.format(subtotal.getNumberFields().get(tempColumnName));
 
                 initX += cellWidth;
             } else {
