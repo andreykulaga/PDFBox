@@ -421,12 +421,12 @@ public class Pdf {
             String type = hashMapOfTypes.get(tempColumnName);
 
             if (type.equalsIgnoreCase("number")) {
-                float fl = subtotal.getNumberFields().get(tempColumnName);
+                double dbl = subtotal.getNumberFields().get(tempColumnName);
                 
-                text = FloatFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration); 
+                text = DoubleFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration); 
 
                 //change color if number is negative
-                if (fl < 0) {
+                if (dbl < 0) {
                     addCellWithText(contentStream, text,
                     configuration.getTextAlignment().get(tempColumnName), color,
                             configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
@@ -473,12 +473,12 @@ public class Pdf {
             String type = hashMapOfTypes.get(tempColumnName);
 
             if (type.equalsIgnoreCase("number")) {
-                float fl = subtotal.getNumberFields().get(tempColumnName);
+                double dbl = subtotal.getNumberFields().get(tempColumnName);
 
-                text = FloatFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration);
+                text = DoubleFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration);
 
                 //change color if number is negative
-                if (fl < 0) {
+                if (dbl < 0) {
                     addCellWithText(contentStream, text,
                     configuration.getTextAlignment().get(tempColumnName), color,
                     configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);

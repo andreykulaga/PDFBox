@@ -10,14 +10,14 @@ import java.util.HashMap;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Subtotal {
 
-    HashMap<String, Float> numberFields;
+    HashMap<String, Double> numberFields;
 //    HashMap<String, LocalDateTime> dateTimeFields;
 //    HashMap<String, String> textFields;
 
     public Subtotal(Transaction transaction) {
-        HashMap<String, Float> newNumberFields = new HashMap<>();
+        HashMap<String, Double> newNumberFields = new HashMap<>();
         for (String string: transaction.getNumberFields().keySet()) {
-            newNumberFields.put(string, (float) 0);
+            newNumberFields.put(string, (double) 0);
         }
         this.numberFields = newNumberFields;
 
@@ -26,8 +26,8 @@ public class Subtotal {
 
     public void addToSubtotal(Transaction transaction) {
         for (String string: transaction.getNumberFields().keySet()) {
-            Float fl = numberFields.get(string) + transaction.getNumberFields().get(string);
-            numberFields.put(string, fl);
+            Double dbl = numberFields.get(string) + transaction.getNumberFields().get(string);
+            numberFields.put(string, dbl);
         }
     }
 }

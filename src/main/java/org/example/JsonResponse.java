@@ -99,7 +99,7 @@ public class JsonResponse {
         
         ArrayList<Datum> data = cacheItem.get(0).report.data;
         for (Datum d: data) {
-            HashMap<String, Float> numberFields = new HashMap<>();
+            HashMap<String, Double> numberFields = new HashMap<>();
             HashMap<String, LocalDateTime> dateTimeFields = new HashMap<>();
             HashMap<String, String> textFields = new HashMap<>();
             for (String s: d.fieldsAndValues.keySet()) {
@@ -120,7 +120,7 @@ public class JsonResponse {
         
                 //check field type and fill hashmaps of transaction
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
-                    Float f = Float.parseFloat(value);
+                    Double f = Double.parseDouble(value);
                     numberFields.put(key, f);
                 }
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {

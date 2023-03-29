@@ -43,7 +43,7 @@ public class TransactionParser {
     public static Transaction parseTextLineIntoTransaction(Long numberOfString, String string, HashMap<String, String> hashMapOfTypes, ArrayList<String> columnNames, ArrayList<String> whatColumnsToHide) throws DateTimeParseException, ArrayIndexOutOfBoundsException {
         String[] array = string.split("\\|");
 
-        HashMap<String, Float> numberFields = new HashMap<>();
+        HashMap<String, Double> numberFields = new HashMap<>();
         HashMap<String, LocalDateTime> dateTimeFields = new HashMap<>();
         HashMap<String, String> textFields = new HashMap<>();
 
@@ -53,7 +53,7 @@ public class TransactionParser {
             if (!whatColumnsToHide.contains(columnName)) {
                 String type = hashMapOfTypes.get(columnName);
                 if (type.equalsIgnoreCase("float")) {
-                    float f = Float.parseFloat(array[i]);
+                    double f = Float.parseFloat(array[i]);
                     numberFields.put(columnName, f);
                 }
                 if (type.equalsIgnoreCase("LocalDateTime")) {

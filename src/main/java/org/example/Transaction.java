@@ -19,7 +19,7 @@ import java.util.Locale;
 public class Transaction {
 
     long numberOfTransaction;
-    HashMap<String, Float> numberFields;
+    HashMap<String, Double> numberFields;
     HashMap<String, LocalDateTime> dateTimeFields;
     HashMap<String, String> textFields;
 
@@ -42,10 +42,10 @@ public class Transaction {
 
         for (String st: numberFields.keySet()) {
 
-            float fl = numberFields.get(st);
-            String floatAsString = FloatFormatter.format(fl, st, configuration);
+            double dbl = numberFields.get(st);
+            String doubleAsString = DoubleFormatter.format(dbl, st, configuration);
 
-            result.put(st, floatAsString);
+            result.put(st, doubleAsString);
         }
         for (String st: dateTimeFields.keySet()) {
             result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(st))));
@@ -55,8 +55,8 @@ public class Transaction {
     }
 
     public Transaction createTransactionWithEmptyTextAndDateFieldsAndZeroNumbers() {
-        HashMap<String, Float> newNumberFields = numberFields;
-        newNumberFields.replaceAll((s, v) -> (float) 0);
+        HashMap<String, Double> newNumberFields = numberFields;
+        newNumberFields.replaceAll((s, v) -> (double) 0);
         Transaction newTransaction = new Transaction();
         newTransaction.setNumberFields(newNumberFields);
         return newTransaction;
@@ -65,7 +65,7 @@ public class Transaction {
     public static Transaction createTransactionFromColumnNames(ArrayList<String> columnNames, HashMap<String, String> columnNamesForTableHead) {
         Transaction transaction = new Transaction();
         HashMap<String, String> textFields = new HashMap<>();
-        HashMap<String, Float> numberFields = new HashMap<>();
+        HashMap<String, Double> numberFields = new HashMap<>();
         HashMap<String, LocalDateTime> dateFields = new HashMap<>();
 
         for (String string: columnNames) {
