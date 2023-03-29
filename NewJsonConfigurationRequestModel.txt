@@ -132,7 +132,7 @@
 	"pageHeader": [{
 			"Font Size": "24",
 			"Text Color": "#ffffff",
-			"BackGroundColor": "# ",
+			"BackGroundColor": "#1F88C0",
 			"Data": [
 				{
 					"field": "",

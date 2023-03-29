@@ -12,7 +12,7 @@ public class Subtotal {
 
     HashMap<String, Double> numberFields;
 //    HashMap<String, LocalDateTime> dateTimeFields;
-//    HashMap<String, String> textFields;
+   HashMap<String, String> textFields;
 
     public Subtotal(Transaction transaction) {
         HashMap<String, Double> newNumberFields = new HashMap<>();

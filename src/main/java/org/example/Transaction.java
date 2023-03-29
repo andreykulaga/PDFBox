@@ -54,13 +54,13 @@ public class Transaction {
       return result;
     }
 
-    public Transaction createTransactionWithEmptyTextAndDateFieldsAndZeroNumbers() {
-        HashMap<String, Double> newNumberFields = numberFields;
-        newNumberFields.replaceAll((s, v) -> (double) 0);
-        Transaction newTransaction = new Transaction();
-        newTransaction.setNumberFields(newNumberFields);
-        return newTransaction;
-    }
+    // public  Transaction createTransactionWithEmptyTextAndDateFieldsAndZeroNumbers() {
+    //     HashMap<String, Double> newNumberFields = numberFields;
+    //     newNumberFields.replaceAll((s, v) -> (double) 0);
+    //     Transaction newTransaction = new Transaction();
+    //     newTransaction.setNumberFields(newNumberFields);
+    //     return newTransaction;
+    // }
 
     public static Transaction createTransactionFromColumnNames(ArrayList<String> columnNames, HashMap<String, String> columnNamesForTableHead) {
         Transaction transaction = new Transaction();

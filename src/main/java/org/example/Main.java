@@ -75,11 +75,26 @@ public class Main {
         HashMap<String, Integer> textLengths = new HashMap<>();
         
         //fill array that we will need to calculate cell width
+    
         for (int i = 0; i < columnNames.size(); i++) {
-            if (columnNames.get(i).length() > configuration.getMaxCharactersInTextLine()) {
+            String line = columnNames.get(i);
+            int length = line.length();
+            
+             
+            //increase length for each capitalised letter, as capitilized letters are too wide
+            String lineToCompare = line.toLowerCase();
+            int howManyCapitalizedLetters = 0;
+            for (int j = 0; j < length; j++) {
+                if (line.charAt(j) == lineToCompare.charAt(j)) {
+                    howManyCapitalizedLetters++;
+                }
+            }
+            length += (howManyCapitalizedLetters/3);     
+
+            if (length > configuration.getMaxCharactersInTextLine()) {
                 textLengths.put(columnNames.get(i), configuration.getMaxCharactersInTextLine());
             } else {
-                textLengths.put(columnNames.get(i), columnNames.get(i).length());
+                textLengths.put(columnNames.get(i), length);
             }
         }
         
@@ -129,7 +144,7 @@ public class Main {
                         }
                     }
                     if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
-                        pdf.addGrandTotalRow(subtotal, hashMapOfTypes);
+                        pdf.addSubtotalOrTotalRow(true, "", subtotal, hashMapOfTypes);
                     }
                     if (doc.getNumberOfPages() > configuration.getNumberOfPagesInPreview()) {
                         doc.removePage(configuration.getNumberOfPagesInPreview());
@@ -169,7 +184,7 @@ public class Main {
                             for (int k = 0; k <= columnPlace; k++) {
                                 //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                                 String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                                pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                                pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
                                         subtotals[k], hashMapOfTypes);
                                 subtotals[k] = new Subtotal(transactions.get(0));
                             }
@@ -190,13 +205,13 @@ public class Main {
                         for (int k = 0; k < subtotals.length - 1; k++) {
                             //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                             String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                            pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                            pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
                                     subtotals[k], hashMapOfTypes);
                         }
                     }
                     //add total
                     if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
-                        pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
+                        pdf.addSubtotalOrTotalRow(true, "", subtotals[subtotals.length - 1], hashMapOfTypes);
                     }
                     if (doc.getNumberOfPages() > configuration.getNumberOfPagesInPreview()) {
                         doc.removePage(configuration.getNumberOfPagesInPreview());
@@ -222,7 +237,7 @@ public class Main {
                         pdf.addTableRow(t);
                         subtotal.addToSubtotal(t);
                     }
-                    pdf.addGrandTotalRow(subtotal, hashMapOfTypes);
+                    pdf.addSubtotalOrTotalRow(true, "", subtotal, hashMapOfTypes);
                 } else {
                     //Create custom comparator with needed columns
                     TransactionComparator transactionComparator = new TransactionComparator(configuration.getColumnsToGroupBy(), hashMapOfTypes);
@@ -258,7 +273,7 @@ public class Main {
                             for (int k = 0; k <= columnPlace; k++) {
                                 //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                                 String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                                pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                                pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
                                         subtotals[k], hashMapOfTypes);
                                 subtotals[k] = new Subtotal(transactions.get(0));
                             }
@@ -278,11 +293,11 @@ public class Main {
                     for (int k = 0; k < subtotals.length - 1; k++) {
                         //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                         String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                        pdf.addSubtotalRow(subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                        pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
                                 subtotals[k], hashMapOfTypes);
                     }
                     //add total
-                    pdf.addGrandTotalRow(subtotals[subtotals.length - 1], hashMapOfTypes);
+                    pdf.addSubtotalOrTotalRow(true, "", subtotals[subtotals.length - 1], hashMapOfTypes);
 
                 }
                 pdf.addFooters();

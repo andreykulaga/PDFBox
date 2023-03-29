@@ -197,10 +197,11 @@ public class Pdf {
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
 
             String text = transaction.getAllValuesAsString(configuration).get(string);
-
-            addCellWithMultipleTextLines(contentStream, text,
-                    TextAlign.CENTER, configuration.getHeadFillingColor(),
-                    configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
+            addCellWithMultipleTextLines(contentStream, text,TextAlign.CENTER, configuration.getHeadFillingColor(), configuration.getDefaultFontColor(), 
+            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, false);
+            // addCellWithMultipleTextLines(contentStream, text,
+            //         TextAlign.CENTER, configuration.getHeadFillingColor(),
+            //         configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
             initX += cellWidth;
         }
         initX = configuration.getLeftMargin();
@@ -321,7 +322,15 @@ public class Pdf {
         }
 
         float cellWidth;
-        int quantityOfLinesOfText = howManyLinesInARow(transaction);
+        int howManyLinesInARow = howManyLinesInARow(transaction);
+
+        //create new page if there is no enough space
+        if (initY - cellHeight*howManyLinesInARow < configuration.getBottomMargin()) {
+            addNewPage();
+            contentStream.close();
+            contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
+        }
+
 
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
@@ -337,23 +346,23 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
-                    initX, initY, cellWidth, quantityOfLinesOfText, configuration.isOnlyVerticalCellBoards());
+                    initX, initY, cellWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
             initX += cellWidth;
         }
 
         initX = configuration.getLeftMargin();
-        initY -= cellHeight*quantityOfLinesOfText;
+        initY -= cellHeight*howManyLinesInARow;
 
-        if (initY < configuration.getBottomMargin()+cellHeight) {
-            if (configuration.isOnlyVerticalCellBoards()) {
-                contentStream.setStrokingColor(configuration.getStrokingColor());
-                contentStream.setLineWidth(configuration.getLineWidth()/2);
-                contentStream.moveTo(initX, initY);
-                contentStream.lineTo(initX+tableWidth, initY);
-                contentStream.stroke();
-                }
-            addNewPage();
-        }
+        // if (initY < configuration.getBottomMargin()+cellHeight) {
+        //     if (configuration.isOnlyVerticalCellBoards()) {
+        //         contentStream.setStrokingColor(configuration.getStrokingColor());
+        //         contentStream.setLineWidth(configuration.getLineWidth()/2);
+        //         contentStream.moveTo(initX, initY);
+        //         contentStream.lineTo(initX+tableWidth, initY);
+        //         contentStream.stroke();
+        //         }
+        //     addNewPage();
+        // }
         contentStream.close();
     }
 
@@ -399,109 +408,170 @@ public class Pdf {
         }
     }
 
-    public void addSubtotalRow(String columnName, Subtotal subtotal, HashMap<String, String> hashMapOfTypes) throws IOException {
+    public void addSubtotalOrTotalRow(boolean isItTotal, String columnName, Subtotal subtotal, HashMap<String, String> hashMapOfTypes) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
         int sumOfAllMaxWidth = 0;
         for (int i: textLengths.values()) {
             sumOfAllMaxWidth += i;
         }
+        
+        //Change the first column of the subtotal to the subtotal line name and set filling color
+        Color color;
+        HashMap <String, String> tempMap = new HashMap<>();
+        String lineName;
+        if (isItTotal) {
+            lineName = "GrandTotal:";
+            color = Color.lightGray;
+        } else {
+            lineName = "Sub-total: " + columnName;
+            color = configuration.getSubTotalFillingColor();
+        }
+        tempMap.put(columnNames.get(0), lineName);
+        subtotal.setTextFields(tempMap);
 
-        Color color = configuration.getSubTotalFillingColor();
-        contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
-        addCellWithText(contentStream, "Sub-total: " + columnName, TextAlign.LEFT, color,
-                configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
-
-
+        
+        int howManyLinesInARow = howManyLinesInARow(subtotal);
+        //create new page if there is no enough space
+        if (initY - cellHeight*howManyLinesInARow < configuration.getBottomMargin()) {
+            addNewPage();
+            contentStream.close();
+            contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
+        }
 
         float cellWidth;
+        //add flag for the first column to add textname of the line
+        int f = 0;
         for (String tempColumnName: columnNames) {
             cellWidth = tableWidth * textLengths.get(tempColumnName) / sumOfAllMaxWidth;
             String text;
             String type = hashMapOfTypes.get(tempColumnName);
 
+            Color textColor = configuration.getTextColor().get(tempColumnName);
             if (type.equalsIgnoreCase("number")) {
                 double dbl = subtotal.getNumberFields().get(tempColumnName);
-                
                 text = DoubleFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration); 
-
                 //change color if number is negative
                 if (dbl < 0) {
-                    addCellWithText(contentStream, text,
-                    configuration.getTextAlignment().get(tempColumnName), color,
-                            configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
-                } else {
-                    addCellWithText(contentStream, text,
-                    configuration.getTextAlignment().get(tempColumnName), color,
-                    configuration.getTextColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
+                    textColor = configuration.getNegativeValueColor().get(tempColumnName);
                 }
-                initX += cellWidth;
             } else {
-                initX += cellWidth;
+                text = "";
             }
+
+            TextAlign textAlign = configuration.getTextAlignment().get(tempColumnName);
+            //add the name of the subtotal line
+            if (f == 0) {
+                textAlign = TextAlign.LEFT;
+                if (isItTotal) {
+                    text = "GrandTotal:";
+                } else {
+                    text = "Sub-total: " + columnName;
+                }
+            }
+            f++;
+
+            addCellWithMultipleTextLines(contentStream, text,
+                textAlign, color, textColor,
+                Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
+           
+            initX += cellWidth;
+
+
+            // if (type.equalsIgnoreCase("number")) {
+            //     double dbl = subtotal.getNumberFields().get(tempColumnName);
+                
+            //     text = DoubleFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration); 
+                
+            //     //change color if number is negative
+            //     if (dbl < 0) {
+            //         addCellWithMultipleTextLines(contentStream, text,
+            //         configuration.getTextAlignment().get(tempColumnName), color, configuration.getNegativeValueColor().get(tempColumnName),
+            //         Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
+                    
+            //     } else {
+            //         addCellWithMultipleTextLines(contentStream, text,
+            //         configuration.getTextAlignment().get(tempColumnName), color, configuration.getTextColor().get(tempColumnName),
+            //         Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
+            //     }
+            //     initX += cellWidth;
+            // } else {
+            //     initX += cellWidth;
+            // }
+
         }
+
+
+        // initX = configuration.getLeftMargin();
+        //  //  //add text of name of the line
+        //  addCellWithMultipleTextLines(contentStream, "Sub-total: " + columnName, TextAlign.LEFT, color, configuration.getDefaultFontColor(), 
+        //  Outline.NOTOUTLINED, initX, initY, tableWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
+        //  // addCellWithText(contentStream, "Sub-total: " + columnName, TextAlign.LEFT, color, configuration.getDefaultFontColor(),
+        //  // Outline.NOTOUTLINED, initX, initY, tableWidth, fontSize);
+
         contentStream.close();
 
-
         initX = configuration.getLeftMargin();
-        initY -= cellHeight;
+        initY -= (cellHeight * howManyLinesInARow);
+
         if (initY < configuration.getBottomMargin()+cellHeight) {
             addNewPage();
         }
     }
 
-    public void addGrandTotalRow(Subtotal subtotal,  HashMap<String, String> hashMapOfTypes) throws IOException {
-        PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
-        int sumOfAllMaxWidth = 0;
-        for (int i: textLengths.values()) {
-            sumOfAllMaxWidth += i;
-        }
+    // public void addGrandTotalRow(Subtotal subtotal,  HashMap<String, String> hashMapOfTypes) throws IOException {
+    //     PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
-        Color color = Color.lightGray;
+    //     int sumOfAllMaxWidth = 0;
+    //     for (int i: textLengths.values()) {
+    //         sumOfAllMaxWidth += i;
+    //     }
 
-        contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
-        addCellWithText(contentStream, "Grand Total", TextAlign.LEFT, color,
-                configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
+    //     Color color = Color.lightGray;
 
-        float cellWidth;
+    //     contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
+    //     addCellWithText(contentStream, "Grand Total", TextAlign.LEFT, color,
+    //             configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, tableWidth, fontSize);
 
-        for (String tempColumnName: columnNames) {
-            cellWidth = tableWidth * textLengths.get(tempColumnName) / sumOfAllMaxWidth;
-            String text;
+    //     float cellWidth;
 
-            String type = hashMapOfTypes.get(tempColumnName);
+    //     for (String tempColumnName: columnNames) {
+    //         cellWidth = tableWidth * textLengths.get(tempColumnName) / sumOfAllMaxWidth;
+    //         String text;
 
-            if (type.equalsIgnoreCase("number")) {
-                double dbl = subtotal.getNumberFields().get(tempColumnName);
+    //         String type = hashMapOfTypes.get(tempColumnName);
 
-                text = DoubleFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration);
+    //         if (type.equalsIgnoreCase("number")) {
+    //             double dbl = subtotal.getNumberFields().get(tempColumnName);
 
-                //change color if number is negative
-                if (dbl < 0) {
-                    addCellWithText(contentStream, text,
-                    configuration.getTextAlignment().get(tempColumnName), color,
-                    configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
-                } else {
-                    addCellWithText(contentStream, text,
-                    configuration.getTextAlignment().get(tempColumnName), color,
-                    configuration.getTextColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
-                }
+    //             text = DoubleFormatter.format(subtotal.getNumberFields().get(tempColumnName), tempColumnName, configuration);
 
-                initX += cellWidth;
-            } else {
-                initX += cellWidth;
-            }
-        }
+    //             //change color if number is negative
+    //             if (dbl < 0) {
+    //                 addCellWithText(contentStream, text,
+    //                 configuration.getTextAlignment().get(tempColumnName), color,
+    //                 configuration.getNegativeValueColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
+    //             } else {
+    //                 addCellWithText(contentStream, text,
+    //                 configuration.getTextAlignment().get(tempColumnName), color,
+    //                 configuration.getTextColor().get(tempColumnName), Outline.OUTLINED, initX, initY, cellWidth, fontSize);
+    //             }
 
-        contentStream.close();
+    //             initX += cellWidth;
+    //         } else {
+    //             initX += cellWidth;
+    //         }
+    //     }
 
-        initX = configuration.getLeftMargin();
-        initY -= cellHeight;
-        if (initY < configuration.getBottomMargin()+cellHeight) {
-            addNewPage();
-        }
-    }
+    //     contentStream.close();
+
+    //     initX = configuration.getLeftMargin();
+    //     initY -= cellHeight;
+    //     if (initY < configuration.getBottomMargin()+cellHeight) {
+    //         addNewPage();
+    //     }
+    // }
 
     public void addCellWithText(PDPageContentStream contentStream, String text,
                                 TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
@@ -653,9 +723,76 @@ public class Pdf {
         return result;
     }
 
+    public int howManyLinesInARow(Subtotal subtotal) {
+
+        //return one line by default
+        int result = 1;
+        HashMap<String, String> hashMap = new HashMap<>();
+        //create hashmap of all values as string
+        for (String str: subtotal.getNumberFields().keySet()) {
+            double dbl = subtotal.getNumberFields().get(str);
+            hashMap.put(str, DoubleFormatter.format(dbl, str, configuration));
+        }
+        //add the only string value
+        String firstColumn = columnNames.get(0);
+        hashMap.put(firstColumn, subtotal.getTextFields().get(firstColumn));
+
+        for (String str: hashMap.keySet()) {
+            String text = hashMap.get(str);
+            
+            //create linked list of all words in text
+            LinkedList<String> textByLines = new LinkedList<>();
+            //if text is small enough, add only one line
+            if (text.length() > configuration.getMaxCharactersInTextLine()) {
+                String[] strings = text.split(" ");
+                textByLines.addAll(Arrays.asList(strings));
+                int size = textByLines.size();
+
+                int i = 0;
+                while (i < size) {
+                    //divide word if it is too long
+                    int max = configuration.getMaxCharactersInTextLine();
+                    if (textByLines.get(i).length() > max) {
+                        String string = textByLines.get(i);
+                        textByLines.remove(i);
+                        size--;
+                        int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
+                        for (int j = 0; j < numberOfParts-1; j++) {
+                            String part = string.substring(j*max, (j+1)*max);
+                            textByLines.add(i+j, part);
+                            size++;
+                        }
+                        //add last part
+                        String part = string.substring(max*(numberOfParts-1));
+                        textByLines.add(i+numberOfParts-1, part);
+                        size++;
+                    }
+                    i++;
+                }
+
+                //wrap words
+                int k = 0;
+                while (k < size-1) {
+                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                        String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
+                        textByLines.set(k, newString);
+                        textByLines.remove(k + 1);
+                        size--;
+                        k--;
+                    }
+                    k++;
+                }
+                if (textByLines.size() > result) {
+                    result = textByLines.size();
+                }
+            }
+        }
+        return result;
+    }
+
     public void addCellWithMultipleTextLines(PDPageContentStream contentStream, String text,
                                 TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
-                                float initX, float initY, float cellWidth, int quantityOfLines, boolean onlyVerticalCellBoards) throws IOException {
+                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize, boolean onlyVerticalCellBoards) throws IOException {
 
         //create linked list of all words in text
         LinkedList<String> textByLines = new LinkedList<>();
