@@ -9,7 +9,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,12 +29,24 @@ public class Configuration {
     PDRectangle printSize = PDRectangle.LETTER;
     boolean changeOrientationToLandscape = true;
     PDFont font = PDType1Font.TIMES_ROMAN;
-    Color strokingColor = Color.DARK_GRAY;
-    Color groupFillingColor = Color.CYAN;
-    boolean onlyVerticalCellBoards = false;
+    Color strokingColor = Color.GRAY;
+//    boolean onlyVerticalCellBoards = false;
     Color defaultFontColor = Color.BLACK;
-    Color headFillingColor = Color.WHITE;
     Color subTotalFillingColor = Color.WHITE;
+
+    //configuration of table head and grouping heads
+    Color tableHeadFontColor;
+    Color tableHeadFillingColor;
+    Color groupHead1FontColor;
+    Color groupHead1FillingColor;
+    Color groupHead2FontColor;
+    Color groupHead2FillingColor;
+//    Color tableHeadFontColor = Color.WHITE;
+//    Color tableHeadFillingColor = Color.BLACK;
+//    Color groupHead1FontColor = Color.white;
+//    Color groupHead1FillingColor = Color.decode("#313094");
+//    Color groupHead2FontColor = Color.white;
+//    Color groupHead2FillingColor = Color.decode("#8a81be");
 
     
 
@@ -48,6 +59,8 @@ public class Configuration {
     float rightMargin;
     float topMargin;
     float bottomMargin;
+    boolean showVerticalBoarders;
+    boolean showHorizontalBoarders;
     ArrayList<String> columnsToGroupBy = new ArrayList<>();
     ArrayList<String> whatColumnsToHide = new ArrayList<>();
     
@@ -66,6 +79,7 @@ public class Configuration {
 
     //Fields configuration
     HashMap<String, String> textFormat = new HashMap<>();
+    HashMap<String, String> columnNamesForTableHead = new HashMap<>();
     HashMap<String, TextAlign> textAlignment = new HashMap<>();
     HashMap<String, Color> textColor = new HashMap<>();
     HashMap<String, Color> negativeValueColor = new HashMap<>();
@@ -81,9 +95,22 @@ public class Configuration {
         maxColumnsAllowed = nJCR.maxColumnsAllowed;
         lineWidth = nJCR.linewidth;
         leftMargin = Float.parseFloat(nJCR.leftMargin);
-        rightMargin = Float.parseFloat(nJCR.rightMargin);;
-        topMargin = Float.parseFloat(nJCR.topMargin);;
-        bottomMargin = Float.parseFloat(nJCR.bottomMargin);;
+        rightMargin = Float.parseFloat(nJCR.rightMargin);
+        topMargin = Float.parseFloat(nJCR.topMargin);
+        bottomMargin = Float.parseFloat(nJCR.bottomMargin);
+
+        showHorizontalBoarders = nJCR.showHorizontalBoarders;
+        showVerticalBoarders = nJCR.showVerticalBoarders;
+
+
+        tableHeadFontColor = Color.decode(nJCR.tableHeadFontColor);
+        tableHeadFillingColor = Color.decode(nJCR.tableHeadFillingColor);
+        groupHead1FontColor = Color.decode(nJCR.groupHead1FontColor);
+        groupHead1FillingColor = Color.decode(nJCR.groupHead1FillingColor);
+        groupHead2FontColor = Color.decode(nJCR.groupHead2FontColor);
+        groupHead2FillingColor = Color.decode(nJCR.groupHead2FillingColor);
+
+
 
         if (nJCR.columnsToGroupBy.size() > 0) {
             for (int i=0; i<nJCR.columnsToGroupBy.size(); i++) {
@@ -141,6 +168,7 @@ public class Configuration {
         for (int i = 0; i < nJCR.getFields().size(); i++) {
             String columnName = nJCR.getFields().get(i).field.toLowerCase().replace("_", " ");
             textFormat.put(columnName, nJCR.getFields().get(i).textFormat);
+            columnNamesForTableHead.put(columnName, nJCR.getFields().get(i).displayedName);
 
             textAlignment.put(columnName, TextAlign.fromStringToTextAlign(nJCR.getFields().get(i).textAlignment));
 

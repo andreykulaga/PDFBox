@@ -7,12 +7,21 @@
 	"rightMargin": "50",
 	"topMargin": "50",
 	"bottomMargin": "50",
+	"tableHeadFontColor": "#ffffff",
+    "tableHeadFillingColor": "#000000",
+    "groupHead1FontColor": "#ffffff",
+    "groupHead1FillingColor": "#313094",
+    "groupHead2FontColor": "#ffffff",
+    "groupHead2FillingColor": "#8a81be",
+    "showVerticalBoarders": true,
+    "showHorizontalBoarders": true,
 	"whatColumnsToHide": [{
 		"field": "Client_Product_Id",
 		"type": "string"
 	}],
 	"fields": [{
 			"field": "Client_Product_Id",
+			"displayedName": "Displayed name of client product id",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
@@ -21,6 +30,7 @@
 			"NegativeAsParentheses": ""
 		}, {
 			"field": "product_Nm",
+			"displayedName": "Displayed name of product name",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
@@ -29,6 +39,7 @@
 			"NegativeAsParentheses": ""
 		}, {
 			"field": "Investment_Nm",
+			"displayedName": "Displayed name 3",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
@@ -38,6 +49,7 @@
 		},
 		{
 			"field": "Alt_Src_Sys_Investment_Id",
+			"displayedName": "Displayed name example",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "Left",
@@ -47,6 +59,7 @@
 		},
 		{
 			"field": "TICKER_Id",
+			"displayedName": "Displayed name 4",
 			"type": "string",
 			"textFormat": "text",
 			"textAlignment": "right",
@@ -56,6 +69,7 @@
 		},
 		{
 			"field": "Original_Share_Qty",
+			"displayedName": "Displayed name 5",
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
@@ -65,6 +79,7 @@
 		},
 		{
 			"field": "unit_price_Base_Amt",
+			"displayedName": "Displayed name 6",
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
@@ -74,6 +89,7 @@
 		},
 		{
 			"field": "Market_Value_Base_Amt",
+			"displayedName": "Displayed name 7",
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
@@ -84,6 +100,7 @@
 		},
 		{
 			"field": "Unit_Original_Cost_Base_Amt",
+			"displayedName": "Displayed name 8",
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
@@ -93,6 +110,7 @@
 		},
 		{
 			"field": "Original_Cost_Base_Amt",
+			"displayedName": "Displayed name 9",
 			"type": "number",
 			"textFormat": "#,##0.00",
 			"textAlignment": "right",
@@ -102,6 +120,7 @@
 		},
 		{
 			"field": "CreateDt",
+			"displayedName": "Displayed name another one",
 			"type": "Datetime",
 			"textFormat": "MM/DD/YYYY",
 			"textAlignment": "Left",
@@ -115,8 +134,8 @@
 			"type": "string"
 		},
 		{
-			"field": "TICKER_Id",
-			"type": "string"
+			"field": "Original_Share_Qty",
+			"type": "number"
 		}
 	],
 	"ColumnsToAggregate": [{
@@ -131,54 +150,62 @@
 	}],
 	"pageHeader": [{
 			"Font Size": "24",
-			"Text Color": "#ffffff",
-			"BackGroundColor": "#1F88C0",
+			"Text Color": "#000000",
+			"BackGroundColor": "#ffffff",
 			"Data": [
 				{
-					"field": "",
-					"value": "Transaction Detail"
+					"field": "Report Name",
+					"value": "Example of Report name"
 				}
 			]
-		},
-		{
-			"Font Size": "3",
-			"Text Color": "#ffffff",
-			"BackGroundColor": "#27b01a",
-			"Data": [
-				{
-					"field": "",
-					"value": " "
-				}
-			]
-		},
-		{
+		}, {
 			"Font Size": "10",
 			"Text Color": "#000000",
 			"BackGroundColor": "#ffffff",
 			"Data": [
 				{
-					"field": "ReportClient",
-					"value": "1575-3-001a"
+					"field": "Account Name",
+					"value": "0008DB80C2A09CC1"
 				},
 				{
-					"field": "FromDate",
-					"value": "12/30/2022"
+					"field": "Report Period",
+					"value": "Closed Period Investments"
 				},
 				{
-					"field": "ToDate",
-					"value": "03/15/2023"
-				},
-				{
-					"field": "Report Basis",
-					"value": "Daily Investment"
-				},
-				{
-					"field": "DateType",
-					"value": "Payable"
+					"field": "Accounting Basis",
+					"value": "Trade Date"
 				}
 			]
-		}
-	],
+		}, {
+		    "Font Size": "10",
+        	"Text Color": "#000000",
+        	"BackGroundColor": "#ffffff",
+        	"Data": [
+        		{
+        			"field": "From",
+        			"value": "12/21/2021"
+        		},
+        		{
+        			"field": "To",
+        			"value": "12/31/2022"
+        		},
+        		{
+        			"field": "Period Type",
+        			"value": "Access Period"
+        		}
+        	]
+        }, {
+		    "Font Size": "10",
+        	"Text Color": "#000000",
+        	"BackGroundColor": "#ffffff",
+        	"Data": [
+        		{
+        			"field": "Require Active Membership",
+        			"value": "Yes"
+        		}
+        	]
+        }
+    ],
 	"PageFooter": {
 		"Font Size": "8",
 		"Text Color": "#9e7911",

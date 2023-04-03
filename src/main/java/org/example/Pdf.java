@@ -7,22 +7,15 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Locale;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Pdf {
@@ -149,12 +142,11 @@ public class Pdf {
             //add page number
             if (configuration.isPageNumberFlag()) {
                 
-                
                 addCellWithText(contentStream, "Page " + (i+1) + " of " + document.getNumberOfPages(),
-                TextAlign.CENTER, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
+                TextAlign.RIGHT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
                 configuration.getLeftMargin(),
                 configuration.getBottomMargin() - (footerCellHeight * (configuration.getLinesOfPageFooter().size()-1))/2, 
-                tableWidth, configuration.getPageFooterFontSize());
+                tableWidth, configuration.getPageFooterFontSize(), true, configuration.getFont());
             }
             //add text lines
             float tab = 0;
@@ -167,7 +159,8 @@ public class Pdf {
                 }
                 addCellWithText(contentStream, st,
                 TextAlign.LEFT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
-                configuration.getLeftMargin(), configuration.getBottomMargin() - (footerCellHeight * j), (tab+1) * footerFontAverageWidth, configuration.getPageFooterFontSize());
+                configuration.getLeftMargin(), configuration.getBottomMargin() - (footerCellHeight * j), (tab+1) * footerFontAverageWidth,
+                        configuration.getPageFooterFontSize(), true, configuration.getFont());
             }
 
             contentStream.close();
@@ -197,8 +190,8 @@ public class Pdf {
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
 
             String text = transaction.getAllValuesAsString(configuration).get(string);
-            addCellWithMultipleTextLines(contentStream, text,TextAlign.CENTER, configuration.getHeadFillingColor(), configuration.getDefaultFontColor(), 
-            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, false);
+            addCellWithMultipleTextLines(contentStream, text,TextAlign.CENTER, configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
+            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize);
             // addCellWithMultipleTextLines(contentStream, text,
             //         TextAlign.CENTER, configuration.getHeadFillingColor(),
             //         configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
@@ -208,7 +201,17 @@ public class Pdf {
         initY -= cellHeight*quantityOfLines;
     }
 
-    public void addHeadOfTable() throws IOException {
+    private void drawCircle(PDPageContentStream contentStream, float cx, float cy, float r, Color color) throws IOException {
+        final float k = 0.552284749831f;
+        contentStream.setNonStrokingColor(color);
+        contentStream.moveTo(cx - r, cy);
+        contentStream.curveTo(cx - r, cy + k * r, cx - k * r, cy + r, cx, cy + r);
+        contentStream.curveTo(cx + k * r, cy + r, cx + r, cy + k * r, cx + r, cy);
+        contentStream.curveTo(cx + r, cy - k * r, cx + k * r, cy - r, cx, cy - r);
+        contentStream.curveTo(cx - k * r, cy - r, cx - r, cy - k * r, cx - r, cy);
+        contentStream.fill();
+    }
+    public void createHeadOfReport() throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(0), PDPageContentStream.AppendMode.APPEND, true);
 
         //add all lines of Header line by line
@@ -256,29 +259,64 @@ public class Pdf {
                 cellLengths.add(l);
                 allLengths += l;
             }
-            //draw the line by drawing each part of it's data
-            for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j++) {
-                String text = configuration.getPageHeaderLines().get(i).get(j);
 
-                TextAlign textAlign;
-                if (j==1 || j%2 !=0 ) {
-                    textAlign = TextAlign.LEFT;
-                } else {
-                    textAlign = TextAlign.RIGHT;
-                    text = text.concat(":");
-                }
-                //if the previous text was empty, then text align center
-                if (j > 0 && configuration.getPageHeaderLines().get(i).get(j-1).length() ==0 ) {
-    
-                    textAlign = TextAlign.CENTER;
-                }
-
-                float cellWidth = tableWidth * cellLengths.get(j) / allLengths;
-
+            //if it is the first line draw it as one cell with green dot at the end
+            if (i == 0) {
+                //get text from second item of array, because the first one is "Report name"
+                String text = configuration.getPageHeaderLines().get(i).get(1);
+                TextAlign textAlign = TextAlign.LEFT;
                 addCellWithText(contentStream, text,
-                textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                initX, initY, cellWidth, pageHeaderFontSize);
-                initX += cellWidth;
+                        textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+                        initX, initY, tableWidth, pageHeaderFontSize, true, configuration.getFont());
+
+                //set color and draw filling rectangle
+                float w = headerFontCapHeight/2;
+                float x = initX + configuration.getFont().getStringWidth(text + " ") / 1000 * pageHeaderFontSize;
+                float y = initY - cellHeight + w;
+                contentStream.setNonStrokingColor(Color.decode("#03af52"));
+                //add green dot
+                drawCircle(contentStream, x + w/2, y + w/2, w/2, Color.decode("#03af52"));
+//                //add green rectangle
+//                contentStream.addRect(x,y,w,w);
+//                contentStream.fill();
+
+            } else {
+                //draw the line by drawing each part of it's data
+                for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j++) {
+                    String text;
+                    float cellWidth;
+                    PDFont font;
+                    if (j%2 == 0) {
+                        text = configuration.getPageHeaderLines().get(i).get(j) + ": ";
+                        font = PDType1Font.TIMES_BOLD;
+                        cellWidth = font.getStringWidth(text) / 1000 * pageHeaderFontSize;
+                        addCellWithText(contentStream, text,
+                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+                                initX, initY, cellWidth, pageHeaderFontSize, true, font);
+                        initX += cellWidth;
+                    } else {
+                        text = configuration.getPageHeaderLines().get(i).get(j);
+                        font = configuration.getFont();
+                        cellWidth = font.getStringWidth(text) / 1000 * pageHeaderFontSize;
+                        addCellWithText(contentStream, text,
+                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+                                initX, initY, cellWidth, pageHeaderFontSize, true, font);
+                        initX = configuration.getLeftMargin() + Math.round((float) j /2) * (tableWidth/3);
+                    }
+                }
+                initX = configuration.getLeftMargin();
+
+//                //draw field with bold
+//                for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j+=2) {
+//                    String text = configuration.getPageHeaderLines().get(i).get(j) + ":";
+//                    Color c = new Color(255,255,255,0);
+//                    TextAlign textAlign = TextAlign.LEFT;
+//                    float cellWidth = tableWidth/3;
+//                    addCellWithText(contentStream, text,
+//                            textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+//                            initX, initY, cellWidth, pageHeaderFontSize, false, PDType1Font.TIMES_BOLD);
+//                    initX += cellWidth;
+//                }
             }
             initX = configuration.getLeftMargin();
             initY -= headerCellHeight;
@@ -307,7 +345,6 @@ public class Pdf {
         // initY -= cellHeight;
 
         //Add table header
-
         addTableHeader(contentStream);
         contentStream.close();
     }
@@ -346,7 +383,7 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
-                    initX, initY, cellWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
+                    initX, initY, cellWidth, howManyLinesInARow, fontSize);
             initX += cellWidth;
         }
 
@@ -374,25 +411,27 @@ public class Pdf {
             sumOfAllMaxWidth += i;
         }
 
-        Color color;
+
+        Color backgroundColor;
+        Color fontColor;
         if (level == 1) {
-            float[] green = Color.RGBtoHSB(107, 136, 17, null);
-            color = Color.getHSBColor(green[0], green[1], green[2]);
+            backgroundColor = configuration.getGroupHead1FillingColor();
+            fontColor = configuration.getGroupHead1FontColor();
         } else {
-            float[] lightGreen = Color.RGBtoHSB(192, 201, 170, null);
-            color = Color.getHSBColor(lightGreen[0], lightGreen[1], lightGreen[2]);
+            backgroundColor = configuration.getGroupHead2FillingColor();
+            fontColor = configuration.getGroupHead2FontColor();
         }
 
-        contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
+//        contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
 
         String text = columnName + ": " + transaction.getAllValuesAsString(configuration).get(columnName);
         if (level <= 2) {
-            addCellWithText(contentStream, text, TextAlign.LEFT, color,
-                    configuration.getDefaultFontColor(), Outline.OUTLINED,
-                    initX, initY, tableWidth, fontSize);
+            addCellWithText(contentStream, text, TextAlign.LEFT, backgroundColor,
+                    fontColor, Outline.OUTLINED,
+                    initX, initY, tableWidth, fontSize, true, configuration.getFont());
         } else {
-            addCellWithTextWithTabulation(contentStream, text, TextAlign.LEFT, color,
-                    configuration.getDefaultFontColor(), Outline.OUTLINED,
+            addCellWithTextWithTabulation(contentStream, text, TextAlign.LEFT, backgroundColor,
+                    fontColor, Outline.OUTLINED,
                     initX, initY, tableWidth, level-2);
         }
 
@@ -473,7 +512,7 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, text,
                 textAlign, color, textColor,
-                Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize, configuration.isOnlyVerticalCellBoards());
+                Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize);
            
             initX += cellWidth;
 
@@ -575,7 +614,7 @@ public class Pdf {
 
     public void addCellWithText(PDPageContentStream contentStream, String text,
                                 TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
-                                float initX, float initY, float cellWidth, float sizeOfFont) throws IOException {
+                                float initX, float initY, float cellWidth, float sizeOfFont, boolean fill, PDFont font) throws IOException {
 
         //set color and draw stroke rectangle
         if (outline == Outline.OUTLINED) {
@@ -586,10 +625,12 @@ public class Pdf {
         }
 
 
-        //set color and draw filling rectangle
-        contentStream.setNonStrokingColor(fillingColor);
-        contentStream.addRect(initX, initY, cellWidth, -cellHeight);
-        contentStream.fill();
+        if (fill) {
+            //set color and draw filling rectangle
+            contentStream.setNonStrokingColor(fillingColor);
+            contentStream.addRect(initX, initY, cellWidth, -cellHeight);
+            contentStream.fill();
+        }
 
 
         //set color for text
@@ -615,7 +656,7 @@ public class Pdf {
         //add text
         contentStream.beginText();
         contentStream.newLineAtOffset(textInitX, textInitY);
-        contentStream.setFont(configuration.getFont(), sizeOfFont);
+        contentStream.setFont(font, sizeOfFont);
         contentStream.showText(text);
         contentStream.endText();
 
@@ -792,7 +833,7 @@ public class Pdf {
 
     public void addCellWithMultipleTextLines(PDPageContentStream contentStream, String text,
                                 TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
-                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize, boolean onlyVerticalCellBoards) throws IOException {
+                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize) throws IOException {
 
         //create linked list of all words in text
         LinkedList<String> textByLines = new LinkedList<>();
@@ -844,14 +885,21 @@ public class Pdf {
         if (outline == Outline.OUTLINED) {
             contentStream.setStrokingColor(configuration.getStrokingColor());
             contentStream.setLineWidth(configuration.getLineWidth());
-            if (onlyVerticalCellBoards) {
+            if (!configuration.isShowHorizontalBoarders() && configuration.isShowVerticalBoarders()) {
                 //draw first vertical line
                 contentStream.moveTo(initX, initY);
                 contentStream.lineTo(initX, initY-(cellHeight * quantityOfLines));
                 //draw second vertical line
                 contentStream.moveTo(initX+cellWidth, initY);
                 contentStream.lineTo(initX+cellWidth, initY-(cellHeight * quantityOfLines));
-            } else {
+            } if (configuration.isShowHorizontalBoarders() && !configuration.isShowVerticalBoarders()) {
+                //draw first horizontal line
+                contentStream.moveTo(initX, initY);
+                contentStream.lineTo(initX+cellWidth, initY);
+                //draw second horizontal line
+                contentStream.moveTo(initX, initY-(cellHeight * quantityOfLines));
+                contentStream.lineTo(initX+cellWidth, initY-(cellHeight * quantityOfLines));
+            } if (configuration.isShowHorizontalBoarders() && configuration.isShowVerticalBoarders()) {
                 contentStream.addRect(initX, initY, cellWidth, -(cellHeight * quantityOfLines));
             }
             contentStream.stroke();

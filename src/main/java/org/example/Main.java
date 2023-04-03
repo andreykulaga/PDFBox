@@ -65,7 +65,8 @@ public class Main {
         ArrayList<String> columnNames = jsonResponse.createColumnNames();
 
         //create HashMap of column names for table head
-        HashMap<String, String> columnNamesForTableHead = jsonResponse.createColumnNamesForTableHead();
+//        HashMap<String, String> columnNamesForTableHead = jsonResponse.createColumnNamesForTableHead();
+        HashMap<String, String> columnNamesForTableHead = configuration.getColumnNamesForTableHead();
 
         //create hash map of types of columns
         HashMap<String, String> hashMapOfTypes = jsonResponse.createHashMapOfTypes();
@@ -77,7 +78,7 @@ public class Main {
         //fill array that we will need to calculate cell width
     
         for (int i = 0; i < columnNames.size(); i++) {
-            String line = columnNames.get(i);
+            String line = columnNamesForTableHead.get(columnNames.get(i));
             int length = line.length();
             
              
@@ -133,7 +134,7 @@ public class Main {
             try (PDDocument doc = new PDDocument()) {
                 Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead);
                 pdf.addNewPage();
-                pdf.addHeadOfTable();
+                pdf.createHeadOfReport();
 
                 if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
                     Subtotal subtotal = new Subtotal(transactions.get(0));
@@ -229,7 +230,7 @@ public class Main {
             try (PDDocument doc = new PDDocument()) {
                 Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead);
                 pdf.addNewPage();
-                pdf.addHeadOfTable();
+                pdf.createHeadOfReport();
 
                 if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
                     Subtotal subtotal = new Subtotal(transactions.get(0));

@@ -210,9 +210,9 @@
 					"field": "TICKER_Id",
 					"type": "string"
 				},
-{
-					"field": "TICKER_Id",
-					"type": "string"
+                {
+					"field": "Original_Share_Qty",
+					"type": "number"
 				}
 			],
 			"aggregate": [{

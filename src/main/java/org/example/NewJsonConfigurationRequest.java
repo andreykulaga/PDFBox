@@ -31,6 +31,17 @@ public class NewJsonConfigurationRequest {
     public String rightMargin;
     public String topMargin;
     public String bottomMargin;
+    public String tableHeadFontColor;
+    public String tableHeadFillingColor;
+    public String groupHead1FontColor;
+    public String groupHead1FillingColor;
+    public String groupHead2FontColor;
+    public String groupHead2FillingColor;
+    public boolean showVerticalBoarders;
+    public boolean showHorizontalBoarders;
+
+
+
     public ArrayList<WhatColumnsToHide> whatColumnsToHide;
     public ArrayList<Field> fields;
     public ArrayList<ColumnsToGroupBy> columnsToGroupBy;
@@ -57,6 +68,7 @@ public class NewJsonConfigurationRequest {
     
     public static class Field{
         public String field;
+        public String displayedName;
         public String type;
         public String textFormat;
         public String textAlignment;

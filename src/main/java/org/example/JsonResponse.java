@@ -72,14 +72,14 @@ public class JsonResponse {
         return columnNames;
     }
 
-    public HashMap<String, String> createColumnNamesForTableHead() {
-        HashMap<String, String> result = new HashMap<>();
-        for (Field f: cacheItem.get(0).report.fields) {
-            String colName = f.field.replaceAll("_", " ").toLowerCase();
-            result.put(colName, f.field.replaceAll("_", " "));
-        }
-        return result;
-    }
+//    public HashMap<String, String> createColumnNamesForTableHead() {
+//        HashMap<String, String> result = new HashMap<>();
+//        for (Field f: cacheItem.get(0).report.fields) {
+//            String colName = f.field.replaceAll("_", " ").toLowerCase();
+//            result.put(colName, f.field.replaceAll("_", " "));
+//        }
+//        return result;
+//    }
 
     public HashMap<String, String> createHashMapOfTypes() {
         HashMap<String, String> hashMapOfTypes = new HashMap<>();
