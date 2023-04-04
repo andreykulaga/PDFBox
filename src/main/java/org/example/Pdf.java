@@ -214,8 +214,41 @@ public class Pdf {
     public void createHeadOfReport() throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(0), PDPageContentStream.AppendMode.APPEND, true);
 
-        //add all lines of Header line by line
+        PDFont ordinaryFont = configuration.getFont();
+        PDFont boldFont = PDType1Font.TIMES_BOLD;
+        //what is the biggest font size, except report name
+        float biggestFontSize = 0;
+        //"i" starts from 1 as the first one is the report name
+        for (int i = 1; i < configuration.getPageHeaderLines().size(); i++) {
+            if (Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize")) > biggestFontSize) {
+                biggestFontSize = Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
+            }
+        }
+        //count all column lengths
+        float[] columnLengths = new float[]{0, 0, 0};
+        //"i" starts from 1 as the first one is the report name
+        for (int i=1; i < configuration.getPageHeaderLines().size(); i++) {
+            for (int j=0; j < 6; j+=2) {
+                //as there could be no text in some columns use try
+                try {
+                    float boldFontStringWidth = boldFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j) + ": ") / 1000 *
+                            Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
+                    float ordinaryFontStringWidth = ordinaryFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j+1)) / 1000 *
+                            Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
+                    if (columnLengths[j/2] < boldFontStringWidth+ordinaryFontStringWidth) {
+                        columnLengths[j/2] = boldFontStringWidth+ordinaryFontStringWidth;
+                    }
+                } catch (IndexOutOfBoundsException ignored) {
+                }
+            }
+        }
+        float allLengths = 0;
+        for (int i = 0; i < 3; i++) {
+            allLengths += columnLengths[i];
+        }
 
+
+        //add all lines of Header line by line
         for (int i=0; i<configuration.getPageHeaderConfiguration().size(); i++) {
             //define font size
             float pageHeaderFontSize = Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
@@ -228,7 +261,7 @@ public class Pdf {
             } catch (NumberFormatException e) {
                 pageHeaderFontColor = Color.black;
             }
-            
+
             //define background color
             Color pageHeaderBackGroundColor;
             String backgroundColorName = configuration.getPageHeaderConfiguration().get(i).get("backGroundColor").toLowerCase();
@@ -251,14 +284,6 @@ public class Pdf {
             cellHeight = headerCellHeight;
             fontDescent = headerFontDescent;
 
-            //count all cell lengths
-            ArrayList<Integer> cellLengths = new ArrayList<>();
-            int allLengths = 0;
-            for (int z=0; z < configuration.getPageHeaderLines().get(i).size(); z++) {
-                int l = configuration.getPageHeaderLines().get(i).get(z).length();
-                cellLengths.add(l);
-                allLengths += l;
-            }
 
             //if it is the first line draw it as one cell with green dot at the end
             if (i == 0) {
@@ -282,26 +307,27 @@ public class Pdf {
 
             } else {
                 //draw the line by drawing each part of it's data
+                float columnWidth = 0;
                 for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j++) {
                     String text;
                     float cellWidth;
-                    PDFont font;
+
                     if (j%2 == 0) {
                         text = configuration.getPageHeaderLines().get(i).get(j) + ": ";
-                        font = PDType1Font.TIMES_BOLD;
-                        cellWidth = font.getStringWidth(text) / 1000 * pageHeaderFontSize;
+                        cellWidth = boldFont.getStringWidth(text) / 1000 * pageHeaderFontSize;
                         addCellWithText(contentStream, text,
                                 TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                                initX, initY, cellWidth, pageHeaderFontSize, true, font);
+                                initX, initY, cellWidth, pageHeaderFontSize, true, boldFont);
                         initX += cellWidth;
                     } else {
                         text = configuration.getPageHeaderLines().get(i).get(j);
-                        font = configuration.getFont();
-                        cellWidth = font.getStringWidth(text) / 1000 * pageHeaderFontSize;
+                        cellWidth = ordinaryFont.getStringWidth(text) / 1000 * pageHeaderFontSize;
                         addCellWithText(contentStream, text,
                                 TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                                initX, initY, cellWidth, pageHeaderFontSize, true, font);
-                        initX = configuration.getLeftMargin() + Math.round((float) j /2) * (tableWidth/3);
+                                initX, initY, cellWidth, pageHeaderFontSize, true, ordinaryFont);
+//                        initX = configuration.getLeftMargin() + Math.round((float) j /2) * (tableWidth/3);
+                        columnWidth += columnLengths[j/2];
+                        initX = configuration.getLeftMargin() + columnWidth  * tableWidth / allLengths;
                     }
                 }
                 initX = configuration.getLeftMargin();
