@@ -306,6 +306,11 @@ public class Pdf {
 //                contentStream.fill();
 
             } else {
+                //add additional empty line after Report name
+                if (i==1) {
+                    initY -= headerCellHeight;
+                }
+
                 //draw the line by drawing each part of it's data
                 float columnWidth = 0;
                 for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j++) {
@@ -332,17 +337,10 @@ public class Pdf {
                 }
                 initX = configuration.getLeftMargin();
 
-//                //draw field with bold
-//                for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j+=2) {
-//                    String text = configuration.getPageHeaderLines().get(i).get(j) + ":";
-//                    Color c = new Color(255,255,255,0);
-//                    TextAlign textAlign = TextAlign.LEFT;
-//                    float cellWidth = tableWidth/3;
-//                    addCellWithText(contentStream, text,
-//                            textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-//                            initX, initY, cellWidth, pageHeaderFontSize, false, PDType1Font.TIMES_BOLD);
-//                    initX += cellWidth;
-//                }
+                //add additional empty line after the last line
+                if (i == configuration.getPageHeaderConfiguration().size() - 1) {
+                    initY -= headerCellHeight;
+                }
             }
             initX = configuration.getLeftMargin();
             initY -= headerCellHeight;

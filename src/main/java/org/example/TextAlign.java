@@ -6,10 +6,10 @@ public enum TextAlign {
     RIGHT;
 
     static TextAlign fromStringToTextAlign(String text) {
-        if (text.equals("LEFT")) {
+        if (text.equalsIgnoreCase("LEFT")) {
             return LEFT;
         }
-        if (text.equals("RIGHT")) {
+        if (text.equalsIgnoreCase( "RIGHT")) {
             return RIGHT;
 
         }
