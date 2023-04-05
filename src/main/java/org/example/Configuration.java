@@ -28,7 +28,8 @@ public class Configuration {
     String outputName = "result";
     PDRectangle printSize = PDRectangle.LETTER;
     boolean changeOrientationToLandscape = true;
-    PDFont font = PDType1Font.TIMES_ROMAN;
+//    PDFont font = PDType1Font.TIMES_ROMAN;
+//    PDFont boldFont = PDType1Font.TIMES_BOLD;
     Color strokingColor = Color.GRAY;
 //    boolean onlyVerticalCellBoards = false;
     Color defaultFontColor = Color.BLACK;

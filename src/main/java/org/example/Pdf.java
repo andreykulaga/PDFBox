@@ -7,10 +7,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.*;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,16 +49,28 @@ public class Pdf {
     HashMap<String, String> columnNamesForTableHead;
     HashMap<String, String> hashMapOfTypes;
 
+    PDFont ordinaryFont;
+    PDFont ordinaryFontForDescription;
+    PDFont boldFont;
+    PDFont boldFontForDescription;
+
 
 
     public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, 
-    HashMap<String, Integer> textLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead) {
+    HashMap<String, Integer> textLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead,
+               File ordinaryFontFile, File boldFontFile) throws IOException {
+
         this.document = document;
         this.configuration = configuration;
         this.columnNames = columnNames;
         this.textLengths = textLengths;
         this.hashMapOfTypes = hashMapOfTypes;
         this.columnNamesForTableHead = columnNamesForTableHead;
+
+        this.ordinaryFont = PDType0Font.load(document, ordinaryFontFile);
+        this.boldFont = PDType0Font.load(document, boldFontFile);
+        this.ordinaryFontForDescription = PDType1Font.HELVETICA;
+        this.boldFontForDescription = PDType1Font.HELVETICA_BOLD;
 
 
         if (configuration.isChangeOrientationToLandscape()) {
@@ -82,13 +94,14 @@ public class Pdf {
         }
 
         //define font size
-        fontSize = tableWidth * 1000 / (rowCharacterLength * configuration.getFont().getFontDescriptor().getAverageWidth());
+        fontSize = tableWidth * 1000 / (rowCharacterLength * ordinaryFontForDescription.getFontDescriptor().getAverageWidth());
 
-        fontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * fontSize / 1000;
-        fontAscent = configuration.getFont().getFontDescriptor().getAscent() * fontSize / 1000;
-        fontDescent = configuration.getFont().getFontDescriptor().getDescent() * fontSize / 1000;
-        fontLeading = configuration.getFont().getFontDescriptor().getLeading() * fontSize / 1000;
-        fontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * fontSize / 1000;
+        fontCapHeight = ordinaryFontForDescription.getFontDescriptor().getCapHeight() * fontSize / 1000;
+        fontAscent = ordinaryFontForDescription.getFontDescriptor().getAscent() * fontSize / 1000;
+        fontDescent = ordinaryFontForDescription.getFontDescriptor().getDescent() * fontSize / 1000;
+        fontLeading = ordinaryFontForDescription.getFontDescriptor().getLeading() * fontSize / 1000;
+        fontAverageWidth = ordinaryFontForDescription.getFontDescriptor().getAverageWidth() * fontSize / 1000;
+
         //define cell height by font and it's size
         cellHeight = fontCapHeight + fontAscent - fontDescent + fontLeading;
     }
@@ -123,10 +136,10 @@ public class Pdf {
 
         //define cell height by font and it's size
 
-        float footerFontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * configuration.getPageFooterFontSize() / 1000;
-        float footerFontAscent = configuration.getFont().getFontDescriptor().getAscent() * configuration.getPageFooterFontSize() / 1000;
-        float footerFontDescent = configuration.getFont().getFontDescriptor().getDescent() * configuration.getPageFooterFontSize() / 1000;
-        float footerFontLeading = configuration.getFont().getFontDescriptor().getLeading() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontCapHeight = ordinaryFontForDescription.getFontDescriptor().getCapHeight() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontAscent = ordinaryFontForDescription.getFontDescriptor().getAscent() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontDescent = ordinaryFontForDescription.getFontDescriptor().getDescent() * configuration.getPageFooterFontSize() / 1000;
+        float footerFontLeading = ordinaryFontForDescription.getFontDescriptor().getLeading() * configuration.getPageFooterFontSize() / 1000;
         float footerCellHeight = footerFontCapHeight + footerFontAscent - footerFontDescent + footerFontLeading;
 
 
@@ -146,11 +159,11 @@ public class Pdf {
                 TextAlign.RIGHT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
                 configuration.getLeftMargin(),
                 configuration.getBottomMargin() - (footerCellHeight * (configuration.getLinesOfPageFooter().size()-1))/2, 
-                tableWidth, configuration.getPageFooterFontSize(), true, configuration.getFont());
+                tableWidth, configuration.getPageFooterFontSize(), true, ordinaryFont);
             }
             //add text lines
             float tab = 0;
-            float footerFontAverageWidth = configuration.getFont().getFontDescriptor().getAverageWidth() * configuration.getPageFooterFontSize() / 1000;
+            float footerFontAverageWidth = ordinaryFontForDescription.getFontDescriptor().getAverageWidth() * configuration.getPageFooterFontSize() / 1000;
             for (int j=0; j < configuration.getLinesOfPageFooter().size(); j++) {
                 String st = configuration.getLinesOfPageFooter().get(j);
                 //count the longest line to tabulate page number to prevent overlap
@@ -160,7 +173,7 @@ public class Pdf {
                 addCellWithText(contentStream, st,
                 TextAlign.LEFT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
                 configuration.getLeftMargin(), configuration.getBottomMargin() - (footerCellHeight * j), (tab+1) * footerFontAverageWidth,
-                        configuration.getPageFooterFontSize(), true, configuration.getFont());
+                        configuration.getPageFooterFontSize(), true, ordinaryFont);
             }
 
             contentStream.close();
@@ -214,8 +227,6 @@ public class Pdf {
     public void createHeadOfReport() throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(0), PDPageContentStream.AppendMode.APPEND, true);
 
-        PDFont ordinaryFont = configuration.getFont();
-        PDFont boldFont = PDType1Font.TIMES_BOLD;
         //what is the biggest font size, except report name
         float biggestFontSize = 0;
         //"i" starts from 1 as the first one is the report name
@@ -272,10 +283,10 @@ public class Pdf {
             }
 
             //define cell height by font and it's size
-            float headerFontCapHeight = configuration.getFont().getFontDescriptor().getCapHeight() * pageHeaderFontSize / 1000;
-            float headerFontAscent = configuration.getFont().getFontDescriptor().getAscent() * pageHeaderFontSize / 1000;
-            float headerFontDescent = configuration.getFont().getFontDescriptor().getDescent() * pageHeaderFontSize / 1000;
-            float headerFontLeading = configuration.getFont().getFontDescriptor().getLeading() * pageHeaderFontSize / 1000;
+            float headerFontCapHeight = ordinaryFontForDescription.getFontDescriptor().getCapHeight() * pageHeaderFontSize / 1000;
+            float headerFontAscent = ordinaryFontForDescription.getFontDescriptor().getAscent() * pageHeaderFontSize / 1000;
+            float headerFontDescent = ordinaryFontForDescription.getFontDescriptor().getDescent() * pageHeaderFontSize / 1000;
+            float headerFontLeading = ordinaryFontForDescription.getFontDescriptor().getLeading() * pageHeaderFontSize / 1000;
             float headerCellHeight = headerFontCapHeight + headerFontAscent - headerFontDescent + headerFontLeading;
 
             //change global cell height and font descent
@@ -292,11 +303,11 @@ public class Pdf {
                 TextAlign textAlign = TextAlign.LEFT;
                 addCellWithText(contentStream, text,
                         textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                        initX, initY, tableWidth, pageHeaderFontSize, true, configuration.getFont());
+                        initX, initY, tableWidth, pageHeaderFontSize, true, ordinaryFont);
 
                 //set color and draw filling rectangle
                 float w = headerFontCapHeight/2;
-                float x = initX + configuration.getFont().getStringWidth(text + " ") / 1000 * pageHeaderFontSize;
+                float x = initX + ordinaryFont.getStringWidth(text + " ") / 1000 * pageHeaderFontSize;
                 float y = initY - cellHeight + w;
                 contentStream.setNonStrokingColor(Color.decode("#03af52"));
                 //add green dot
@@ -452,7 +463,7 @@ public class Pdf {
         if (level <= 2) {
             addCellWithText(contentStream, text, TextAlign.LEFT, backgroundColor,
                     fontColor, Outline.OUTLINED,
-                    initX, initY, tableWidth, fontSize, true, configuration.getFont());
+                    initX, initY, tableWidth, fontSize, true, ordinaryFont);
         } else {
             addCellWithTextWithTabulation(contentStream, text, TextAlign.LEFT, backgroundColor,
                     fontColor, Outline.OUTLINED,
@@ -665,7 +676,7 @@ public class Pdf {
         float textInitX = 0;
 
         //calculate string length in points
-        float stringWidth = configuration.getFont().getStringWidth(text) / 1000 * sizeOfFont;
+        float stringWidth = ordinaryFont.getStringWidth(text) / 1000 * sizeOfFont;
 
         if (textAlign == TextAlign.LEFT) {
             textInitX = initX + fontAverageWidth;
@@ -726,7 +737,7 @@ public class Pdf {
         //add text
         contentStream.beginText();
         contentStream.newLineAtOffset(textInitX, textInitY);
-        contentStream.setFont(configuration.getFont(), fontSize);
+        contentStream.setFont(ordinaryFont, fontSize);
         contentStream.showText(text);
         contentStream.endText();
 
@@ -952,12 +963,12 @@ public class Pdf {
 
         //add text
 //        contentStream.beginText();
-        contentStream.setFont(configuration.getFont(), fontSize);
+        contentStream.setFont(ordinaryFont, fontSize);
         contentStream.setLeading(cellHeight);
 //        contentStream.newLineAtOffset(textInitX, textInitY);
         for (String string: textByLines) {
             //calculate string length in points
-            float stringWidth = configuration.getFont().getStringWidth(string) / 1000 * fontSize;
+            float stringWidth = ordinaryFont.getStringWidth(string) / 1000 * fontSize;
 
             if (textAlign == TextAlign.LEFT) {
                 textInitX = initX + fontAverageWidth;
@@ -971,7 +982,7 @@ public class Pdf {
 
             contentStream.beginText();
             contentStream.newLineAtOffset(textInitX, textInitY);
-            contentStream.setFont(configuration.getFont(), fontSize);
+            contentStream.setFont(ordinaryFont, fontSize);
             contentStream.showText(string);
             contentStream.endText();
             textInitY -= cellHeight;

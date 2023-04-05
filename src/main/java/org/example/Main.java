@@ -150,10 +150,14 @@ public class Main {
             }
         }
 
+        //load fonts
+        File ordinaryFontFile = new File("arial.ttf");
+        File boldFontFile = new File("arial-bold.ttf");
+
         //create preview
         if (configuration.isPreview()) {
             try (PDDocument doc = new PDDocument()) {
-                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead);
+                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead, ordinaryFontFile, boldFontFile);
                 pdf.addNewPage();
                 pdf.createHeadOfReport();
 
@@ -249,7 +253,7 @@ public class Main {
         //create result PDF document
         if (configuration.isPdfExport()) {
             try (PDDocument doc = new PDDocument()) {
-                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead);
+                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead, ordinaryFontFile, boldFontFile);
                 pdf.addNewPage();
                 pdf.createHeadOfReport();
 
