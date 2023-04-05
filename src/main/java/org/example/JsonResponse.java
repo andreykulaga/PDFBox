@@ -114,19 +114,30 @@ public class JsonResponse {
                 //check length and keep the biggest one to calculate cell width latter
                 int length = value.length();
 
-                 //increase length for each capitalised letter, as capitilized letters are too wide
+
+                //increase length for each capitalised letter, as capitilized letters are too wide
                 String lineToCompare = value.toLowerCase();
                 int howManyCapitalizedLetters = 0;
                 for (int j = 0; j < length; j++) {
-                    if (value.charAt(j) == lineToCompare.charAt(j)) {
-                    howManyCapitalizedLetters++;
+                    if (value.charAt(j) != lineToCompare.charAt(j)) {
+                        howManyCapitalizedLetters++;
                     }
                 }
-                length += (howManyCapitalizedLetters/3);  
+                length += (howManyCapitalizedLetters*4/5);
 
-
-                if (length > textLengths.get(key) && length <= configuration.getMaxCharactersInTextLine()) {
+                //if it is number, get a double and format it
+                if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
+                    Double f = Double.parseDouble(value);
+                    length = DoubleFormatter.format(f, key, configuration).length();
+                }
+                //change all
+                if (length > textLengths.get(key)) {
                     textLengths.replace(key, length);
+                }
+                //strip text length to max in configuration for all text lines
+                if (hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
+                        length > configuration.getMaxCharactersInTextLine()) {
+                    textLengths.replace(key, configuration.getMaxCharactersInTextLine());
                 }
                 
         

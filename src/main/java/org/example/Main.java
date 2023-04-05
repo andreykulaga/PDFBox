@@ -3,6 +3,7 @@ package org.example;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -86,11 +87,11 @@ public class Main {
             String lineToCompare = line.toLowerCase();
             int howManyCapitalizedLetters = 0;
             for (int j = 0; j < length; j++) {
-                if (line.charAt(j) == lineToCompare.charAt(j)) {
+                if (line.charAt(j) != lineToCompare.charAt(j)) {
                     howManyCapitalizedLetters++;
                 }
             }
-            length += (howManyCapitalizedLetters/3);     
+            length += (howManyCapitalizedLetters*4/5);
 
             if (length > configuration.getMaxCharactersInTextLine()) {
                 textLengths.put(columnNames.get(i), configuration.getMaxCharactersInTextLine());
@@ -99,7 +100,7 @@ public class Main {
             }
         }
         
-        //create array list of transactions and extract from JsonResponse
+        //create array list of transactions and extract from JsonResponse, textLengths are updated
         ArrayList<Transaction> transactions = jsonResponse.extractTransactions(textLengths, configuration);
 
     
@@ -116,7 +117,7 @@ public class Main {
             columnNames.remove(string);
         }
         
-        //warning message when there are more columns then max in configuration
+        //warning message when there are more columns than max in configuration
         if (columnNames.size() > configuration.getMaxColumnsAllowed()) {
             JOptionPane optionPane = new JOptionPane("There are more columns in your report than column limit",JOptionPane.WARNING_MESSAGE);
             JDialog dialog = optionPane.createDialog("Warning!");
@@ -127,6 +128,26 @@ public class Main {
         //clean map of types from hidden columns
         for (String string : configuration.getWhatColumnsToHide()) {
             hashMapOfTypes.remove(string);
+        }
+
+        //count sum of all number fields of transaction to count max width of it's columns
+        HashMap<String, Double> totals = new HashMap<>();
+        for (String column: columnNames) {
+            if (hashMapOfTypes.get(column).equalsIgnoreCase("number")) {
+                totals.put(column, (double) 0);
+            }
+        }
+        for (Transaction t: transactions) {
+            for (String column: totals.keySet()) {
+                Double d = totals.get(column);
+                totals.put(column, d+t.getNumberFields().get(column));
+            }
+        }
+        for (String column: totals.keySet()) {
+            int l = DoubleFormatter.format(totals.get(column), column, configuration).length();
+            if (l > textLengths.get(column)) {
+                textLengths.put(column, l);
+            }
         }
 
         //create preview

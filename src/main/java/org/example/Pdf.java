@@ -191,7 +191,7 @@ public class Pdf {
 
             String text = transaction.getAllValuesAsString(configuration).get(string);
             addCellWithMultipleTextLines(contentStream, text,TextAlign.CENTER, configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
-            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize);
+            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, textLengths.get(string));
             // addCellWithMultipleTextLines(contentStream, text,
             //         TextAlign.CENTER, configuration.getHeadFillingColor(),
             //         configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
@@ -407,7 +407,7 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
-                    initX, initY, cellWidth, howManyLinesInARow, fontSize);
+                    initX, initY, cellWidth, howManyLinesInARow, fontSize, textLengths.get(string));
             initX += cellWidth;
         }
 
@@ -536,7 +536,7 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, text,
                 textAlign, color, textColor,
-                Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize);
+                Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow, fontSize, textLengths.get(tempColumnName));
            
             initX += cellWidth;
 
@@ -737,11 +737,14 @@ public class Pdf {
         //return one line by default
         int result = 1;
 
-        for (String text : transaction.getAllValuesAsString(configuration).values()){
+        for (String key : columnNames){
+            String text = transaction.getAllValuesAsString(configuration).get(key);
+            int maxCharactersInTextLine = textLengths.get(key);
+
             //create linked list of all words in text
             LinkedList<String> textByLines = new LinkedList<>();
             //if text is small enough, add only one line
-            if (text.length() > configuration.getMaxCharactersInTextLine()) {
+            if (text.length() > maxCharactersInTextLine) {
                 String[] strings = text.split(" ");
                 textByLines.addAll(Arrays.asList(strings));
                 int size = textByLines.size();
@@ -749,7 +752,7 @@ public class Pdf {
                 int i = 0;
                 while (i < size) {
                     //divide word if it is too long
-                    int max = configuration.getMaxCharactersInTextLine();
+                    int max = maxCharactersInTextLine;
                     if (textByLines.get(i).length() > max) {
                         String string = textByLines.get(i);
                         textByLines.remove(i);
@@ -771,7 +774,7 @@ public class Pdf {
                 //wrap words
                 int k = 0;
                 while (k < size-1) {
-                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= maxCharactersInTextLine) {
                         String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
                         textByLines.set(k, newString);
                         textByLines.remove(k + 1);
@@ -804,11 +807,12 @@ public class Pdf {
 
         for (String str: hashMap.keySet()) {
             String text = hashMap.get(str);
+            int maxCharactersInTextLine = textLengths.get(str);
             
             //create linked list of all words in text
             LinkedList<String> textByLines = new LinkedList<>();
             //if text is small enough, add only one line
-            if (text.length() > configuration.getMaxCharactersInTextLine()) {
+            if (text.length() > maxCharactersInTextLine) {
                 String[] strings = text.split(" ");
                 textByLines.addAll(Arrays.asList(strings));
                 int size = textByLines.size();
@@ -816,7 +820,7 @@ public class Pdf {
                 int i = 0;
                 while (i < size) {
                     //divide word if it is too long
-                    int max = configuration.getMaxCharactersInTextLine();
+                    int max = maxCharactersInTextLine;
                     if (textByLines.get(i).length() > max) {
                         String string = textByLines.get(i);
                         textByLines.remove(i);
@@ -838,7 +842,7 @@ public class Pdf {
                 //wrap words
                 int k = 0;
                 while (k < size-1) {
-                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= maxCharactersInTextLine) {
                         String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
                         textByLines.set(k, newString);
                         textByLines.remove(k + 1);
@@ -857,12 +861,12 @@ public class Pdf {
 
     public void addCellWithMultipleTextLines(PDPageContentStream contentStream, String text,
                                 TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
-                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize) throws IOException {
+                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize, int maxCharactersInTextLine) throws IOException {
 
         //create linked list of all words in text
         LinkedList<String> textByLines = new LinkedList<>();
         //if text is small enough, add only one line
-        if (text.length() <= configuration.getMaxCharactersInTextLine()) {
+        if (text.length() <= maxCharactersInTextLine) {
             textByLines.add(text);
         } else {
             String[] strings = text.split(" ");
@@ -872,7 +876,7 @@ public class Pdf {
             int i = 0;
             while (i < size) {
                 //divide word if it is too long
-                int max = configuration.getMaxCharactersInTextLine();
+                int max = maxCharactersInTextLine;
                 if (textByLines.get(i).length() > max) {
                     String string = textByLines.get(i);
                     textByLines.remove(i);
@@ -894,7 +898,7 @@ public class Pdf {
             //wrap words
             int k = 0;
             while (k < size-1) {
-                if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= configuration.getMaxCharactersInTextLine()) {
+                if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= maxCharactersInTextLine) {
                     String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
                     textByLines.set(k, newString);
                     textByLines.remove(k + 1);
