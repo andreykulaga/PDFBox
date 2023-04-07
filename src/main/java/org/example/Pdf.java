@@ -72,7 +72,6 @@ public class Pdf {
         this.ordinaryFontForDescription = PDType1Font.HELVETICA;
         this.boldFontForDescription = PDType1Font.HELVETICA_BOLD;
 
-
         if (configuration.isChangeOrientationToLandscape()) {
             pageXSize = configuration.getPrintSize().getHeight();
             pageYSize = configuration.getPrintSize().getWidth();

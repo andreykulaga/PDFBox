@@ -30,7 +30,7 @@ public class Configuration {
     boolean changeOrientationToLandscape = true;
 //    PDFont font = PDType1Font.TIMES_ROMAN;
 //    PDFont boldFont = PDType1Font.TIMES_BOLD;
-    Color strokingColor = Color.GRAY;
+    Color strokingColor;
 //    boolean onlyVerticalCellBoards = false;
     Color defaultFontColor = Color.BLACK;
     Color subTotalFillingColor = Color.WHITE;
@@ -42,6 +42,7 @@ public class Configuration {
     Color groupHead1FillingColor;
     Color groupHead2FontColor;
     Color groupHead2FillingColor;
+
 //    Color tableHeadFontColor = Color.WHITE;
 //    Color tableHeadFillingColor = Color.BLACK;
 //    Color groupHead1FontColor = Color.white;
@@ -110,6 +111,7 @@ public class Configuration {
         groupHead1FillingColor = Color.decode(nJCR.groupHead1FillingColor);
         groupHead2FontColor = Color.decode(nJCR.groupHead2FontColor);
         groupHead2FillingColor = Color.decode(nJCR.groupHead2FillingColor);
+        strokingColor = Color.decode(nJCR.tableLineBoarderColor);
 
 
 

@@ -37,6 +37,7 @@ public class NewJsonConfigurationRequest {
     public String groupHead1FillingColor;
     public String groupHead2FontColor;
     public String groupHead2FillingColor;
+    public String tableLineBoarderColor;
     public boolean showVerticalBoarders;
     public boolean showHorizontalBoarders;
 

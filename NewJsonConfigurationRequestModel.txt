@@ -13,6 +13,7 @@
     "groupHead1FillingColor": "#313094",
     "groupHead2FontColor": "#ffffff",
     "groupHead2FillingColor": "#8a81be",
+    "tableLineBoarderColor": "#A7A7A7",
     "showVerticalBoarders": true,
     "showHorizontalBoarders": true,
 	"whatColumnsToHide": [{
@@ -149,7 +150,7 @@
 		"aggregate": "AVG"
 	}],
 	"pageHeader": [{
-			"Font Size": "24",
+			"Font Size": "32",
 			"Text Color": "#000000",
 			"BackGroundColor": "#ffffff",
 			"Data": [
