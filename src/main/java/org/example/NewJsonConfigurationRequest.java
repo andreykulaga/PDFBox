@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 @Setter
@@ -21,39 +22,53 @@ import java.util.ArrayList;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public class NewJsonConfigurationRequest {
     
-    @JsonProperty("HeaderAtEveryPage") 
+    @JsonProperty("showHeaderOnEveryPage")
     public boolean headerAtEveryPage;
+    @JsonProperty("maxCharactersToWrap")
     public int maxCharactersInTextLine;
-    @JsonProperty("MaxColumnsAllowed") 
+    @JsonProperty("maxColumnsAllowed")
     public int maxColumnsAllowed;
-    public int linewidth;
-    public String leftMargin;
-    public String rightMargin;
-    public String topMargin;
-    public String bottomMargin;
+    @JsonProperty("columnHeaderFontColor")
     public String tableHeadFontColor;
+    @JsonProperty("rowHeaderBackgroundColor")
     public String tableHeadFillingColor;
     public String rowHeaderVerticalAlignment;
     public String rowHeaderHorizontalAlignment;
+    public HashMap<String, String> pageMargin;
+    public BoarderOption boarderOption;
 
-    public String groupHead1FontColor;
-    public String groupHead1FillingColor;
-    public String groupHead2FontColor;
-    public String groupHead2FillingColor;
-    public String tableLineBoarderColor;
-    public boolean showVerticalBoarders;
-    public boolean showHorizontalBoarders;
+
+    //    @JsonProperty("left")
+//    public String leftMargin;
+//    @JsonProperty("right")
+//    public String rightMargin;
+//    @JsonProperty("top")
+//    public String topMargin;
+//    @JsonProperty("bottom")
+//    public String bottomMargin;
+//    public String tableLineBoarderColor;
+//    public boolean showVerticalBoarders;
+//    public boolean showHorizontalBoarders;
+
 
 
 
     public ArrayList<WhatColumnsToHide> whatColumnsToHide;
     public ArrayList<Field> fields;
     public ArrayList<ColumnsToGroupBy> columnsToGroupBy;
-    @JsonProperty("ColumnsToAggregate") 
+    @JsonProperty("ColumnsToAggregate")
     public ArrayList<ColumnsToAggregate> columnsToAggregate;
+    @JsonProperty("pageHeaderRows")
     public ArrayList<PageHeader> pageHeader;
-    @JsonProperty("PageFooter") 
+    @JsonProperty("pageFooter")
     public PageFooter pageFooter;
+    public static class BoarderOption {
+        public boolean showVerticalBoarder;
+        public  boolean showHorizontalBoarder;
+        public float lineWidth;
+        public String lineBoarderColor;
+
+    }
 
     public static class ColumnsToAggregate{
         public String field;
@@ -63,6 +78,8 @@ public class NewJsonConfigurationRequest {
     public static class ColumnsToGroupBy{
         public String field;
         public String type;
+        public String fontColor;
+        public String backgroundColor;
     }
     
     public static class Datum{
@@ -71,39 +88,45 @@ public class NewJsonConfigurationRequest {
     }
     
     public static class Field{
+        @JsonProperty("name")
         public String field;
+        @JsonProperty("displayName")
         public String displayedName;
+        @JsonProperty("dataType")
         public String type;
+        @JsonProperty("dataFormat")
         public String textFormat;
         public String textAlignment;
+        @JsonProperty("fontColor")
         public String textColor;
-        @JsonProperty("NegativeValueColor") 
-        public String negativeValueColor;
-        @JsonProperty("NegativeAsParentheses") 
-        public boolean negativeAsParentheses;
+        public HashMap<String, String> negativeNumberOption;
+//        @JsonProperty("NegativeValueColor")
+//        public String negativeValueColor;
+//        @JsonProperty("NegativeAsParentheses")
+//        public boolean negativeAsParentheses;
     }
     
     public static class PageFooter{
-        @JsonProperty("Font Size") 
+        @JsonProperty("fontSize")
         public String fontSize;
-        @JsonProperty("Text Color") 
+        @JsonProperty("fontColor")
         public String textColor;
-        @JsonProperty("BackGroundColor") 
+        @JsonProperty("backgroundColor")
         public String backGroundColor;
-        @JsonProperty("PageNumberFlag") 
+        @JsonProperty("showPageNumber")
         public boolean pageNumberFlag;
-        @JsonProperty("Data") 
+        @JsonProperty("data")
         public ArrayList<Datum> data;
     }
     
     public static class PageHeader{
-        @JsonProperty("Font Size") 
+        @JsonProperty("fontSize")
         public String fontSize;
-        @JsonProperty("Text Color") 
+        @JsonProperty("fontColor")
         public String textColor;
-        @JsonProperty("BackGroundColor") 
+        @JsonProperty("backgroundColor")
         public String backGroundColor;
-        @JsonProperty("Data") 
+        @JsonProperty("data")
         public ArrayList<Datum> data;
     }
     

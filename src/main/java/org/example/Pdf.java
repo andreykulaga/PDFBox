@@ -472,15 +472,15 @@ public class Pdf {
         }
 
 
-        Color backgroundColor;
-        Color fontColor;
-        if (level == 1) {
-            backgroundColor = configuration.getGroupHead1FillingColor();
-            fontColor = configuration.getGroupHead1FontColor();
-        } else {
-            backgroundColor = configuration.getGroupHead2FillingColor();
-            fontColor = configuration.getGroupHead2FontColor();
-        }
+        Color backgroundColor = configuration.getGroupHeadFillingColor().get(columnName);
+        Color fontColor = configuration.getGroupHeadFontColor().get(columnName);
+//        if (level == 1) {
+//            backgroundColor = configuration.getGroupHead1FillingColor();
+//            fontColor = configuration.getGroupHead1FontColor();
+//        } else {
+//            backgroundColor = configuration.getGroupHead2FillingColor();
+//            fontColor = configuration.getGroupHead2FontColor();
+//        }
 
 //        contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
 

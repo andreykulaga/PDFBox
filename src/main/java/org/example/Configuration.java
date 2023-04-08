@@ -40,10 +40,14 @@ public class Configuration {
     Color tableHeadFillingColor;
     TextAlign rowHeaderVerticalAlignment;
     TextAlign rowHeaderHorizontalAlignment;
-    Color groupHead1FontColor;
-    Color groupHead1FillingColor;
-    Color groupHead2FontColor;
-    Color groupHead2FillingColor;
+
+
+    HashMap<String, Color> groupHeadFontColor = new HashMap<>();
+    HashMap<String, Color> groupHeadFillingColor = new HashMap<>();
+//    Color groupHead1FontColor;
+//    Color groupHead1FillingColor;
+//    Color groupHead2FontColor;
+//    Color groupHead2FillingColor;
 
 //    Color tableHeadFontColor = Color.WHITE;
 //    Color tableHeadFillingColor = Color.BLACK;
@@ -97,14 +101,14 @@ public class Configuration {
         headerAtEveryPage = nJCR.headerAtEveryPage;
         maxCharactersInTextLine = nJCR.maxCharactersInTextLine;
         maxColumnsAllowed = nJCR.maxColumnsAllowed;
-        lineWidth = nJCR.linewidth;
-        leftMargin = Float.parseFloat(nJCR.leftMargin);
-        rightMargin = Float.parseFloat(nJCR.rightMargin);
-        topMargin = Float.parseFloat(nJCR.topMargin);
-        bottomMargin = Float.parseFloat(nJCR.bottomMargin);
+        lineWidth = nJCR.boarderOption.lineWidth;
+        leftMargin = Float.parseFloat(nJCR.pageMargin.get("left"));
+        rightMargin = Float.parseFloat(nJCR.pageMargin.get("right"));
+        topMargin = Float.parseFloat(nJCR.pageMargin.get("top"));
+        bottomMargin = Float.parseFloat(nJCR.pageMargin.get("bottom"));
 
-        showHorizontalBoarders = nJCR.showHorizontalBoarders;
-        showVerticalBoarders = nJCR.showVerticalBoarders;
+        showHorizontalBoarders = nJCR.boarderOption.showHorizontalBoarder;
+        showVerticalBoarders = nJCR.boarderOption.showVerticalBoarder;
 
 
         tableHeadFontColor = Color.decode(nJCR.tableHeadFontColor);
@@ -113,18 +117,20 @@ public class Configuration {
         rowHeaderVerticalAlignment = TextAlign.fromStringToTextAlign(nJCR.rowHeaderVerticalAlignment);
         rowHeaderHorizontalAlignment = TextAlign.fromStringToTextAlign(nJCR.rowHeaderHorizontalAlignment);
 
-
-        groupHead1FontColor = Color.decode(nJCR.groupHead1FontColor);
-        groupHead1FillingColor = Color.decode(nJCR.groupHead1FillingColor);
-        groupHead2FontColor = Color.decode(nJCR.groupHead2FontColor);
-        groupHead2FillingColor = Color.decode(nJCR.groupHead2FillingColor);
-        strokingColor = Color.decode(nJCR.tableLineBoarderColor);
+        strokingColor = Color.decode(nJCR.boarderOption.lineBoarderColor);
 
 
+//        groupHead1FontColor = Color.decode(nJCR.columnsToGroupBy.get(0).fontColor);
+//        groupHead1FillingColor = Color.decode(nJCR.columnsToGroupBy.get(0).backgroundColor);
+//        groupHead2FontColor = Color.decode(nJCR.columnsToGroupBy.get(1).fontColor);
+//        groupHead2FillingColor = Color.decode(nJCR.columnsToGroupBy.get(1).backgroundColor);
 
         if (nJCR.columnsToGroupBy.size() > 0) {
             for (int i=0; i<nJCR.columnsToGroupBy.size(); i++) {
-                columnsToGroupBy.add(nJCR.columnsToGroupBy.get(i).field.toLowerCase().replace("_", " "));
+                String columnName = nJCR.columnsToGroupBy.get(i).field.toLowerCase().replace("_", " ");
+                columnsToGroupBy.add(columnName);
+                groupHeadFontColor.put(columnName, Color.decode(nJCR.columnsToGroupBy.get(i).fontColor));
+                groupHeadFillingColor.put(columnName, Color.decode(nJCR.columnsToGroupBy.get(i).backgroundColor));
             }
         }
 
@@ -182,7 +188,11 @@ public class Configuration {
 
             textAlignment.put(columnName, TextAlign.fromStringToTextAlign(nJCR.getFields().get(i).textAlignment));
 
-            negativeAsParenthesesHashMap.put(columnName, nJCR.getFields().get(i).negativeAsParentheses);
+            if (nJCR.getFields().get(i).negativeNumberOption.get("decorateWith").equalsIgnoreCase("Parenthesis")) {
+                negativeAsParenthesesHashMap.put(columnName, true);
+            } else {
+                negativeAsParenthesesHashMap.put(columnName, false);
+            }
 
             try {
                 textColor.put(columnName, Color.decode(nJCR.getFields().get(i).textColor));
@@ -191,7 +201,7 @@ public class Configuration {
             }
 
             try {
-                negativeValueColor.put(columnName, Color.decode(nJCR.getFields().get(i).negativeValueColor));
+                negativeValueColor.put(columnName, Color.decode(nJCR.getFields().get(i).negativeNumberOption.get("fontColor")));
             } catch (NumberFormatException e) {
                 negativeValueColor.put(columnName, Color.BLACK);
             }
