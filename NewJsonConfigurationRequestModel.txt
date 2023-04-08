@@ -9,6 +9,8 @@
 	"bottomMargin": "50",
 	"tableHeadFontColor": "#ffffff",
     "tableHeadFillingColor": "#000000",
+    "rowHeaderVerticalAlignment": "Middle",
+    "rowHeaderHorizontalAlignment": "Left",
     "groupHead1FontColor": "#ffffff",
     "groupHead1FillingColor": "#313094",
     "groupHead2FontColor": "#ffffff",

@@ -38,6 +38,8 @@ public class Configuration {
     //configuration of table head and grouping heads
     Color tableHeadFontColor;
     Color tableHeadFillingColor;
+    TextAlign rowHeaderVerticalAlignment;
+    TextAlign rowHeaderHorizontalAlignment;
     Color groupHead1FontColor;
     Color groupHead1FillingColor;
     Color groupHead2FontColor;
@@ -107,6 +109,11 @@ public class Configuration {
 
         tableHeadFontColor = Color.decode(nJCR.tableHeadFontColor);
         tableHeadFillingColor = Color.decode(nJCR.tableHeadFillingColor);
+
+        rowHeaderVerticalAlignment = TextAlign.fromStringToTextAlign(nJCR.rowHeaderVerticalAlignment);
+        rowHeaderHorizontalAlignment = TextAlign.fromStringToTextAlign(nJCR.rowHeaderHorizontalAlignment);
+
+
         groupHead1FontColor = Color.decode(nJCR.groupHead1FontColor);
         groupHead1FillingColor = Color.decode(nJCR.groupHead1FillingColor);
         groupHead2FontColor = Color.decode(nJCR.groupHead2FontColor);

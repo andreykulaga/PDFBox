@@ -33,6 +33,9 @@ public class NewJsonConfigurationRequest {
     public String bottomMargin;
     public String tableHeadFontColor;
     public String tableHeadFillingColor;
+    public String rowHeaderVerticalAlignment;
+    public String rowHeaderHorizontalAlignment;
+
     public String groupHead1FontColor;
     public String groupHead1FillingColor;
     public String groupHead2FontColor;
