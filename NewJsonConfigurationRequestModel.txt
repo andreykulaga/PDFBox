@@ -1,6 +1,6 @@
 {
 	"showHeaderOnEveryPage": true,
-	"wrapTextInTable": false,
+	"wrapTextInTable": true,
 	"maxCharactersToWrap": 20,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",
@@ -176,7 +176,7 @@
 			"data": [
 				{
 					"field": "Report Name",
-					"value": "Example of Report name"
+					"value": "Report name"
 				}
 			]
 		}, {

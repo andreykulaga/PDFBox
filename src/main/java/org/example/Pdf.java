@@ -148,23 +148,10 @@ public class Pdf {
             addTableHeader(contentStream);
         }
 
-//        //add page number
-//        if (configuration.isPrintPageNumber()) {
-//            addCellWithText(contentStream, "Page number " + pageNumber, TextAlign.RIGHT, Color.WHITE, Outline.NOTOUTLINED, initX, configuration.getBottomMargin(), tableWidth);
-//        }
         contentStream.close();
     }
 
     public void addFooters() throws IOException {
-
-        //define cell height by font and it's size
-
-//        float footerFontCapHeight = getfontDescriptor(ordinaryFont).getCapHeight() * configuration.getPageFooterFontSize() / 1000;
-//        float footerFontAscent = getfontDescriptor(ordinaryFont).getAscent() * configuration.getPageFooterFontSize() / 1000;
-//        float footerFontDescent = getfontDescriptor(ordinaryFont).getDescent() * configuration.getPageFooterFontSize() / 1000;
-//        float footerFontLeading = getfontDescriptor(ordinaryFont).getLeading() * configuration.getPageFooterFontSize() / 1000;
-//        float footerCellHeight = footerFontCapHeight + footerFontAscent - footerFontDescent + footerFontLeading;
-
 
         //change global cell height and fontDescent
         float tempCellHeight = cellHeight;
@@ -200,11 +187,10 @@ public class Pdf {
                         (tab+1) * footerFontAverageWidth,
                         configuration.getPageFooterFontSize(), true, ordinaryFont);
             }
-
             contentStream.close();
         }
 
-        //change global cell height and font descendtback
+        //change global cell height and font descent back
         cellHeight = tempCellHeight;
         fontDescent = tempFontDescent;
 
@@ -230,13 +216,9 @@ public class Pdf {
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
 
-//            String text = transaction.getAllValuesAsString(configuration).get(string);
             String text = columnNamesForTableHead.get(string);
             addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(), configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
             Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, textLengths.get(string), boldFont);
-            // addCellWithMultipleTextLines(contentStream, text,
-            //         TextAlign.CENTER, configuration.getHeadFillingColor(),
-            //         configuration.getDefaultFontColor(), Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, configuration.isOnlyVerticalCellBoards());
             initX += cellWidth;
         }
         initX = configuration.getLeftMargin();
@@ -330,16 +312,20 @@ public class Pdf {
                 //get text from second item of array, because the first one is "Report name"
                 String text = configuration.getPageHeaderLines().get(i).get(1);
                 TextAlign textAlign = TextAlign.LEFT;
+                //For all other cells in report we start text with tabulation of one font average font width
+                // (to prevent the first letter from connecting with cell boarder), but for Report name we need it
+                // to start as the table boarder -> iniX minus average font width minus width of table boarder
+
                 addCellWithText(contentStream, text,
                         textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                        initX, initY, tableWidth, pageHeaderFontSize, true, ordinaryFont);
+                        initX - fontAverageWidth - configuration.getLineWidth(),
+                        initY, tableWidth, pageHeaderFontSize, true, ordinaryFont);
 
-                //set color and draw filling rectangle
+                //add green dot
                 float w = headerFontCapHeight/2;
                 float x = initX + ordinaryFont.getStringWidth(text + " ") / 1000 * pageHeaderFontSize;
                 float y = initY - cellHeight + w;
                 contentStream.setNonStrokingColor(Color.decode("#03af52"));
-                //add green dot
                 drawCircle(contentStream, x + w/2, y + w/2, w/2, Color.decode("#03af52"));
 //                //add green rectangle
 //                contentStream.addRect(x,y,w,w);
