@@ -28,38 +28,22 @@ public class Configuration {
     String outputName = "result";
     PDRectangle printSize = PDRectangle.LETTER;
     boolean changeOrientationToLandscape = true;
-//    PDFont font = PDType1Font.TIMES_ROMAN;
-//    PDFont boldFont = PDType1Font.TIMES_BOLD;
-    Color strokingColor;
-//    boolean onlyVerticalCellBoards = false;
-    Color defaultFontColor = Color.BLACK;
-    Color subTotalFillingColor = Color.WHITE;
+//    Color defaultFontColor = Color.BLACK;
 
     //configuration of table head and grouping heads
     Color tableHeadFontColor;
     Color tableHeadFillingColor;
     TextAlign rowHeaderVerticalAlignment;
     TextAlign rowHeaderHorizontalAlignment;
+    Color subTotalFillingColor = Color.WHITE;
 
 
     HashMap<String, Color> groupHeadFontColor = new HashMap<>();
     HashMap<String, Color> groupHeadFillingColor = new HashMap<>();
-//    Color groupHead1FontColor;
-//    Color groupHead1FillingColor;
-//    Color groupHead2FontColor;
-//    Color groupHead2FillingColor;
-
-//    Color tableHeadFontColor = Color.WHITE;
-//    Color tableHeadFillingColor = Color.BLACK;
-//    Color groupHead1FontColor = Color.white;
-//    Color groupHead1FillingColor = Color.decode("#313094");
-//    Color groupHead2FontColor = Color.white;
-//    Color groupHead2FillingColor = Color.decode("#8a81be");
-
-    
 
     //General configuration
     boolean headerAtEveryPage;
+    boolean wrapTextInTable;
     int maxCharactersInTextLine;
     int maxColumnsAllowed;
     float lineWidth;
@@ -67,11 +51,12 @@ public class Configuration {
     float rightMargin;
     float topMargin;
     float bottomMargin;
+    Color strokingColor;
     boolean showVerticalBoarders;
     boolean showHorizontalBoarders;
     ArrayList<String> columnsToGroupBy = new ArrayList<>();
     ArrayList<String> whatColumnsToHide = new ArrayList<>();
-    
+
 
     //PageFooter configuration
     float pageFooterFontSize;
@@ -81,7 +66,7 @@ public class Configuration {
     ArrayList<String> linesOfPageFooter = new ArrayList<>();
 
 
-     //PageHeader configuration
+    //PageHeader configuration
     ArrayList<HashMap<String, String>> pageHeaderConfiguration = new ArrayList<>();
     ArrayList<ArrayList<String>> pageHeaderLines = new ArrayList<>();
 
@@ -99,6 +84,7 @@ public class Configuration {
         
     public void importNewJsonConfigurationRequest (NewJsonConfigurationRequest nJCR) {
         headerAtEveryPage = nJCR.headerAtEveryPage;
+        wrapTextInTable = nJCR.wrapTextInTable;
         maxCharactersInTextLine = nJCR.maxCharactersInTextLine;
         maxColumnsAllowed = nJCR.maxColumnsAllowed;
         lineWidth = nJCR.boarderOption.lineWidth;

@@ -135,7 +135,8 @@ public class JsonResponse {
                     textLengths.replace(key, length);
                 }
                 //strip text length to max in configuration for all text lines
-                if (hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
+                if (configuration.isWrapTextInTable() &&
+                        hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
                         length > configuration.getMaxCharactersInTextLine()) {
                     textLengths.replace(key, configuration.getMaxCharactersInTextLine());
                 }

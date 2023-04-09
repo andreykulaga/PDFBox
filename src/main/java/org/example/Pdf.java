@@ -218,16 +218,20 @@ public class Pdf {
             sumOfAllMaxWidth += i;
         };
 
-        //create fake transaction from column names to count how many lines need for table header
-        Transaction transaction = Transaction.createTransactionFromColumnNames(columnNames, columnNamesForTableHead);
-        int quantityOfLines = howManyLinesInARow(transaction);
+        int quantityOfLines = 1;
+        if (configuration.isWrapTextInTable()) {
+            //create fake transaction from column names to count how many lines need for table header
+            Transaction transaction = Transaction.createTransactionFromColumnNames(columnNames, columnNamesForTableHead);
+            quantityOfLines = howManyLinesInARow(transaction);
+        }
 
 
         float cellWidth;
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
 
-            String text = transaction.getAllValuesAsString(configuration).get(string);
+//            String text = transaction.getAllValuesAsString(configuration).get(string);
+            String text = columnNamesForTableHead.get(string);
             addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(), configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
             Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, textLengths.get(string), boldFont);
             // addCellWithMultipleTextLines(contentStream, text,
@@ -419,10 +423,14 @@ public class Pdf {
         }
 
         float cellWidth;
-        int howManyLinesInARow = howManyLinesInARow(transaction);
+
+        int quantityOfLines = 1;
+        if (configuration.isWrapTextInTable()) {
+            quantityOfLines = howManyLinesInARow(transaction);
+        }
 
         //create new page if there is no enough space
-        if (initY - cellHeight*howManyLinesInARow < configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight) {
+        if (initY - cellHeight*quantityOfLines < configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight) {
             addNewPage();
             contentStream.close();
             contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
@@ -443,12 +451,12 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
-                    initX, initY, cellWidth, howManyLinesInARow, fontSize, textLengths.get(string), ordinaryFont);
+                    initX, initY, cellWidth, quantityOfLines, fontSize, textLengths.get(string), ordinaryFont);
             initX += cellWidth;
         }
 
         initX = configuration.getLeftMargin();
-        initY -= cellHeight*howManyLinesInARow;
+        initY -= cellHeight*quantityOfLines;
 
         // if (initY < configuration.getBottomMargin()+cellHeight) {
         //     if (configuration.isOnlyVerticalCellBoards()) {

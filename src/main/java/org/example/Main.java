@@ -93,7 +93,7 @@ public class Main {
             }
             length += (howManyCapitalizedLetters*4/5);
 
-            if (length > configuration.getMaxCharactersInTextLine()) {
+            if (configuration.isWrapTextInTable() && length > configuration.getMaxCharactersInTextLine()) {
                 textLengths.put(columnNames.get(i), configuration.getMaxCharactersInTextLine());
             } else {
                 textLengths.put(columnNames.get(i), length);

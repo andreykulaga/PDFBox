@@ -1,5 +1,6 @@
 {
 	"showHeaderOnEveryPage": true,
+	"wrapTextInTable": false,
 	"maxCharactersToWrap": 20,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",

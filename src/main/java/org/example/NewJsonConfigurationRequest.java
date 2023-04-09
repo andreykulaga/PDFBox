@@ -24,6 +24,7 @@ public class NewJsonConfigurationRequest {
     
     @JsonProperty("showHeaderOnEveryPage")
     public boolean headerAtEveryPage;
+    public boolean wrapTextInTable;
     @JsonProperty("maxCharactersToWrap")
     public int maxCharactersInTextLine;
     @JsonProperty("maxColumnsAllowed")
@@ -36,21 +37,6 @@ public class NewJsonConfigurationRequest {
     public String rowHeaderHorizontalAlignment;
     public HashMap<String, String> pageMargin;
     public BoarderOption boarderOption;
-
-
-    //    @JsonProperty("left")
-//    public String leftMargin;
-//    @JsonProperty("right")
-//    public String rightMargin;
-//    @JsonProperty("top")
-//    public String topMargin;
-//    @JsonProperty("bottom")
-//    public String bottomMargin;
-//    public String tableLineBoarderColor;
-//    public boolean showVerticalBoarders;
-//    public boolean showHorizontalBoarders;
-
-
 
 
     public ArrayList<WhatColumnsToHide> whatColumnsToHide;
@@ -100,10 +86,6 @@ public class NewJsonConfigurationRequest {
         @JsonProperty("fontColor")
         public String textColor;
         public HashMap<String, String> negativeNumberOption;
-//        @JsonProperty("NegativeValueColor")
-//        public String negativeValueColor;
-//        @JsonProperty("NegativeAsParentheses")
-//        public boolean negativeAsParentheses;
     }
     
     public static class PageFooter{
