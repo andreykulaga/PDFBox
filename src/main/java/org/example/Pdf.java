@@ -44,7 +44,7 @@ public class Pdf {
     float pageYSize;
     float fontSize;
 
-    HashMap<String, Integer> textLengths;
+    HashMap<String, Float> textLengths;
     ArrayList<String> columnNames;
     HashMap<String, String> columnNamesForTableHead;
     HashMap<String, String> hashMapOfTypes;
@@ -60,10 +60,12 @@ public class Pdf {
     float footerFontLeading;
     float footerCellHeight;
 
+    float sumOfAllMaxWidth;
+
 
 
     public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, 
-    HashMap<String, Integer> textLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead,
+    HashMap<String, Float> textLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead,
                File ordinaryFontFile, File boldFontFile) throws IOException {
 
         this.document = document;
@@ -89,15 +91,25 @@ public class Pdf {
         pageWidth = page.getTrimBox().getWidth();
         tableWidth = pageWidth - configuration.getLeftMargin() - configuration.getRightMargin();
 
-        //count max length of all columns in characters to decide font size
-        int rowCharacterLength = 0;
-        for (int i : textLengths.values()) {
+        //count max length of all columns to decide font size
+        float rowLength = 0;
+        for (float i : textLengths.values()) {
 //            rowCharacterLength += (textLengths.get(string) + 2); // +2 - is one space before and after text
-            rowCharacterLength += (i +2); // +2 - is one space before and after text
+            float doubleSpaceWidth = PDType1Font.HELVETICA.getStringWidth("  ") / 1000;
+            rowLength += (i + doubleSpaceWidth); //  - additional is one space before and after text
+        }
+
+        sumOfAllMaxWidth = 0;
+        for (float i: textLengths.values()) {
+            sumOfAllMaxWidth += i;
         }
 
         //define font size
-        fontSize = tableWidth * 1000 / (rowCharacterLength * getFontDescriptor(ordinaryFont).getAverageWidth());
+        if (configuration.forceFontSize) {
+            fontSize = configuration.fontSize;
+        } else {
+            fontSize = tableWidth / rowLength;
+        }
 
         fontCapHeight = getFontDescriptor(ordinaryFont).getCapHeight() * fontSize / 1000;
         fontAscent = getFontDescriptor(ordinaryFont).getAscent() * fontSize / 1000;
@@ -198,27 +210,20 @@ public class Pdf {
     }
 
     public void addTableHeader(PDPageContentStream contentStream) throws IOException {
-        //count sum of characters of all widths
-        int sumOfAllMaxWidth = 0;
-        for (int i: textLengths.values()) {
-            sumOfAllMaxWidth += i;
-        };
 
         int quantityOfLines = 1;
         if (configuration.isWrapTextInTable()) {
             //create fake transaction from column names to count how many lines need for table header
             Transaction transaction = Transaction.createTransactionFromColumnNames(columnNames, columnNamesForTableHead);
-            quantityOfLines = howManyLinesInARow(transaction);
+            quantityOfLines = howManyLinesInARow(transaction, boldFont);
         }
-
 
         float cellWidth;
         for (String string: columnNames){
             cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
-
             String text = columnNamesForTableHead.get(string);
             addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(), configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
-            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, textLengths.get(string), boldFont);
+            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, boldFont);
             initX += cellWidth;
         }
         initX = configuration.getLeftMargin();
@@ -402,17 +407,12 @@ public class Pdf {
     public void addTableRow(Transaction transaction) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
-        //count sum of characters of all widths
-        int sumOfAllMaxWidth = 0;
-        for (int i: textLengths.values()) {
-            sumOfAllMaxWidth += i;
-        }
-
         float cellWidth;
+
 
         int quantityOfLines = 1;
         if (configuration.isWrapTextInTable()) {
-            quantityOfLines = howManyLinesInARow(transaction);
+            quantityOfLines = howManyLinesInARow(transaction, ordinaryFont);
         }
 
         //create new page if there is no enough space
@@ -437,7 +437,7 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
-                    initX, initY, cellWidth, quantityOfLines, fontSize, textLengths.get(string), ordinaryFont);
+                    initX, initY, cellWidth, quantityOfLines, fontSize, ordinaryFont);
             initX += cellWidth;
         }
 
@@ -459,11 +459,6 @@ public class Pdf {
 
     public void addGroupHead(String columnName, Transaction transaction, int level) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
-
-        int sumOfAllMaxWidth = 0;
-        for (int i: textLengths.values()) {
-            sumOfAllMaxWidth += i;
-        }
 
 
         Color backgroundColor = configuration.getGroupHeadFillingColor().get(columnName);
@@ -504,10 +499,6 @@ public class Pdf {
     public void addSubtotalOrTotalRow(boolean isItTotal, String columnName, Subtotal subtotal, HashMap<String, String> hashMapOfTypes) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
-        int sumOfAllMaxWidth = 0;
-        for (int i: textLengths.values()) {
-            sumOfAllMaxWidth += i;
-        }
         
         //Change the first column of the subtotal to the subtotal line name and set filling color
         Color color;
@@ -524,7 +515,7 @@ public class Pdf {
         subtotal.setTextFields(tempMap);
 
         
-        int howManyLinesInARow = howManyLinesInARow(subtotal);
+        int howManyLinesInARow = howManyLinesInARow(subtotal, boldFont);
         //create new page if there is no enough space
         if (initY - cellHeight*howManyLinesInARow < configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight) {
             addNewPage();
@@ -567,7 +558,7 @@ public class Pdf {
             addCellWithMultipleTextLines(contentStream, text,
                 textAlign, color, textColor,
                 Outline.OUTLINED, initX, initY, cellWidth, howManyLinesInARow,
-                    fontSize, textLengths.get(tempColumnName), boldFont);
+                    fontSize, boldFont);
            
             initX += cellWidth;
 
@@ -763,142 +754,59 @@ public class Pdf {
 
     }
 
-    public int howManyLinesInARow(Transaction transaction) {
+    public int howManyLinesInARow(Transaction transaction, PDFont font) throws IOException {
 
         //return one line by default
         int result = 1;
 
-        for (String key : columnNames){
+        for (String key : columnNames) {
             String text = transaction.getAllValuesAsString(configuration).get(key);
-            int maxCharactersInTextLine = textLengths.get(key);
-
+            float cellWidth = tableWidth * textLengths.get(key) / sumOfAllMaxWidth;
+            float doubleSpaceWidth = font.getStringWidth("  ") * fontSize / 1000;
+            float widthAvailableForText = cellWidth - doubleSpaceWidth;
             //create linked list of all words in text
-            LinkedList<String> textByLines = new LinkedList<>();
-            //if text is small enough, add only one line
-            if (text.length() > maxCharactersInTextLine) {
-                String[] strings = text.split(" ");
-                textByLines.addAll(Arrays.asList(strings));
-                int size = textByLines.size();
-
-                int i = 0;
-                while (i < size) {
-                    //divide word if it is too long
-                    int max = maxCharactersInTextLine;
-                    if (textByLines.get(i).length() > max) {
-                        String string = textByLines.get(i);
-                        textByLines.remove(i);
-                        size--;
-                        int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
-                        for (int j = 0; j < numberOfParts-1; j++) {
-                            String part = string.substring(j*max, (j+1)*max);
-                            textByLines.add(i+j, part);
-                            size++;
-                        }
-                        //add last part
-                        String part = string.substring(max*(numberOfParts-1));
-                        textByLines.add(i+numberOfParts-1, part);
-                        size++;
-                    }
-                    i++;
-                }
-
-                //wrap words
-                int k = 0;
-                while (k < size-1) {
-                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= maxCharactersInTextLine) {
-                        String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
-                        textByLines.set(k, newString);
-                        textByLines.remove(k + 1);
-                        size--;
-                        k--;
-                    }
-                    k++;
-                }
-                if (textByLines.size() > result) {
-                    result = textByLines.size();
-                }
+            LinkedList<String> textByLines = splitTextByLines(text, widthAvailableForText, font);
+            if (textByLines.size() > result) {
+                result = textByLines.size();
             }
         }
         return result;
     }
 
-    public int howManyLinesInARow(Subtotal subtotal) {
+    public int howManyLinesInARow(Subtotal subtotal, PDFont font) throws IOException {
 
         //return one line by default
         int result = 1;
-        HashMap<String, String> hashMap = new HashMap<>();
+
         //create hashmap of all values as string
-        for (String str: subtotal.getNumberFields().keySet()) {
-            double dbl = subtotal.getNumberFields().get(str);
-            hashMap.put(str, DoubleFormatter.format(dbl, str, configuration));
+        HashMap<String, String> hashMap = new HashMap<>();
+        for (String columnName: subtotal.getNumberFields().keySet()) {
+            double dbl = subtotal.getNumberFields().get(columnName);
+            hashMap.put(columnName, DoubleFormatter.format(dbl, columnName, configuration));
         }
+
         //add the only string value
         String firstColumn = columnNames.get(0);
         hashMap.put(firstColumn, subtotal.getTextFields().get(firstColumn));
 
-        for (String str: hashMap.keySet()) {
-            String text = hashMap.get(str);
-            int maxCharactersInTextLine = textLengths.get(str);
-            
+        for (String key: hashMap.keySet()) {
+            String text = hashMap.get(key);
+            float cellWidth = tableWidth * textLengths.get(key) / sumOfAllMaxWidth;
+            float widthAvailableForText = cellWidth - font.getStringWidth("  ") * fontSize / 1000;
             //create linked list of all words in text
-            LinkedList<String> textByLines = new LinkedList<>();
-            //if text is small enough, add only one line
-            if (text.length() > maxCharactersInTextLine) {
-                String[] strings = text.split(" ");
-                textByLines.addAll(Arrays.asList(strings));
-                int size = textByLines.size();
-
-                int i = 0;
-                while (i < size) {
-                    //divide word if it is too long
-                    int max = maxCharactersInTextLine;
-                    if (textByLines.get(i).length() > max) {
-                        String string = textByLines.get(i);
-                        textByLines.remove(i);
-                        size--;
-                        int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
-                        for (int j = 0; j < numberOfParts-1; j++) {
-                            String part = string.substring(j*max, (j+1)*max);
-                            textByLines.add(i+j, part);
-                            size++;
-                        }
-                        //add last part
-                        String part = string.substring(max*(numberOfParts-1));
-                        textByLines.add(i+numberOfParts-1, part);
-                        size++;
-                    }
-                    i++;
-                }
-
-                //wrap words
-                int k = 0;
-                while (k < size-1) {
-                    if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= maxCharactersInTextLine) {
-                        String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
-                        textByLines.set(k, newString);
-                        textByLines.remove(k + 1);
-                        size--;
-                        k--;
-                    }
-                    k++;
-                }
-                if (textByLines.size() > result) {
-                    result = textByLines.size();
-                }
+            LinkedList<String> textByLines = splitTextByLines(text, widthAvailableForText, font);
+            if (textByLines.size() > result) {
+                result = textByLines.size();
             }
         }
         return result;
     }
 
-    public void addCellWithMultipleTextLines(PDPageContentStream contentStream, String text,
-                                TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
-                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize,
-                                             int maxCharactersInTextLine, PDFont font) throws IOException {
-
+    public LinkedList<String> splitTextByLines(String text, float widthAvailableForText, PDFont font) throws IOException {
         //create linked list of all words in text
         LinkedList<String> textByLines = new LinkedList<>();
         //if text is small enough, add only one line
-        if (text.length() <= maxCharactersInTextLine) {
+        if (font.getStringWidth(text) * fontSize / 1000<= widthAvailableForText) {
             textByLines.add(text);
         } else {
             String[] strings = text.split(" ");
@@ -908,21 +816,31 @@ public class Pdf {
             int i = 0;
             while (i < size) {
                 //divide word if it is too long
-                int max = maxCharactersInTextLine;
-                if (textByLines.get(i).length() > max) {
-                    String string = textByLines.get(i);
-                    textByLines.remove(i);
-                    size--;
-                    int numberOfParts = (int)Math.ceil((double)string.length() / (double)max);
-                    for (int j = 0; j < numberOfParts-1; j++) {
-                        String part = string.substring(j*max, (j+1)*max);
-                        textByLines.add(i+j, part);
-                        size++;
+                String string = textByLines.get(i);
+                float stringWidth = font.getStringWidth(string) * fontSize / 1000;
+                if (stringWidth > widthAvailableForText) {
+                    for (int j = string.length() - 1; j >= 0; j--) {
+                        if (j == 0) {
+                            textByLines = new LinkedList<>();
+                            for (int k=0; k < text.length(); k++) {
+                                textByLines.add(k, text.substring(k, k+1));
+                            }
+                            return textByLines;
+                        }
+                        String tempString = string.substring(j, string.length());
+                        float tempStringWidth = font.getStringWidth(tempString) * fontSize / 1000;
+                        if (stringWidth - tempStringWidth < widthAvailableForText) {
+                            //if we found such part of word, then we stop divide it by characters,
+                            // add part of word as next in linked list, replace the word at the current place
+                            textByLines.add(i + 1, tempString);
+                            textByLines.add(i, string.substring(0, j));
+                            //remove the string that we work with (it moved to +1 place)
+                            textByLines.remove(i+1);
+                            size++;
+                            i++;
+                            j = 0;
+                        }
                     }
-                    //add last part
-                    String part = string.substring(max*(numberOfParts-1));
-                    textByLines.add(i+numberOfParts-1, part);
-                    size++;
                 }
                 i++;
             }
@@ -930,7 +848,8 @@ public class Pdf {
             //wrap words
             int k = 0;
             while (k < size-1) {
-                if ((textByLines.get(k).length() + 1 + textByLines.get(k + 1).length()) <= maxCharactersInTextLine) {
+                float temp = font.getStringWidth(textByLines.get(k) + " " + textByLines.get(k + 1) )* fontSize;
+                if (font.getStringWidth(textByLines.get(k) + " " + textByLines.get(k + 1)) * fontSize / 1000 <= widthAvailableForText) {
                     String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
                     textByLines.set(k, newString);
                     textByLines.remove(k + 1);
@@ -940,6 +859,14 @@ public class Pdf {
                 k++;
             }
         }
+        return textByLines;
+    }
+
+    public void addCellWithMultipleTextLines(PDPageContentStream contentStream, String text,
+                                TextAlign textAlign, Color fillingColor, Color fontColor, Outline outline,
+                                float initX, float initY, float cellWidth, int quantityOfLines, float fontSize, PDFont font) throws IOException {
+
+        LinkedList<String> textByLines = splitTextByLines(text, cellWidth, font);
 
         //set color and draw stroke rectangle
         if (outline == Outline.OUTLINED) {
@@ -976,17 +903,7 @@ public class Pdf {
         //define starting position of text
         float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
         float textInitX = 0;
-//        float textLength = text.length() * fontAverageWidth;
-//        //change textLength if it is more than max
-//        if (text.length() > configuration.getMaxCharactersInTextLine()) {
-//            textLength = configuration.getMaxCharactersInTextLine() * fontAverageWidth;
-//        }
 
-        //add text
-//        contentStream.beginText();
-//        contentStream.setFont(font, fontSize);
-//        contentStream.setLeading(cellHeight);
-//        contentStream.newLineAtOffset(textInitX, textInitY);
         for (String string: textByLines) {
             //calculate string length in points
             float stringWidth = font.getStringWidth(string) / 1000 * fontSize;

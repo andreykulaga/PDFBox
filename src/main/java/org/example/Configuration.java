@@ -45,6 +45,8 @@ public class Configuration {
     boolean headerAtEveryPage;
     boolean wrapTextInTable;
     int maxCharactersInTextLine;
+    public boolean forceFontSize;
+    public float fontSize;
     int maxColumnsAllowed;
     float lineWidth;
     float leftMargin;
@@ -86,6 +88,8 @@ public class Configuration {
         headerAtEveryPage = nJCR.headerAtEveryPage;
         wrapTextInTable = nJCR.wrapTextInTable;
         maxCharactersInTextLine = nJCR.maxCharactersInTextLine;
+        forceFontSize = nJCR.forceFontSize;
+        fontSize = nJCR.fontSize;
         maxColumnsAllowed = nJCR.maxColumnsAllowed;
         lineWidth = nJCR.boarderOption.lineWidth;
         leftMargin = Float.parseFloat(nJCR.pageMargin.get("left"));

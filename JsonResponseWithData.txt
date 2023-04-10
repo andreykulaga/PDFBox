@@ -21,7 +21,7 @@
 			}, {
 				"Client_Product_Id": null,
 				"Product_Nm": "dsvsvsbmt",
-				"Investment_Nm": "INR REAL",
+				"Investment_Nm": "INR REALblhblblhblblhblblhblblkblkb",
 				"Alt_Src_Sys_Investment_Id": null,
 				"TICKER_Id": null,
 				"Original_Share_Qty": 100.0,
@@ -117,7 +117,7 @@
 			}, {
 				"Client_Product_Id": null,
 				"Product_Nm": "3233rdfdsf454",
-				"Investment_Nm": "USA fsgbhsghstghstgstgfeg sfgsgse sggsetr",
+				"Investment_Nm": "USA ",
 				"Alt_Src_Sys_Investment_Id": null,
 				"TICKER_Id": null,
 				"Original_Share_Qty": 1234567891234567.0,

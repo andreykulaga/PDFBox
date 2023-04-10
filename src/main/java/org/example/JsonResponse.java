@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -91,7 +93,7 @@ public class JsonResponse {
         return hashMapOfTypes;
     }
 
-    public ArrayList<Transaction> extractTransactions(HashMap<String, Integer> textLengths, Configuration configuration) {
+    public ArrayList<Transaction> extractTransactions(HashMap<String, Float> textLengths, HashMap<String, String> theLongestRow, Configuration configuration) {
         ArrayList<Transaction> transactions = new ArrayList<>();
         
         HashMap<String, String> hashMapOfTypes = createHashMapOfTypes();
@@ -107,41 +109,6 @@ public class JsonResponse {
                 String key = s.replaceAll("_", " ").toLowerCase();
                 String value = d.fieldsAndValues.get(s);
 
-                if (value == null) {
-                    value = "null";
-                }
-
-                //check length and keep the biggest one to calculate cell width latter
-                int length = value.length();
-
-
-                //increase length for each capitalised letter, as capitilized letters are too wide
-                String lineToCompare = value.toLowerCase();
-                int howManyCapitalizedLetters = 0;
-                for (int j = 0; j < length; j++) {
-                    if (value.charAt(j) != lineToCompare.charAt(j)) {
-                        howManyCapitalizedLetters++;
-                    }
-                }
-                length += (howManyCapitalizedLetters*4/5);
-
-                //if it is number, get a double and format it
-                if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
-                    Double f = Double.parseDouble(value);
-                    length = DoubleFormatter.format(f, key, configuration).length();
-                }
-                //change all
-                if (length > textLengths.get(key)) {
-                    textLengths.replace(key, length);
-                }
-                //strip text length to max in configuration for all text lines
-                if (configuration.isWrapTextInTable() &&
-                        hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
-                        length > configuration.getMaxCharactersInTextLine()) {
-                    textLengths.replace(key, configuration.getMaxCharactersInTextLine());
-                }
-                
-        
                 //check field type and fill hashmaps of transaction
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
                     Double f = Double.parseDouble(value);
@@ -152,6 +119,55 @@ public class JsonResponse {
                     dateTimeFields.put(key, ldt);
                 } else {
                     textFields.put(key, value);
+                }
+
+
+                if (value == null) {
+                    value = "null";
+                }
+                //if it is number, get a double and format it
+                if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
+                    double f = Double.parseDouble(value);
+                    value = DoubleFormatter.format(f, key, configuration);
+                }
+
+                float length;
+                try {
+                    //check length and keep the biggest one to calculate cell width latter
+                    length = PDType1Font.HELVETICA.getStringWidth(value) / 1000;
+
+//                //if it is text,increase length for each capitalised letter, as capitalised letters are too wide
+//                if (hashMapOfTypes.get(key).equalsIgnoreCase("string")) {
+//                    String lineToCompare = value.toLowerCase();
+//                    int howManyCapitalizedLetters = 0;
+//                    for (int j = 0; j < length; j++) {
+//                        if (value.charAt(j) != lineToCompare.charAt(j)) {
+//                            howManyCapitalizedLetters++;
+//                        }
+//                    }
+//                    length += (howManyCapitalizedLetters*4/5);
+//                }
+
+//                //change all
+//                if (length > textLengths.get(key)) {
+//                }
+                    //strip text length to max in configuration for all text lines
+                    //if font size not forse, wrapping is enabled, it is text field, characters more than max
+                    if (!configuration.forceFontSize && configuration.isWrapTextInTable() &&
+                            hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
+                            value.length() > configuration.getMaxCharactersInTextLine()) {
+                        float tempLength = PDType1Font.HELVETICA.getStringWidth(value.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000;
+                        //if it is less than is already in text lengths it means that there is already value for string with length bigger than max but more wide characters
+                        if (tempLength > textLengths.get(key)) {
+                            textLengths.replace(key, tempLength);
+                        }
+                    } else {
+                        if (value.length() > textLengths.get(key)) {
+                            textLengths.replace(key, length);
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
             Transaction t = new Transaction(transactionNumber,numberFields,dateTimeFields,textFields);

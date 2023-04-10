@@ -72,36 +72,40 @@ public class Main {
         //create hash map of types of columns
         HashMap<String, String> hashMapOfTypes = jsonResponse.createHashMapOfTypes();
 
-
         //create array list that we will need to calculate cell width
-        HashMap<String, Integer> textLengths = new HashMap<>();
-        
-        //fill array that we will need to calculate cell width
-    
-        for (int i = 0; i < columnNames.size(); i++) {
-            String line = columnNamesForTableHead.get(columnNames.get(i));
-            int length = line.length();
-            
-             
-            //increase length for each capitalised letter, as capitilized letters are too wide
-            String lineToCompare = line.toLowerCase();
-            int howManyCapitalizedLetters = 0;
-            for (int j = 0; j < length; j++) {
-                if (line.charAt(j) != lineToCompare.charAt(j)) {
-                    howManyCapitalizedLetters++;
+        HashMap<String, Float> textLengths = new HashMap<>();
+        HashMap<String, String> theLongestRow = new HashMap<>();
+
+        try {
+            //fill array that we will need to calculate cell width
+            for (int i = 0; i < columnNames.size(); i++) {
+                String line = columnNamesForTableHead.get(columnNames.get(i));
+//            int length = line.length();
+                float length = PDType1Font.HELVETICA_BOLD.getStringWidth(line) / 1000;
+
+//                //increase length for each capitalised letter, as capitalised letters are too wide
+//                String lineToCompare = line.toLowerCase();
+//                int howManyCapitalizedLetters = 0;
+//                for (int j = 0; j < length; j++) {
+//                    if (line.charAt(j) != lineToCompare.charAt(j)) {
+//                        howManyCapitalizedLetters++;
+//                    }
+//                }
+//                length += (howManyCapitalizedLetters*4/5);
+
+                if (!configuration.forceFontSize && configuration.isWrapTextInTable() && line.length() > configuration.getMaxCharactersInTextLine()) {
+                    textLengths.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000);
+                } else {
+                    textLengths.put(columnNames.get(i), length);
                 }
             }
-            length += (howManyCapitalizedLetters*4/5);
 
-            if (configuration.isWrapTextInTable() && length > configuration.getMaxCharactersInTextLine()) {
-                textLengths.put(columnNames.get(i), configuration.getMaxCharactersInTextLine());
-            } else {
-                textLengths.put(columnNames.get(i), length);
-            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        
+
         //create array list of transactions and extract from JsonResponse, textLengths are updated
-        ArrayList<Transaction> transactions = jsonResponse.extractTransactions(textLengths, configuration);
+        ArrayList<Transaction> transactions = jsonResponse.extractTransactions(textLengths, theLongestRow, configuration);
 
     
 
@@ -110,8 +114,6 @@ public class Main {
             textLengths.remove(string);
         }
 
-        
-        
         //clean array list of column names from hidden columns
         for (String string : configuration.getWhatColumnsToHide()) {
             columnNames.remove(string);
@@ -131,23 +133,28 @@ public class Main {
         }
 
         //count sum of all number fields of transaction to count max width of it's columns
-        HashMap<String, Double> totals = new HashMap<>();
-        for (String column: columnNames) {
-            if (hashMapOfTypes.get(column).equalsIgnoreCase("number")) {
-                totals.put(column, (double) 0);
+        try {
+            HashMap<String, Double> totals = new HashMap<>();
+            for (String column : columnNames) {
+                if (hashMapOfTypes.get(column).equalsIgnoreCase("number")) {
+                    totals.put(column, (double) 0);
+                }
             }
-        }
-        for (Transaction t: transactions) {
-            for (String column: totals.keySet()) {
-                Double d = totals.get(column);
-                totals.put(column, d+t.getNumberFields().get(column));
+            for (Transaction t : transactions) {
+                for (String column : totals.keySet()) {
+                    Double d = totals.get(column);
+                    totals.put(column, d + t.getNumberFields().get(column));
+                }
             }
-        }
-        for (String column: totals.keySet()) {
-            int l = DoubleFormatter.format(totals.get(column), column, configuration).length();
-            if (l > textLengths.get(column)) {
-                textLengths.put(column, l);
+            for (String column : totals.keySet()) {
+                String string = DoubleFormatter.format(totals.get(column), column, configuration);
+                float l = PDType1Font.HELVETICA_BOLD.getStringWidth(string) / 1000;
+                if (l > textLengths.get(column)) {
+                    textLengths.put(column, l);
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         //load fonts

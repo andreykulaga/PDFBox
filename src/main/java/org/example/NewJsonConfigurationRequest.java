@@ -27,6 +27,8 @@ public class NewJsonConfigurationRequest {
     public boolean wrapTextInTable;
     @JsonProperty("maxCharactersToWrap")
     public int maxCharactersInTextLine;
+    public boolean forceFontSize;
+    public float fontSize;
     @JsonProperty("maxColumnsAllowed")
     public int maxColumnsAllowed;
     @JsonProperty("columnHeaderFontColor")
