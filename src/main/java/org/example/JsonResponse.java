@@ -93,7 +93,7 @@ public class JsonResponse {
         return hashMapOfTypes;
     }
 
-    public ArrayList<Transaction> extractTransactions(HashMap<String, Float> textLengths, Configuration configuration) {
+    public ArrayList<Transaction> extractTransactions(HashMap<String, Float> textLengths, HashMap<String, Float> notStringMaxLengths, Configuration configuration) {
         ArrayList<Transaction> transactions = new ArrayList<>();
         
         HashMap<String, String> hashMapOfTypes = createHashMapOfTypes();
@@ -141,19 +141,30 @@ public class JsonResponse {
                     //check length and keep the biggest one to calculate cell width latter
                     length = PDType1Font.HELVETICA.getStringWidth(value) / 1000;
 
-                    //strip text length to max in configuration for all text lines
-                    //if font size not forse, wrapping is enabled, it is text field, characters more than max
-                    if (!configuration.forceFontSize && configuration.isWrapTextInTable() &&
-                            hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
-                            value.length() > configuration.getMaxCharactersInTextLine()) {
-                        float tempLength = PDType1Font.HELVETICA.getStringWidth(value.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000;
-                        //if it is less than is already in text lengths it means that there is already value for string with length bigger than max but more wide characters
-                        if (tempLength > textLengths.get(key)) {
-                            textLengths.replace(key, tempLength);
+
+                    if (!configuration.forceFontSize) {
+                        if (configuration.isWrapTextInTable() &&
+                                hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
+                                value.length() > configuration.getMaxCharactersInTextLine()) {
+                            float tempLength = PDType1Font.HELVETICA.getStringWidth(value.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000;
+                            //if it is less than is already in text lengths it means that there is already value for string with length bigger than max but more wide characters
+                            if (tempLength > textLengths.get(key)) {
+                                textLengths.replace(key, tempLength);
+                            }
+                        } else {
+                            if (length > textLengths.get(key)) {
+                                textLengths.replace(key, length);
+                            }
                         }
                     } else {
                         if (length > textLengths.get(key)) {
+                            System.out.println(textLengths.get(key));
+                            System.out.println(length);
+                            System.out.println();
                             textLengths.replace(key, length);
+                        }
+                        if (length > notStringMaxLengths.get(key)) {
+                            notStringMaxLengths.replace(key, length);
                         }
                     }
                 } catch (IOException e) {

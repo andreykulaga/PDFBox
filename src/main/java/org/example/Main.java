@@ -73,7 +73,11 @@ public class Main {
         HashMap<String, String> hashMapOfTypes = jsonResponse.createHashMapOfTypes();
 
         //create array list that we will need to calculate cell width
-        HashMap<String, Float> textLengths = new HashMap<>();
+        HashMap<String, Float> maxLengthsOfTextInCell = new HashMap<>();
+
+        //create array list to store max length of data in not string column
+        HashMap<String, Float> notStringMaxLengths = new HashMap<>();
+
 
         try {
             //fill array that we will need to calculate cell width
@@ -81,15 +85,22 @@ public class Main {
                 String line = columnNamesForTableHead.get(columnNames.get(i));
                 float length = PDType1Font.HELVETICA_BOLD.getStringWidth(line) / 1000;
 
-                if (!configuration.forceFontSize && configuration.isWrapTextInTable() && line.length() > configuration.getMaxCharactersInTextLine()) {
-                    textLengths.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000);
-                } else {
-                    //if font size is forced than count only for text column names
-                    if (hashMapOfTypes.get(columnNames.get(i)).equalsIgnoreCase("string")) {
-                        textLengths.put(columnNames.get(i), length);
+                if (!configuration.forceFontSize) {
+                    if (configuration.isWrapTextInTable() && line.length() > configuration.getMaxCharactersInTextLine()) {
+                        maxLengthsOfTextInCell.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine() - 1)) / 1000);
                     } else {
-                        textLengths.put(columnNames.get(i), (float) 0);
+                        maxLengthsOfTextInCell.put(columnNames.get(i), length);
                     }
+                } else {
+                    maxLengthsOfTextInCell.put(columnNames.get(i), length);
+                    notStringMaxLengths.put(columnNames.get(i), (float) 0);
+
+//                    //if font size is forced than count only for text column names
+//                    if (hashMapOfTypes.get(columnNames.get(i)).equalsIgnoreCase("string")) {
+//                        maxLengthsOfTextInCell.put(columnNames.get(i), length);
+//                    } else {
+//                        maxLengthsOfTextInCell.put(columnNames.get(i), (float) 0);
+//                    }
                 }
             }
 
@@ -97,14 +108,14 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        //create array list of transactions and extract from JsonResponse, textLengths are updated
-        ArrayList<Transaction> transactions = jsonResponse.extractTransactions(textLengths, configuration);
+        //create array list of transactions and extract from JsonResponse, maxLengthsOfTextInCell are updated
+        ArrayList<Transaction> transactions = jsonResponse.extractTransactions(maxLengthsOfTextInCell, notStringMaxLengths, configuration);
 
     
 
-        //clean textLengths from columns that are hidden
+        //clean maxLengthsOfTextInCell from columns that are hidden
         for (String string : configuration.getWhatColumnsToHide()) {
-            textLengths.remove(string);
+            maxLengthsOfTextInCell.remove(string);
         }
 
         //clean array list of column names from hidden columns
@@ -142,8 +153,8 @@ public class Main {
             for (String column : totals.keySet()) {
                 String string = DoubleFormatter.format(totals.get(column), column, configuration);
                 float l = PDType1Font.HELVETICA_BOLD.getStringWidth(string) / 1000;
-                if (l > textLengths.get(column)) {
-                    textLengths.put(column, l);
+                if (l > maxLengthsOfTextInCell.get(column)) {
+                    maxLengthsOfTextInCell.put(column, l);
                 }
             }
         } catch (IOException e) {
@@ -157,7 +168,7 @@ public class Main {
         //create preview
         if (configuration.isPreview()) {
             try (PDDocument doc = new PDDocument()) {
-                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead, ordinaryFontFile, boldFontFile);
+                Pdf pdf = new Pdf(doc, configuration, columnNames, maxLengthsOfTextInCell, notStringMaxLengths, hashMapOfTypes, columnNamesForTableHead, ordinaryFontFile, boldFontFile);
                 pdf.addNewPage();
                 pdf.createHeadOfReport();
 
@@ -253,7 +264,7 @@ public class Main {
         //create result PDF document
         if (configuration.isPdfExport()) {
             try (PDDocument doc = new PDDocument()) {
-                Pdf pdf = new Pdf(doc, configuration, columnNames, textLengths, hashMapOfTypes, columnNamesForTableHead, ordinaryFontFile, boldFontFile);
+                Pdf pdf = new Pdf(doc, configuration, columnNames, maxLengthsOfTextInCell, notStringMaxLengths, hashMapOfTypes, columnNamesForTableHead, ordinaryFontFile, boldFontFile);
                 pdf.addNewPage();
                 pdf.createHeadOfReport();
 

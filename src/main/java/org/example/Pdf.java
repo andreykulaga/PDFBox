@@ -12,10 +12,7 @@ import org.apache.pdfbox.pdmodel.font.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Pdf {
@@ -44,7 +41,8 @@ public class Pdf {
     float pageYSize;
     float fontSize;
 
-    HashMap<String, Float> textLengths;
+    HashMap<String, Float> maxLengthsOfTextInCell;
+    HashMap<String, Float> notStringMaxLengths;
     ArrayList<String> columnNames;
     HashMap<String, String> columnNamesForTableHead;
     HashMap<String, String> hashMapOfTypes;
@@ -65,13 +63,14 @@ public class Pdf {
 
 
     public Pdf(PDDocument document, Configuration configuration, ArrayList<String> columnNames, 
-    HashMap<String, Float> textLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead,
+    HashMap<String, Float> maxLengthsOfTextInCell, HashMap<String, Float> notStringMaxLengths, HashMap<String, String> hashMapOfTypes, HashMap<String, String> columnNamesForTableHead,
                File ordinaryFontFile, File boldFontFile) throws IOException {
 
         this.document = document;
         this.configuration = configuration;
         this.columnNames = columnNames;
-        this.textLengths = textLengths;
+        this.maxLengthsOfTextInCell = maxLengthsOfTextInCell;
+        this.notStringMaxLengths = notStringMaxLengths;
         this.hashMapOfTypes = hashMapOfTypes;
         this.columnNamesForTableHead = columnNamesForTableHead;
 
@@ -93,57 +92,96 @@ public class Pdf {
 
         //count max length of all columns to decide font size
         float rowLength = 0;
-        for (float i : textLengths.values()) {
+        for (float i : this.maxLengthsOfTextInCell.values()) {
             float doubleSpaceWidth = PDType1Font.HELVETICA_BOLD.getStringWidth("  ") / 1000;
             rowLength += (i + doubleSpaceWidth); //  - additional is one space before and after text
         }
 
         sumOfAllMaxWidth = 0;
-        for (float i: textLengths.values()) {
+        for (float i: this.maxLengthsOfTextInCell.values()) {
             sumOfAllMaxWidth += i;
         }
 
         //define font size
         if (!configuration.forceFontSize) {
             fontSize = tableWidth / rowLength;
-//            for (String string: hashMapOfTypes.keySet()) {
-//                float newLength = textLengths.get(string) * fontSize;
-//                textLengths.put(string, newLength);
-//                System.out.println("width of " + string + " is " + newLength);
-//                sumOfAllNumberWidth += newLength;
-//                }
-
         } else {
             fontSize = configuration.fontSize;
             //change textLengths so numbers will be as wide as it enough for font, and texts will redistribute left space
             float sumOfAllNumberWidth = 0;
             float sumOfAllTextWidth = 0;
+
+            //calculate column new column width according to their longest text
+            HashMap<String, Float> newMaxLengthsOfTextInCell = new HashMap<>();
+            for (String string: hashMapOfTypes.keySet()) {
+                float newLength = maxLengthsOfTextInCell.get(string) * tableWidth / sumOfAllMaxWidth;
+                newMaxLengthsOfTextInCell.put(string, newLength);
+            }
+
+            //clear to use further
+            maxLengthsOfTextInCell.clear();
+            //for number and date column check if it is enough width to accommodate their text in one row in forced font size
             for (String string: hashMapOfTypes.keySet()) {
                 if (hashMapOfTypes.get(string).equalsIgnoreCase("number")
                         || hashMapOfTypes.get(string).equalsIgnoreCase("Datetime")) {
-
                     float doubleSpaceWidth = boldFont.getStringWidth("   ") * fontSize / 1000;
-                    float newLength = textLengths.get(string) * fontSize + doubleSpaceWidth;
-                    textLengths.put(string, newLength);
-                    System.out.println("width of " + string + " is " + newLength);
-                    sumOfAllNumberWidth += newLength;
-                }
-                if (hashMapOfTypes.get(string).equalsIgnoreCase("string")) {
-                    sumOfAllTextWidth += textLengths.get(string);
+                    float lengthOfTheLongestRowExceptColumnName = notStringMaxLengths.get(string) * fontSize + doubleSpaceWidth;
+                    if (lengthOfTheLongestRowExceptColumnName > newMaxLengthsOfTextInCell.get(string)) {
+                        maxLengthsOfTextInCell.put(string, lengthOfTheLongestRowExceptColumnName);
+                        newMaxLengthsOfTextInCell.remove(string);
+                    }
                 }
             }
-            float whatIsLeftForText = tableWidth - sumOfAllNumberWidth;
-            for (String string: hashMapOfTypes.keySet()) {
-                if (hashMapOfTypes.get(string).equalsIgnoreCase("string")) {
-                    float newLength = textLengths.get(string) * whatIsLeftForText / sumOfAllTextWidth;
-                    textLengths.put(string, newLength);
-                    System.out.println("width of " + string + " is " + newLength);
-                }
+
+            //count sum on newLengths (that was changed) and unchanged
+            float sumOfChangedLengths = 0;
+            float sumOfUnchangedLengths = 0;
+            for (float fl: maxLengthsOfTextInCell.values()) {
+                sumOfChangedLengths += fl;
             }
+            for (float fl: newMaxLengthsOfTextInCell.values()) {
+                sumOfUnchangedLengths += fl;
+            }
+            //for how much we need to decrease unchanged columns
+            float difference = sumOfUnchangedLengths + sumOfChangedLengths - tableWidth;
+
+            while (difference > 0) {
+                //decrease unchanged columns
+                Set<String> set = new HashSet<>(newMaxLengthsOfTextInCell.keySet());
+                for (String string: set) {
+                    float newLength = newMaxLengthsOfTextInCell.get(string) * (1 - difference/sumOfUnchangedLengths);
+                    if (hashMapOfTypes.get(string).equalsIgnoreCase("number")
+                            || hashMapOfTypes.get(string).equalsIgnoreCase("Datetime")) {
+                        float doubleSpaceWidth = boldFont.getStringWidth("   ") * fontSize / 1000;
+                        float lengthOfTheLongestRowExceptColumnName = notStringMaxLengths.get(string) * fontSize + doubleSpaceWidth;
+                        if (lengthOfTheLongestRowExceptColumnName > newLength) {
+                            maxLengthsOfTextInCell.put(string, lengthOfTheLongestRowExceptColumnName);
+                            newMaxLengthsOfTextInCell.remove(string);
+                        } else {
+                            newMaxLengthsOfTextInCell.put(string, newLength);
+                        }
+                    } else {
+                        newMaxLengthsOfTextInCell.put(string, newLength);
+                    }
+                }
+                //recalculate sum on newLengths (that was changed) and unchanged
+                sumOfChangedLengths = 0;
+                sumOfUnchangedLengths = 0;
+                for (float fl: maxLengthsOfTextInCell.values()) {
+                    sumOfChangedLengths += fl;
+                }
+                for (float fl: newMaxLengthsOfTextInCell.values()) {
+                    sumOfUnchangedLengths += fl;
+                }
+                //recalculate the difference
+                difference = sumOfUnchangedLengths + sumOfChangedLengths - tableWidth;
+            }
+
+            maxLengthsOfTextInCell.putAll(newMaxLengthsOfTextInCell);
 
             //recalculate sum of width
             sumOfAllMaxWidth = 0;
-            for (float i: textLengths.values()) {
+            for (float i: this.maxLengthsOfTextInCell.values()) {
                 sumOfAllMaxWidth += i;
             }
 
@@ -258,7 +296,7 @@ public class Pdf {
 
         float cellWidth;
         for (String string: columnNames){
-            cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
+            cellWidth = tableWidth * maxLengthsOfTextInCell.get(string) / sumOfAllMaxWidth;
             String text = columnNamesForTableHead.get(string);
 
             addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(), configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
@@ -463,7 +501,7 @@ public class Pdf {
 
 
         for (String string: columnNames){
-            cellWidth = tableWidth * textLengths.get(string) / sumOfAllMaxWidth;
+            cellWidth = tableWidth * maxLengthsOfTextInCell.get(string) / sumOfAllMaxWidth;
             TextAlign textAlign = configuration.getTextAlignment().get(string);
             Color fontColor = configuration.getTextColor().get(string);
 
@@ -566,7 +604,7 @@ public class Pdf {
         //add flag for the first column to add textname of the line
         int f = 0;
         for (String tempColumnName: columnNames) {
-            cellWidth = tableWidth * textLengths.get(tempColumnName) / sumOfAllMaxWidth;
+            cellWidth = tableWidth * maxLengthsOfTextInCell.get(tempColumnName) / sumOfAllMaxWidth;
             String text;
             String type = hashMapOfTypes.get(tempColumnName);
 
@@ -715,7 +753,7 @@ public class Pdf {
 
         for (String key : columnNames) {
             String text = transaction.getAllValuesAsString(configuration).get(key);
-            float cellWidth = tableWidth * textLengths.get(key) / sumOfAllMaxWidth;
+            float cellWidth = tableWidth * maxLengthsOfTextInCell.get(key) / sumOfAllMaxWidth;
             float doubleSpaceWidth = font.getStringWidth("  ") * fontSize / 1000;
             float widthAvailableForText = cellWidth - doubleSpaceWidth;
             //create linked list of all words in text
@@ -745,7 +783,7 @@ public class Pdf {
 
         for (String key: hashMap.keySet()) {
             String text = hashMap.get(key);
-            float cellWidth = tableWidth * textLengths.get(key) / sumOfAllMaxWidth;
+            float cellWidth = tableWidth * maxLengthsOfTextInCell.get(key) / sumOfAllMaxWidth;
             float widthAvailableForText = cellWidth - font.getStringWidth("  ") * fontSize / 1000;
             //create linked list of all words in text
             LinkedList<String> textByLines = splitTextByLines(text, widthAvailableForText, font);
