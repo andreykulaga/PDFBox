@@ -93,7 +93,7 @@ public class JsonResponse {
         return hashMapOfTypes;
     }
 
-    public ArrayList<Transaction> extractTransactions(HashMap<String, Float> textLengths, HashMap<String, String> theLongestRow, Configuration configuration) {
+    public ArrayList<Transaction> extractTransactions(HashMap<String, Float> textLengths, Configuration configuration) {
         ArrayList<Transaction> transactions = new ArrayList<>();
         
         HashMap<String, String> hashMapOfTypes = createHashMapOfTypes();
@@ -111,7 +111,7 @@ public class JsonResponse {
 
                 //check field type and fill hashmaps of transaction
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
-                    Double f = Double.parseDouble(value);
+                    double f = Double.parseDouble(value);
                     numberFields.put(key, f);
                 }
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
@@ -130,27 +130,17 @@ public class JsonResponse {
                     double f = Double.parseDouble(value);
                     value = DoubleFormatter.format(f, key, configuration);
                 }
+                //if it is date, format it according to config
+                if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
+                    value = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"))
+                            .format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(key)));
+                }
 
                 float length;
                 try {
                     //check length and keep the biggest one to calculate cell width latter
                     length = PDType1Font.HELVETICA.getStringWidth(value) / 1000;
 
-//                //if it is text,increase length for each capitalised letter, as capitalised letters are too wide
-//                if (hashMapOfTypes.get(key).equalsIgnoreCase("string")) {
-//                    String lineToCompare = value.toLowerCase();
-//                    int howManyCapitalizedLetters = 0;
-//                    for (int j = 0; j < length; j++) {
-//                        if (value.charAt(j) != lineToCompare.charAt(j)) {
-//                            howManyCapitalizedLetters++;
-//                        }
-//                    }
-//                    length += (howManyCapitalizedLetters*4/5);
-//                }
-
-//                //change all
-//                if (length > textLengths.get(key)) {
-//                }
                     //strip text length to max in configuration for all text lines
                     //if font size not forse, wrapping is enabled, it is text field, characters more than max
                     if (!configuration.forceFontSize && configuration.isWrapTextInTable() &&
@@ -162,7 +152,7 @@ public class JsonResponse {
                             textLengths.replace(key, tempLength);
                         }
                     } else {
-                        if (value.length() > textLengths.get(key)) {
+                        if (length > textLengths.get(key)) {
                             textLengths.replace(key, length);
                         }
                     }

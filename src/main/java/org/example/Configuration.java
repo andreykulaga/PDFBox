@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class Configuration {
 
     //Configuration not in JSON, from previous iteration of program
-    boolean preview = true;
+    boolean preview = false;
     int numberOfPagesInPreview = 1;
     boolean pdfExport = true;
     String outputName = "result";

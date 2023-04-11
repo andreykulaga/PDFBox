@@ -74,29 +74,22 @@ public class Main {
 
         //create array list that we will need to calculate cell width
         HashMap<String, Float> textLengths = new HashMap<>();
-        HashMap<String, String> theLongestRow = new HashMap<>();
 
         try {
             //fill array that we will need to calculate cell width
             for (int i = 0; i < columnNames.size(); i++) {
                 String line = columnNamesForTableHead.get(columnNames.get(i));
-//            int length = line.length();
                 float length = PDType1Font.HELVETICA_BOLD.getStringWidth(line) / 1000;
-
-//                //increase length for each capitalised letter, as capitalised letters are too wide
-//                String lineToCompare = line.toLowerCase();
-//                int howManyCapitalizedLetters = 0;
-//                for (int j = 0; j < length; j++) {
-//                    if (line.charAt(j) != lineToCompare.charAt(j)) {
-//                        howManyCapitalizedLetters++;
-//                    }
-//                }
-//                length += (howManyCapitalizedLetters*4/5);
 
                 if (!configuration.forceFontSize && configuration.isWrapTextInTable() && line.length() > configuration.getMaxCharactersInTextLine()) {
                     textLengths.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000);
                 } else {
-                    textLengths.put(columnNames.get(i), length);
+                    //if font size is forced than count only for text column names
+                    if (hashMapOfTypes.get(columnNames.get(i)).equalsIgnoreCase("string")) {
+                        textLengths.put(columnNames.get(i), length);
+                    } else {
+                        textLengths.put(columnNames.get(i), (float) 0);
+                    }
                 }
             }
 
@@ -105,7 +98,7 @@ public class Main {
         }
 
         //create array list of transactions and extract from JsonResponse, textLengths are updated
-        ArrayList<Transaction> transactions = jsonResponse.extractTransactions(textLengths, theLongestRow, configuration);
+        ArrayList<Transaction> transactions = jsonResponse.extractTransactions(textLengths, configuration);
 
     
 
