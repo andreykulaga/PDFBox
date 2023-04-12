@@ -105,9 +105,6 @@ public class Pdf {
             fontSize = tableWidth / rowLength;
         } else {
             fontSize = configuration.fontSize;
-            //change textLengths so numbers will be as wide as it enough for font, and texts will redistribute left space
-            float sumOfAllNumberWidth = 0;
-            float sumOfAllTextWidth = 0;
 
             //calculate column new column width according to their longest text
             HashMap<String, Float> newMaxLengthsOfTextInCell = new HashMap<>();
@@ -441,8 +438,6 @@ public class Pdf {
                         initX = configuration.getLeftMargin() + columnWidth  * tableWidth / allLengths;
                     }
                 }
-                initX = configuration.getLeftMargin();
-
                 //add additional empty line after the last line
                 if (i == configuration.getPageHeaderConfiguration().size() - 1) {
                     initY -= headerCellHeight;
@@ -817,7 +812,7 @@ public class Pdf {
                             }
                             return textByLines;
                         }
-                        String tempString = string.substring(j, string.length());
+                        String tempString = string.substring(j);
                         float tempStringWidth = font.getStringWidth(tempString) * fontSize / 1000;
                         if (stringWidth - tempStringWidth < widthAvailableForText) {
                             //if we found such part of word, then we stop divide it by characters,
@@ -837,7 +832,6 @@ public class Pdf {
             //wrap words
             int k = 0;
             while (k < size-1) {
-                float temp = font.getStringWidth(textByLines.get(k) + " " + textByLines.get(k + 1) )* fontSize;
                 if (font.getStringWidth(textByLines.get(k) + " " + textByLines.get(k + 1)) * fontSize / 1000 <= widthAvailableForText) {
                     String newString = textByLines.get(k) + " " + textByLines.get(k + 1);
                     textByLines.set(k, newString);
