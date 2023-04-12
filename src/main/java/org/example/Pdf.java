@@ -42,7 +42,6 @@ public class Pdf {
     float fontSize;
 
     HashMap<String, Float> maxLengthsOfTextInCell;
-    HashMap<String, Float> notStringMaxLengths;
     ArrayList<String> columnNames;
     HashMap<String, String> columnNamesForTableHead;
     HashMap<String, String> hashMapOfTypes;
@@ -70,7 +69,6 @@ public class Pdf {
         this.configuration = configuration;
         this.columnNames = columnNames;
         this.maxLengthsOfTextInCell = maxLengthsOfTextInCell;
-        this.notStringMaxLengths = notStringMaxLengths;
         this.hashMapOfTypes = hashMapOfTypes;
         this.columnNamesForTableHead = columnNamesForTableHead;
 
