@@ -886,8 +886,18 @@ public class Pdf {
         contentStream.setNonStrokingColor(fontColor);
 
         //define starting position of text
-        float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
         float textInitX = 0;
+        float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
+        //change initY for cells if their text has fewer rows than cell, if TextAlign is Center or Bottom.
+        //TextAlign Top is default for all
+        if (textByLines.size() < quantityOfLines) {
+            if (configuration.getRowHeaderVerticalAlignment().equals(TextAlign.CENTER)) {
+                textInitY -= cellHeight * (quantityOfLines - textByLines.size())/2;
+            }
+            if (configuration.getRowHeaderVerticalAlignment().equals(TextAlign.BOTTOM)) {
+                textInitY -= cellHeight * (quantityOfLines - textByLines.size());
+            }
+        }
 
         for (String string: textByLines) {
             //calculate string length in points

@@ -5,11 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -92,7 +88,7 @@ public class NewJsonConfigurationRequest {
     
     public static class PageFooter{
         @JsonProperty("fontSize")
-        public String fontSize;
+        public float fontSize;
         @JsonProperty("fontColor")
         public String textColor;
         @JsonProperty("backgroundColor")
@@ -105,7 +101,7 @@ public class NewJsonConfigurationRequest {
     
     public static class PageHeader{
         @JsonProperty("fontSize")
-        public String fontSize;
+        public float fontSize;
         @JsonProperty("fontColor")
         public String textColor;
         @JsonProperty("backgroundColor")

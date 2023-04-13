@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -131,7 +129,7 @@ public class Configuration {
         }
 
         //PageFooter Configuration
-        pageFooterFontSize = Float.parseFloat(nJCR.pageFooter.fontSize);
+        pageFooterFontSize = nJCR.pageFooter.fontSize;
 
         try {
             pageFooterFontColor = Color.decode(nJCR.pageFooter.textColor);
@@ -155,7 +153,7 @@ public class Configuration {
         //PageHeader Configuration
         for (int i=0; i < nJCR.getPageHeader().size(); i++) {
             HashMap<String, String> hashMap = new HashMap<>();
-            hashMap.put("fontSize", nJCR.getPageHeader().get(i).fontSize);
+            hashMap.put("fontSize", String.valueOf(nJCR.getPageHeader().get(i).fontSize));
             hashMap.put("textColor", nJCR.getPageHeader().get(i).textColor);
             hashMap.put("backGroundColor", nJCR.getPageHeader().get(i).backGroundColor);
             pageHeaderConfiguration.add(hashMap);

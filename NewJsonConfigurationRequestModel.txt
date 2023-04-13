@@ -172,7 +172,7 @@
 		"aggregate": "AVG"
 	}],
 	"pageHeaderRows": [{
-			"fontSize": "32",
+			"fontSize": 32,
 			"fontColor": "#000000",
 			"backgroundColor": "#ffffff",
 			"data": [
@@ -182,7 +182,7 @@
 				}
 			]
 		}, {
-			"fontSize": "10",
+			"fontSize": 10,
 			"fontColor": "#000000",
 			"backgroundColor": "#ffffff",
 			"data": [
@@ -200,7 +200,7 @@
 				}
 			]
 		}, {
-		    "fontSize": "10",
+		    "fontSize": 10,
         	"fontColor": "#000000",
         	"backgroundColor": "#ffffff",
         	"data": [
@@ -218,7 +218,7 @@
         		}
         	]
         }, {
-		    "fontSize": "10",
+		    "fontSize": 10,
         	"fontColor": "#000000",
         	"backgroundColor": "#ffffff",
         	"data": [
@@ -230,7 +230,7 @@
         }
     ],
 	"pageFooter": {
-		"fontSize": "8",
+		"fontSize": 8,
 		"fontColor": "#9e7911",
 		"backgroundColor": "#ffffff",
 		"showPageNumber": true,
