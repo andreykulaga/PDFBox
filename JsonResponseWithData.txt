@@ -14,7 +14,7 @@
 				"TICKER_Id": null,
 				"Original_Share_Qty": 1000000000.0,
 				"Unit_Price_Base_Amt": 0.0,
-				"Market_Value_Base_Amt": 1232341341.04,
+				"Market_Value_Base_Amt": null,
 				"Unit_Original_Cost_Base_Amt": 0.0,
 				"Original_Cost_Base_Amt": 0.0,
 				"CreateDt": "2023-01-21 09:12 AM"

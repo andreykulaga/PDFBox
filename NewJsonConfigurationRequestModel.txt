@@ -2,7 +2,7 @@
 	"showHeaderOnEveryPage": true,
 	"wrapTextInTable": true,
 	"maxCharactersToWrap": 20,
-	"forceFontSize": true,
+	"forceFontSize": false,
 	"fontSize": 7,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",
