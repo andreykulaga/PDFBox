@@ -112,15 +112,16 @@ public class JsonResponse {
                 //check field type and fill hashmaps of transaction
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
                     double f;
-                    try {
-                        f = Double.parseDouble(value);
-                    } catch (NumberFormatException e) {
+                    if (value.equalsIgnoreCase("null")) {
                         f = 0;
+                    } else {
+                        f = Double.parseDouble(value);
                     }
                     numberFields.put(key, f);
                 }
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
-                    LocalDateTime ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"));
+//                    LocalDateTime ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"));
+                    LocalDateTime ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
                     dateTimeFields.put(key, ldt);
                 } else {
                     textFields.put(key, value);
@@ -133,16 +134,16 @@ public class JsonResponse {
                 //if it is number, get a double and format it
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
                     double f;
-                    try {
-                        f = Double.parseDouble(value);
-                    } catch (NumberFormatException e) {
+                    if (value.equalsIgnoreCase("null")) {
                         f = 0;
+                    } else {
+                        f = Double.parseDouble(value);
                     }
                     value = DoubleFormatter.format(f, key, configuration);
                 }
                 //if it is date, format it according to config
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
-                    value = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"))
+                    value = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
                             .format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(key)));
                 }
 
