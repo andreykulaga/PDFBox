@@ -407,12 +407,11 @@ public class Pdf {
 //                //add green rectangle
 //                contentStream.addRect(x,y,w,w);
 //                contentStream.fill();
+                //add additional empty line after Report name
+                initY -= headerCellHeight/3;
+
 
             } else {
-                //add additional empty line after Report name
-                if (i==1) {
-                    initY -= headerCellHeight;
-                }
 
                 //draw the line by drawing each part of it's data
                 float columnWidth = 0;

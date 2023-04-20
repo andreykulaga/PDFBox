@@ -169,9 +169,6 @@ public class JsonResponse {
                         }
                     } else {
                         if (length > textLengths.get(key)) {
-                            System.out.println(textLengths.get(key));
-                            System.out.println(length);
-                            System.out.println();
                             textLengths.replace(key, length);
                         }
                         if (length > notStringMaxLengths.get(key)) {
