@@ -1,14 +1,14 @@
 {
 	"showHeaderOnEveryPage": true,
-	"wrapTextInTable": true,
+	"wrapTextInTable": false,
 	"maxCharactersToWrap": 20,
 	"forceFontSize": false,
-	"fontSize": 7,
+	"fontSize": 11,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",
     "rowHeaderBackgroundColor": "#000000",
     "rowHeaderVerticalAlignment": "Middle",
-    "rowHeaderHorizontalAlignment": "Left",
+    "rowHeaderHorizontalAlignment": "Center",
     "pageMargin":{
         "top":"36",
         "left":"36",
@@ -27,7 +27,7 @@
 	}],
 	"fields": [{
 			"name": "Client_Product_Id",
-			"displayName": "Displayed name of client product id",
+			"displayName": "Portfolio External",
 			"dataType": "string",
 			"dataFormat": "text",
 			"textAlignment": "Left",
@@ -37,8 +37,8 @@
 			    "fontColor": "#FF0000"
 			    }
 			}, {
-			"name": "product_Nm",
-			"displayName": "Displayed name of product name",
+			"name": "Product_Nm",
+			"displayName": "Portfolio Name",
 			"dataType": "string",
 			"dataFormat": "text",
 			"textAlignment": "Left",
@@ -49,7 +49,7 @@
 			    }
 			}, {
 			"name": "Investment_Nm",
-			"displayName": "Displayed name of Investment_Nm",
+			"displayName": "Investment Name",
 			"dataType": "string",
 			"dataFormat": "text",
 			"textAlignment": "Left",
@@ -60,7 +60,7 @@
 			    }
 			}, {
 			"name": "Alt_Src_Sys_Investment_Id",
-			"displayName": "Displayed name of Alt_Src_Sys_Investment_Id",
+			"displayName": "Alternate Source System Investment ID",
 			"dataType": "string",
 			"dataFormat": "text",
 			"textAlignment": "Left",
@@ -71,7 +71,7 @@
 			    }
 			}, {
 			"name": "TICKER_Id",
-			"displayName": "Displayed name of TICKER_Id",
+			"displayName": "Ticker",
 			"dataType": "string",
 			"dataFormat": "text",
 			"textAlignment": "Right",
@@ -81,66 +81,88 @@
 			    "fontColor": "#FF0000"
 			    }
 			}, {
-			"name": "Original_Share_Qty",
-			"displayName": "Displayed name of Original_Share_Qty",
-			"dataType": "number",
-			"dataFormat": "#,##0.00",
-			"textAlignment": "Right",
-			"fontColor": "#000000",
-			"negativeNumberOption":{
-			    "decorateWith": "Parenthesis",
-			    "fontColor": "#FF0000"
-			    }
-			}, {
-			"name": "unit_price_Base_Amt",
-			"displayName": "Displayed name of unit_price_Base_Amt",
-			"dataType": "number",
-			"dataFormat": "#,##0.00",
-			"textAlignment": "Right",
-			"fontColor": "#000000",
-			"negativeNumberOption":{
-			    "decorateWith": "Parenthesis",
-			    "fontColor": "#FF0000"
-			    }
-			}, {
-			"name": "Market_Value_Base_Amt",
-			"displayName": "Displayed name of Market_Value_Base_Amt",
-			"dataType": "number",
-			"dataFormat": "#,##0.00",
-			"textAlignment": "Right",
-			"fontColor": "#000000",
-			"negativeNumberOption":{
-			    "decorateWith": "Parenthesis",
-			    "fontColor": "#FF0000"
-			    }
-			}, {
-			"name": "Unit_Original_Cost_Base_Amt",
-			"displayName": "Displayed name of Unit_Original_Cost_Base_Amt",
-			"dataType": "number",
-			"dataFormat": "#,##0.00",
-			"textAlignment": "Right",
-			"fontColor": "#000000",
-			"negativeNumberOption":{
-			    "decorateWith": "Parenthesis",
-			    "fontColor": "#FF0000"
-			    }
-			}, {
-			"name": "Original_Cost_Base_Amt",
-			"displayName": "Displayed name of Original_Cost_Base_Amt",
-			"dataType": "number",
-			"dataFormat": "#,##0.00",
-			"textAlignment": "Right",
-			"fontColor": "#000000",
-			"negativeNumberOption":{
-			    "decorateWith": "Parenthesis",
-			    "fontColor": "#FF0000"
-			    }
-			}, {
-			"name": "CreateDt",
-			"displayName": "Displayed name of CreateDt",
-			"dataType": "Datetime",
-			"dataFormat": "MM/DD/YYYY",
+			"name": "Currency Code (Local)",
+			"displayName": "Currency Code (Local)",
+			"dataType": "string",
+			"dataFormat": "text",
 			"textAlignment": "Left",
+			"fontColor": "#000000",
+			"negativeNumberOption":{
+			    "decorateWith": "Parenthesis",
+			    "fontColor": "#FF0000"
+			    }
+			}, {
+			"name": "Trade Date",
+            "displayName": "Trade Date",
+            "dataType": "Datetime",
+            "dataFormat": "MM/DD/YYYY",
+            "textAlignment": "Left",
+            "fontColor": "#000000",
+            "negativeNumberOption":{
+                "decorateWith": "Parenthesis",
+                "fontColor": "#FF0000"
+                }
+			}, {
+			"name": "Actual Settlement Date",
+            "displayName": "Actual Settlement Date",
+            "dataType": "Datetime",
+            "dataFormat": "MM/DD/YYYY",
+            "textAlignment": "Left",
+            "fontColor": "#000000",
+            "negativeNumberOption":{
+                "decorateWith": "Parenthesis",
+                "fontColor": "#FF0000"
+                }
+			}, {
+            "name": "Transaction",
+			"displayName": "Transaction",
+			"dataType": "string",
+			"dataFormat": "text",
+			"textAlignment": "Left",
+			"fontColor": "#000000",
+			"negativeNumberOption":{
+			    "decorateWith": "Parenthesis",
+			    "fontColor": "#FF0000"
+			    }
+			}, {
+			"name": "Quantity",
+			"displayName": "Quantity",
+			"dataType": "number",
+			"dataFormat": "#,##0.00",
+			"textAlignment": "Right",
+			"fontColor": "#000000",
+			"negativeNumberOption":{
+			    "decorateWith": "Parenthesis",
+			    "fontColor": "#FF0000"
+			    }
+			}, {
+			"name": "Unit Price",
+			"displayName": "Unit Price",
+			"dataType": "number",
+			"dataFormat": "#,##0.00",
+			"textAlignment": "Right",
+			"fontColor": "#000000",
+			"negativeNumberOption":{
+			    "decorateWith": "Parenthesis",
+			    "fontColor": "#FF0000"
+			    }
+			}, {
+            "name": "Net Amount",
+			"displayName": "Net Amount",
+			"dataType": "number",
+			"dataFormat": "#,##0.00",
+			"textAlignment": "Right",
+			"fontColor": "#000000",
+			"negativeNumberOption":{
+			    "decorateWith": "Parenthesis",
+			    "fontColor": "#FF0000"
+			    }
+			}, {
+            "name": "Notional Amount (Local)",
+			"displayName": "Notional Amount (Local)",
+			"dataType": "number",
+			"dataFormat": "#,##0.00",
+			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
@@ -153,12 +175,6 @@
 			"type": "string",
 			"fontColor": "#ffffff",
 			"backgroundColor":"#313094"
-		},
-		{
-			"field": "Original_Share_Qty",
-			"type": "number",
-            "fontColor": "#ffffff",
-            "backgroundColor":"#8a81be"
 		}
 	],
 	"ColumnsToAggregate": [{

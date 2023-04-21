@@ -56,6 +56,7 @@ public class Pdf {
     float footerFontDescent;
     float footerFontLeading;
     float footerCellHeight;
+    float footerTopBoarder;
 
     float sumOfAllMaxWidth;
 
@@ -197,6 +198,9 @@ public class Pdf {
         footerFontDescent = getFontDescriptor(ordinaryFont).getDescent() * configuration.getPageFooterFontSize() / 1000;
         footerFontLeading = getFontDescriptor(ordinaryFont).getLeading() * configuration.getPageFooterFontSize() / 1000;
         footerCellHeight = footerFontCapHeight + footerFontAscent - footerFontDescent + footerFontLeading;
+
+
+        footerTopBoarder = configuration.getBottomMargin() + ((float) configuration.getLinesOfPageFooter().size() / 2 + 3)*footerCellHeight;
     }
 
 
@@ -235,6 +239,8 @@ public class Pdf {
     }
 
     public void addFooters() throws IOException {
+        //we should add footers only after all document is ready, because only then
+        // we can calculate how many pages in the document to display it in footers
 
         //change global cell height and fontDescent
         float tempCellHeight = cellHeight;
@@ -245,29 +251,40 @@ public class Pdf {
         for (int i=0; i< document.getNumberOfPages(); i++) {
             PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(i), PDPageContentStream.AppendMode.APPEND, true);
 
+            //draw a line above the footer
+            contentStream.moveTo(configuration.getLeftMargin(), footerTopBoarder - footerCellHeight);
+            contentStream.lineTo(initX+tableWidth, footerTopBoarder - footerCellHeight);
+            contentStream.stroke();
+
             //add page number
             if (configuration.isPageNumberFlag()) {
                 
                 addCellWithText(contentStream, "Page " + (i+1) + " of " + document.getNumberOfPages(),
                 TextAlign.RIGHT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
                 configuration.getLeftMargin(),
-                configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight - (footerCellHeight * (configuration.getLinesOfPageFooter().size()-1))/2,
-                tableWidth, configuration.getPageFooterFontSize(), true, ordinaryFont);
+                footerTopBoarder - 3*footerCellHeight - (footerCellHeight * ((float) configuration.getLinesOfPageFooter().size()/2 -1))/2,
+                tableWidth, configuration.getPageFooterFontSize(), true, boldFont);
             }
-            //add text lines
-            float tab = 0;
-            float footerFontAverageWidth = getFontDescriptor(ordinaryFont).getAverageWidth() * configuration.getPageFooterFontSize() / 1000;
-            for (int j=0; j < configuration.getLinesOfPageFooter().size(); j++) {
-                String st = configuration.getLinesOfPageFooter().get(j);
-                //count the longest line to tabulate page number to prevent overlap
-                if (st.length() > tab) {
-                    tab = st.length();
-                }
-                addCellWithText(contentStream, st,
+
+            for (int j=0; j < configuration.getLinesOfPageFooter().size(); j+=2) {
+                String boldString = configuration.getLinesOfPageFooter().get(j) + ":";
+                float lengthOfBoldString = boldFont.getStringWidth(boldString + "  ") * configuration.getPageFooterFontSize() / 1000;
+
+                String ordinaryString = configuration.getLinesOfPageFooter().get(j+1);
+                float lengthOfOrdinaryString = ordinaryFont.getStringWidth(ordinaryString + " ") * configuration.getPageFooterFontSize() / 1000;
+
+                float y = footerTopBoarder - 3*footerCellHeight - (footerCellHeight * j/2);
+
+                addCellWithText(contentStream, boldString,
                 TextAlign.LEFT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
                 configuration.getLeftMargin(),
-                        configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight - (footerCellHeight * j),
-                        (tab+1) * footerFontAverageWidth,
+                        y, lengthOfBoldString,
+                        configuration.getPageFooterFontSize(), true, boldFont);
+
+                addCellWithText(contentStream, ordinaryString,
+                TextAlign.RIGHT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
+                        (float) (configuration.getLeftMargin() + (lengthOfBoldString)),
+                        y, lengthOfOrdinaryString,
                         configuration.getPageFooterFontSize(), true, ordinaryFont);
             }
             contentStream.close();
@@ -276,8 +293,6 @@ public class Pdf {
         //change global cell height and font descent back
         cellHeight = tempCellHeight;
         fontDescent = tempFontDescent;
-
-
     }
 
     public void addTableHeader(PDPageContentStream contentStream) throws IOException {
@@ -294,7 +309,8 @@ public class Pdf {
             cellWidth = tableWidth * maxLengthsOfTextInCell.get(string) / sumOfAllMaxWidth;
             String text = columnNamesForTableHead.get(string);
 
-            addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(), configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
+            addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(),
+                    configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
             Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, boldFont);
             initX += cellWidth;
         }
@@ -408,7 +424,7 @@ public class Pdf {
 //                contentStream.addRect(x,y,w,w);
 //                contentStream.fill();
                 //add additional empty line after Report name
-                initY -= headerCellHeight/3;
+                initY -= headerCellHeight/4;
 
 
             } else {
@@ -485,7 +501,7 @@ public class Pdf {
         }
 
         //create new page if there is no enough space
-        if (initY - cellHeight*quantityOfLines < configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight) {
+        if (initY - cellHeight*quantityOfLines < footerTopBoarder) {
             addNewPage();
             contentStream.close();
             contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
@@ -560,7 +576,7 @@ public class Pdf {
 
         contentStream.close();
 
-        if (initY < configuration.getBottomMargin()+cellHeight) {
+        if (initY - cellHeight < footerTopBoarder) {
             addNewPage();
         }
     }
@@ -586,7 +602,7 @@ public class Pdf {
         
         int howManyLinesInARow = howManyLinesInARow(subtotal, boldFont);
         //create new page if there is no enough space
-        if (initY - cellHeight*howManyLinesInARow < configuration.getBottomMargin() + configuration.getLinesOfPageFooter().size()*footerCellHeight) {
+        if (initY - cellHeight*howManyLinesInARow < footerTopBoarder) {
             addNewPage();
             contentStream.close();
             contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
@@ -637,7 +653,7 @@ public class Pdf {
         initX = configuration.getLeftMargin();
         initY -= (cellHeight * howManyLinesInARow);
 
-        if (initY < configuration.getBottomMargin()+cellHeight) {
+        if (initY - cellHeight < footerTopBoarder) {
             addNewPage();
         }
     }
@@ -671,16 +687,17 @@ public class Pdf {
         float textInitX = 0;
 
         //calculate string length in points
-        float stringWidth = ordinaryFont.getStringWidth(text) / 1000 * sizeOfFont;
+        float stringWidth = font.getStringWidth(text) / 1000 * sizeOfFont;
+        float spaceWidth = font.getStringWidth(" ") / 1000 * sizeOfFont;
 
         if (textAlign == TextAlign.LEFT) {
-            textInitX = initX + fontAverageWidth;
+            textInitX = initX + spaceWidth;
         }
         if (textAlign == TextAlign.CENTER) {
             textInitX = initX + cellWidth/2 - stringWidth/2;
         }
         if (textAlign == TextAlign.RIGHT) {
-            textInitX = initX + cellWidth - stringWidth - fontAverageWidth;
+             textInitX = initX + cellWidth - stringWidth - spaceWidth;
         }
 
         //add text
@@ -901,15 +918,16 @@ public class Pdf {
         for (String string: textByLines) {
             //calculate string length in points
             float stringWidth = font.getStringWidth(string) / 1000 * fontSize;
+            float spaceWidth = font.getStringWidth(" ") / 1000 * fontSize;
 
             if (textAlign == TextAlign.LEFT) {
-                textInitX = initX + getFontDescriptor(font).getAverageWidth() / 1000 * fontSize;
+                textInitX = initX + spaceWidth;
             }
             if (textAlign == TextAlign.CENTER) {
                 textInitX = initX + cellWidth/2 - stringWidth/2;
             }
             if (textAlign == TextAlign.RIGHT) {
-                textInitX = initX + cellWidth - stringWidth - getFontDescriptor(font).getAverageWidth() / 1000 * fontSize;
+                textInitX = initX + cellWidth - stringWidth - spaceWidth;
             }
 
             contentStream.beginText();

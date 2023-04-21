@@ -145,8 +145,10 @@ public class Configuration {
 
         for (int i=0; i < nJCR.pageFooter.data.size(); i++) {
             String f = nJCR.pageFooter.data.get(i).field;
+            linesOfPageFooter.add(f);
             String v = nJCR.pageFooter.data.get(i).value;
-            linesOfPageFooter.add(f.concat(": ").concat(v));
+            linesOfPageFooter.add(v);
+//            linesOfPageFooter.add(f.concat(": ").concat(v));
         }
 
 

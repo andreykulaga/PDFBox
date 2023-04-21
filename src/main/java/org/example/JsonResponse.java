@@ -120,7 +120,6 @@ public class JsonResponse {
                     numberFields.put(key, f);
                 }
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
-//                    LocalDateTime ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"));
                     LocalDateTime ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
                     dateTimeFields.put(key, ldt);
                 } else {
@@ -150,14 +149,14 @@ public class JsonResponse {
                 float length;
                 try {
                     //check length and keep the biggest one to calculate cell width latter
-                    length = PDType1Font.HELVETICA.getStringWidth(value) / 1000;
+                    length = PDType1Font.HELVETICA.getStringWidth(value + "  ") / 1000;
 
 
                     if (!configuration.forceFontSize) {
                         if (configuration.isWrapTextInTable() &&
                                 hashMapOfTypes.get(key).equalsIgnoreCase("string") &&
                                 value.length() > configuration.getMaxCharactersInTextLine()) {
-                            float tempLength = PDType1Font.HELVETICA.getStringWidth(value.substring(0, configuration.getMaxCharactersInTextLine()-1)) / 1000;
+                            float tempLength = PDType1Font.HELVETICA.getStringWidth(value.substring(0, configuration.getMaxCharactersInTextLine()-1) + "  ") / 1000;
                             //if it is less than is already in text lengths it means that there is already value for string with length bigger than max but more wide characters
                             if (tempLength > textLengths.get(key)) {
                                 textLengths.replace(key, tempLength);

@@ -78,16 +78,15 @@ public class Main {
         //create array list to store max length of data in not string column
         HashMap<String, Float> notStringMaxLengths = new HashMap<>();
 
-
         try {
             //fill array that we will need to calculate cell width
             for (int i = 0; i < columnNames.size(); i++) {
                 String line = columnNamesForTableHead.get(columnNames.get(i));
-                float length = PDType1Font.HELVETICA_BOLD.getStringWidth(line) / 1000;
+                float length = PDType1Font.HELVETICA_BOLD.getStringWidth(line + "  ") / 1000;
 
                 if (!configuration.forceFontSize) {
                     if (configuration.isWrapTextInTable() && line.length() > configuration.getMaxCharactersInTextLine()) {
-                        maxLengthsOfTextInCell.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine() - 1)) / 1000);
+                        maxLengthsOfTextInCell.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine() - 1) + "  ") / 1000);
                     } else {
                         maxLengthsOfTextInCell.put(columnNames.get(i), length);
                     }
@@ -152,7 +151,7 @@ public class Main {
             }
             for (String column : totals.keySet()) {
                 String string = DoubleFormatter.format(totals.get(column), column, configuration);
-                float l = PDType1Font.HELVETICA_BOLD.getStringWidth(string) / 1000;
+                float l = PDType1Font.HELVETICA_BOLD.getStringWidth(string + "  ") / 1000;
                 if (l > maxLengthsOfTextInCell.get(column)) {
                     maxLengthsOfTextInCell.put(column, l);
                 }

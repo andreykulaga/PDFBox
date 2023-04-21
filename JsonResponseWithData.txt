@@ -7,35 +7,123 @@
 		"report": {
 			"reportId": 0,
 			"data": [{
-				"Client_Product_Id": null,
-				"Product_Nm": null,
-				"Investment_Nm": null,
-				"Alt_Src_Sys_Investment_Id": null,
-				"TICKER_Id": null,
-				"Original_Share_Qty": 1000000000.0,
-				"Unit_Price_Base_Amt": 0.0,
-				"Market_Value_Base_Amt": null,
-				"Unit_Original_Cost_Base_Amt": 0.0,
-				"Original_Cost_Base_Amt": 0.0,
-				"CreateDt": "2023-01-21T09:12:00"
-			}, {
-				"Client_Product_Id": "POOLGO",
-				"Product_Nm": "3233rdfdsf4545454",
-				"Investment_Nm": "BRAZILIAN REAL",
-				"Alt_Src_Sys_Investment_Id": "BRL",
-				"TICKER_Id": "BRL",
-				"Original_Share_Qty": 1234567891234567.0,
-				"Unit_Price_Base_Amt": -1000000000000000000000.750000,
-				"Market_Value_Base_Amt": 0.000000,
-				"Unit_Original_Cost_Base_Amt": 0.23456,
-				"Original_Cost_Base_Amt": -3.24555,
-				"CreateDt": "2023-01-21T09:12:05"
+				"Client_Product_Id": "DYNGM3",
+				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+				"Alt_Src_Sys_Investment_Id": "88673M201",
+				"TICKER_Id": "GDNG",
+				"Currency Code (Local)": "USD",
+				"Trade Date": "2023-02-03T09:12:00",
+				"Actual Settlement Date": "2023-02-23T09:12:00",
+				"Transaction": "Dividend",
+				"Quantity": 136.0,
+				"Unit Price": 9.96,
+				"Net Amount": -1354.56,
+				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 314.0,
+  				"Unit Price": 4.5,
+  				"Net Amount": 72.03,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 859.0,
+  				"Unit Price": 39.58,
+  				"Net Amount": 35.6,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 0.0,
+  				"Net Amount": 182.84,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 0.0,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 0.0,
+  				"Net Amount": -1413.00,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 0.0,
+  				"Net Amount": 183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "PT Gudang Garam Tb Unspon ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "GDNG",
+  				"Currency Code (Local)": "USD",
+  				"Trade Date": "2023-02-03T09:12:00",
+  				"Actual Settlement Date": "2023-02-23T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 0.0,
+  				"Net Amount": -5238.11,
+  				"Notional Amount (Local)": 0.0
 			}],
 			"fields": [{
 					"field": "Client_Product_Id",
 					"type": "string"
 				}, {
-					"field": "product_Nm",
+					"field": "Product_Nm",
 					"type": "string"
 				}, {
 					"field": "Investment_Nm",
@@ -50,28 +138,36 @@
 					"type": "string"
 				},
 				{
-					"field": "Original_Share_Qty",
-					"type": "number"
+					"field": "Currency Code (Local)",
+					"type": "string"
 				},
 				{
-					"field": "unit_price_Base_Amt",
-					"type": "number"
-				},
-				{
-					"field": "Market_Value_Base_Amt",
-					"type": "number"
-				},
-				{
-					"field": "Unit_Original_Cost_Base_Amt",
-					"type": "number"
-				},
-				{
-					"field": "Original_Cost_Base_Amt",
-					"type": "number"
-				},
-				{
-					"field": "CreateDt",
+					"field": "Trade Date",
 					"type": "Datetime"
+				},
+				{
+					"field": "Actual Settlement Date",
+					"type": "Datetime"
+				},
+				{
+					"field": "Transaction",
+					"type": "string"
+				},
+				{
+					"field": "Quantity",
+					"type": "number"
+				},
+				{
+					"field": "Unit Price",
+					"type": "number"
+				},
+				{
+					"field": "Net Amount",
+					"type": "number"
+				},
+				{
+					"field": "Notional Amount (Local)",
+					"type": "number"
 				}
 			],
 			"grouping": [{
