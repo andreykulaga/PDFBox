@@ -16,7 +16,7 @@
         "bottom":"36"
         },
     "boarderOption":{
-        "showVerticalBoarder":true,
+        "showVerticalBoarder":false,
         "showHorizontalBoarder":true,
         "lineWidth":1,
         "lineBoarderColor":"#A7A7A7"
@@ -170,12 +170,8 @@
 			    }
 			}
 	],
-	"columnsToGroupBy": [{
-			"field": "TICKER_Id",
-			"type": "string",
-			"fontColor": "#ffffff",
-			"backgroundColor":"#313094"
-		}
+	"columnsToGroupBy": [
+
 	],
 	"ColumnsToAggregate": [{
 		"field": "Investment_Nm",
