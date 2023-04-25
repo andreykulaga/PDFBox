@@ -109,10 +109,14 @@ public class JsonResponse {
                 String key = s.replaceAll("_", " ").toLowerCase();
                 String value = d.fieldsAndValues.get(s);
 
+                if (value.equalsIgnoreCase("null")) {
+                    value = "";
+                }
+
                 //check field type and fill hashmaps of transaction
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
                     double f;
-                    if (value.equalsIgnoreCase("null")) {
+                    if (value.equalsIgnoreCase("")) {
                         f = 0;
                     } else {
                         f = Double.parseDouble(value);
@@ -120,20 +124,23 @@ public class JsonResponse {
                     numberFields.put(key, f);
                 }
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
-                    LocalDateTime ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+                    LocalDateTime ldt;
+                    if (value.equalsIgnoreCase("")) {
+                        ldt = LocalDateTime.of(1, 1, 1, 0,0, 0, 0);
+                    } else {
+                        ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+                    }
+
                     dateTimeFields.put(key, ldt);
                 } else {
                     textFields.put(key, value);
                 }
 
 
-                if (value == null) {
-                    value = "null";
-                }
                 //if it is number, get a double and format it
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
                     double f;
-                    if (value.equalsIgnoreCase("null")) {
+                    if (value.equalsIgnoreCase("")) {
                         f = 0;
                     } else {
                         f = Double.parseDouble(value);
@@ -142,8 +149,10 @@ public class JsonResponse {
                 }
                 //if it is date, format it according to config
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
-                    value = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
-                            .format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(key)));
+                    if (!value.equalsIgnoreCase("")) {
+                        value = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+                                .format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(key)));
+                    }
                 }
 
                 float length;
