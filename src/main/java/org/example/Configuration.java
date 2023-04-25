@@ -173,7 +173,20 @@ public class Configuration {
         //Fields configuration
         for (int i = 0; i < nJCR.getFields().size(); i++) {
             String columnName = nJCR.getFields().get(i).field.toLowerCase().replace("_", " ");
-            textFormat.put(columnName, nJCR.getFields().get(i).textFormat);
+
+            //if text format is null, then put default for datetime and number
+            String format = nJCR.getFields().get(i).textFormat;
+            if (format == null) {
+                if (nJCR.getFields().get(i).type.equalsIgnoreCase("number")) {
+                    format = "#,##0.00";
+                } else if (nJCR.getFields().get(i).type.equalsIgnoreCase("Datetime")) {
+                    format = "MM/DD/YYYY";
+                } else {
+                    format = "text";
+                }
+            }
+            textFormat.put(columnName, format);
+
             columnNamesForTableHead.put(columnName, nJCR.getFields().get(i).displayedName);
 
             textAlignment.put(columnName, TextAlign.fromStringToTextAlign(nJCR.getFields().get(i).textAlignment));

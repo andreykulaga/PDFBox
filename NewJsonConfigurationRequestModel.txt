@@ -29,7 +29,7 @@
 			"name": "Client_Product_Id",
 			"displayName": "Portfolio External",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -40,7 +40,7 @@
 			"name": "Product_Nm",
 			"displayName": "Portfolio Name",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -51,7 +51,7 @@
 			"name": "Investment_Nm",
 			"displayName": "Investment Name",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -62,7 +62,7 @@
 			"name": "Alt_Src_Sys_Investment_Id",
 			"displayName": "Alternate Source System Investment ID",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -73,7 +73,7 @@
 			"name": "TICKER_Id",
 			"displayName": "Ticker",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -84,7 +84,7 @@
 			"name": "Currency Code (Local)",
 			"displayName": "Currency Code (Local)",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -95,7 +95,7 @@
 			"name": "Trade Date",
             "displayName": "Trade Date",
             "dataType": "Datetime",
-            "dataFormat": "MM/DD/YYYY",
+            "dataFormat": null,
             "textAlignment": "Left",
             "fontColor": "#000000",
             "negativeNumberOption":{
@@ -106,7 +106,7 @@
 			"name": "Actual Settlement Date",
             "displayName": "Actual Settlement Date",
             "dataType": "Datetime",
-            "dataFormat": "MM/DD/YYYY",
+            "dataFormat": null,
             "textAlignment": "Left",
             "fontColor": "#000000",
             "negativeNumberOption":{
@@ -117,7 +117,7 @@
             "name": "Transaction",
 			"displayName": "Transaction",
 			"dataType": "string",
-			"dataFormat": "text",
+			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -128,7 +128,7 @@
 			"name": "Quantity",
 			"displayName": "Quantity",
 			"dataType": "number",
-			"dataFormat": "#,##0.00",
+			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -139,7 +139,7 @@
 			"name": "Unit Price",
 			"displayName": "Unit Price",
 			"dataType": "number",
-			"dataFormat": "#,##0.00",
+			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -150,7 +150,7 @@
             "name": "Net Amount",
 			"displayName": "Net Amount",
 			"dataType": "number",
-			"dataFormat": "#,##0.00",
+			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
@@ -161,7 +161,7 @@
             "name": "Notional Amount (Local)",
 			"displayName": "Notional Amount (Local)",
 			"dataType": "number",
-			"dataFormat": "#,##0.00",
+			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"negativeNumberOption":{
