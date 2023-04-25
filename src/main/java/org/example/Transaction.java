@@ -48,7 +48,11 @@ public class Transaction {
             result.put(st, doubleAsString);
         }
         for (String st: dateTimeFields.keySet()) {
-            result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(st))));
+            if (dateTimeFields.get(st).isEqual(LocalDateTime.of(1, 1, 1, 0,0, 0, 0))) {
+               result.put(st, "");
+            } else {
+                result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(st))));
+            }
         }
         
       return result;
