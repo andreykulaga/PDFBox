@@ -312,7 +312,7 @@ public class Pdf {
 
             addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(),
                     configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
-            Outline.OUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, boldFont);
+            Outline.NOTOUTLINED, initX, initY, cellWidth, quantityOfLines, fontSize, boldFont);
             initX += cellWidth;
         }
         initX = configuration.getLeftMargin();
