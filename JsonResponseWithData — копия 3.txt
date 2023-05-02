@@ -1,0 +1,96 @@
+{
+	"Rule": {
+		"ExpiresAt": "04:00:00",
+		"ExpirationPolicy": 0
+	},
+	"CacheItem": [{
+		"report": {
+			"reportId": 0,
+			"data": [{
+				"Client_Product_Id": "DYNGM3",
+				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+				"Investment_Nm": "TV Asahi Holdings Corp ADR",
+				"Alt_Src_Sys_Investment_Id": "90114T100",
+				"TICKER_Id": "THOD",
+				"Currency Code (Local)": "USD",
+				"Trade Date": "2023-02-03T09:12:00",
+				"Actual Settlement Date": "2023-02-07T09:12:00",
+				"Transaction": "Buy",
+				"Quantity": 136.0,
+				"Unit Price": 9.96,
+				"Net Amount": -1354.56,
+				"Notional Amount (Local)": null 
+			}],
+			"fields": [{
+					"field": "Client_Product_Id",
+					"type": "string"
+				}, {
+					"field": "Product_Nm",
+					"type": "string"
+				}, {
+					"field": "Investment_Nm",
+					"type": "string"
+				},
+				{
+					"field": "Alt_Src_Sys_Investment_Id",
+					"type": "string"
+				},
+				{
+					"field": "TICKER_Id",
+					"type": "string"
+				},
+				{
+					"field": "Currency Code (Local)",
+					"type": "string"
+				},
+				{
+					"field": "Trade Date",
+					"type": "Datetime"
+				},
+				{
+					"field": "Actual Settlement Date",
+					"type": "Datetime"
+				},
+				{
+					"field": "Transaction",
+					"type": "string"
+				},
+				{
+					"field": "Quantity",
+					"type": "number"
+				},
+				{
+					"field": "Unit Price",
+					"type": "number"
+				},
+				{
+					"field": "Net Amount",
+					"type": "number"
+				},
+				{
+					"field": "Notional Amount (Local)",
+					"type": "number"
+				}
+			],
+			"grouping": [{
+					"field": "TICKER_Id",
+					"type": "string"
+				},
+                {
+					"field": "Original_Share_Qty",
+					"type": "number"
+				}
+			],
+			"aggregate": [{
+				"field": "Investment_Nm",
+				"aggregate": "CNT"
+			}, {
+				"field": "Original_Share_Qty",
+				"aggregate": "SUM"
+			}, {
+				"field": "Original_Share_Qty",
+				"aggregate": "AVG"
+			}]
+		}
+	}]
+}

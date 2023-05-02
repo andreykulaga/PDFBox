@@ -30,6 +30,7 @@ public class Pdf {
     float fontAscent;
     float fontDescent;
     float fontLeading;
+    float fontShoulder;
     float fontAverageWidth;
     float cellHeight;
     float pageHeight;
@@ -186,12 +187,19 @@ public class Pdf {
         fontCapHeight = getFontDescriptor(ordinaryFont).getCapHeight() * fontSize / 1000;
         fontAscent = getFontDescriptor(ordinaryFont).getAscent() * fontSize / 1000;
         fontDescent = getFontDescriptor(ordinaryFont).getDescent() * fontSize / 1000;
-        fontLeading = getFontDescriptor(ordinaryFont).getLeading() * fontSize / 1000;
+        fontLeading = fontCapHeight;
         fontAverageWidth = getFontDescriptor(ordinaryFont).getAverageWidth() * fontSize / 1000;
 
-        //define cell height by font and it's size
-        cellHeight = fontCapHeight + fontAscent - fontDescent + fontLeading;
+        if (fontCapHeight > fontAscent) {
+            fontShoulder = (fontSize + fontDescent - fontCapHeight)/2;
+        } else {
+            fontShoulder = (fontSize + fontDescent - fontAscent)/2;
+        }
 
+        cellHeight = fontSize + fontLeading;
+//        if (configuration.isShowHorizontalBoarders()) {
+//            cellHeight += configuration.getLineWidth();
+//        }
 
         footerFontCapHeight = getFontDescriptor(ordinaryFont).getCapHeight() * configuration.getPageFooterFontSize() / 1000;
         footerFontAscent = getFontDescriptor(ordinaryFont).getAscent() * configuration.getPageFooterFontSize() / 1000;
@@ -309,6 +317,7 @@ public class Pdf {
         for (String string: columnNames){
             cellWidth = tableWidth * maxLengthsOfTextInCell.get(string) / sumOfAllMaxWidth;
             String text = columnNamesForTableHead.get(string);
+
 
             addCellWithMultipleTextLines(contentStream, text, configuration.getRowHeaderHorizontalAlignment(),
                     configuration.getTableHeadFillingColor(), configuration.getTableHeadFontColor(),
@@ -529,17 +538,10 @@ public class Pdf {
 
         initX = configuration.getLeftMargin();
         initY -= cellHeight*quantityOfLines;
+        if (configuration.isShowHorizontalBoarders()) {
+            initY -= configuration.getLineWidth();
+        }
 
-        // if (initY < configuration.getBottomMargin()+cellHeight) {
-        //     if (configuration.isOnlyVerticalCellBoards()) {
-        //         contentStream.setStrokingColor(configuration.getStrokingColor());
-        //         contentStream.setLineWidth(configuration.getLineWidth()/2);
-        //         contentStream.moveTo(initX, initY);
-        //         contentStream.lineTo(initX+tableWidth, initY);
-        //         contentStream.stroke();
-        //         }
-        //     addNewPage();
-        // }
         contentStream.close();
     }
 
@@ -733,7 +735,8 @@ public class Pdf {
         contentStream.setNonStrokingColor(fontColor);
 
         //define starting position of text
-        float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
+//        float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
+        float textInitY = initY - cellHeight;
         float textInitX = 0;
         float textLength = text.length() * fontAverageWidth;
 
@@ -870,7 +873,7 @@ public class Pdf {
         float widthAvailableForText = cellWidth - doubleSpaceWidth;
         LinkedList<String> textByLines = splitTextByLines(text, widthAvailableForText, font);
 
-        //set color and draw stroke rectangle
+        //set color and draw lines
         if (outline == Outline.OUTLINED) {
             contentStream.setStrokingColor(configuration.getStrokingColor());
             contentStream.setLineWidth(configuration.getLineWidth());
@@ -882,21 +885,42 @@ public class Pdf {
                 contentStream.moveTo(initX+cellWidth, initY);
                 contentStream.lineTo(initX+cellWidth, initY-(cellHeight * quantityOfLines));
             } if (configuration.isShowHorizontalBoarders() && !configuration.isShowVerticalBoarders()) {
-                //draw first horizontal line
-                contentStream.moveTo(initX, initY);
-                contentStream.lineTo(initX+cellWidth, initY);
-                //draw second horizontal line
-                contentStream.moveTo(initX, initY-(cellHeight * quantityOfLines));
-                contentStream.lineTo(initX+cellWidth, initY-(cellHeight * quantityOfLines));
+                //horizontal line after text
+                contentStream.moveTo(initX, initY - configuration.getLineWidth()/2 - cellHeight*quantityOfLines);
+                contentStream.lineTo(initX+cellWidth, initY - configuration.getLineWidth()/2 - cellHeight*quantityOfLines);
             } if (configuration.isShowHorizontalBoarders() && configuration.isShowVerticalBoarders()) {
-                contentStream.addRect(initX, initY, cellWidth, -(cellHeight * quantityOfLines));
+                //draw first vertical line
+                contentStream.moveTo(initX, initY);
+                contentStream.lineTo(initX, initY-(cellHeight * quantityOfLines));
+                //draw second vertical line
+                contentStream.moveTo(initX+cellWidth, initY);
+                contentStream.lineTo(initX+cellWidth, initY-(cellHeight * quantityOfLines));
+                //draw first horizontal line
+                contentStream.moveTo(initX - configuration.getLineWidth()/2, initY - configuration.getLineWidth()/2 - cellHeight*quantityOfLines);
+                contentStream.lineTo(initX+cellWidth + configuration.getLineWidth()/2, initY - configuration.getLineWidth()/2 - cellHeight*quantityOfLines);
             }
             contentStream.stroke();
         }
 
+
         //set color and draw filling rectangle
+
+        float rectangleWidth = cellWidth;
+        float moveX = 0;
+
+        if (outline == Outline.NOTOUTLINED) {
+            rectangleWidth += 0.1;
+        }
+        if (configuration.isShowVerticalBoarders()) {
+            rectangleWidth -= configuration.getLineWidth();
+            moveX = configuration.getLineWidth()/2;
+            if (outline == Outline.NOTOUTLINED) {
+                rectangleWidth += configuration.getLineWidth();
+                moveX = 0;
+            }
+        }
         contentStream.setNonStrokingColor(fillingColor);
-        contentStream.addRect(initX, initY, cellWidth, -(cellHeight * quantityOfLines));
+        contentStream.addRect(initX + moveX, initY, rectangleWidth, -cellHeight * quantityOfLines);
         contentStream.fill();
 
         //set color for text
@@ -904,7 +928,7 @@ public class Pdf {
 
         //define starting position of text
         float textInitX = 0;
-        float textInitY = (float) (initY - cellHeight - fontDescent + (cellHeight * 0.1));
+        float textInitY = initY - fontSize - fontLeading/2 - fontDescent - fontShoulder;
         //change initY for cells if their text has fewer rows than cell, if TextAlign is Center or Bottom.
         //TextAlign Top is default for all
         if (textByLines.size() < quantityOfLines) {
@@ -915,6 +939,7 @@ public class Pdf {
                 textInitY -= cellHeight * (quantityOfLines - textByLines.size());
             }
         }
+
 
         for (String string: textByLines) {
             //calculate string length in points
@@ -938,5 +963,6 @@ public class Pdf {
             contentStream.endText();
             textInitY -= cellHeight;
         }
+
     }
  }

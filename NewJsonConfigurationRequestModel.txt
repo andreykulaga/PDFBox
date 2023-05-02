@@ -1,7 +1,7 @@
 {
 	"showHeaderOnEveryPage": true,
-	"wrapTextInTable": false,
-	"maxCharactersToWrap": 20,
+	"wrapTextInTable": true,
+	"maxCharactersToWrap": 10,
 	"forceFontSize": false,
 	"fontSize": 11,
 	"maxColumnsAllowed": 20,
