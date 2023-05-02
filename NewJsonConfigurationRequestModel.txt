@@ -1,6 +1,6 @@
 {
 	"showHeaderOnEveryPage": true,
-	"wrapTextInTable": true,
+	"wrapTextInTable": false,
 	"maxCharactersToWrap": 10,
 	"forceFontSize": false,
 	"fontSize": 11,

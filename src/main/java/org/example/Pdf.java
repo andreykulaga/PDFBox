@@ -655,10 +655,6 @@ public class Pdf {
 
         initX = configuration.getLeftMargin();
         initY -= (cellHeight * howManyLinesInARow);
-
-        if (initY - cellHeight < footerTopBoarder) {
-            addNewPage();
-        }
     }
 
     public void addCellWithText(PDPageContentStream contentStream, String text,
