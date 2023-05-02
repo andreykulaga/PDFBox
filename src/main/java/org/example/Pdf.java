@@ -48,14 +48,8 @@ public class Pdf {
     HashMap<String, String> hashMapOfTypes;
 
     PDFont ordinaryFont;
-//    PDFont ordinaryFontForDescription;
     PDFont boldFont;
-//    PDFont boldFontForDescription;
 
-    float footerFontCapHeight;
-    float footerFontAscent;
-    float footerFontDescent;
-    float footerFontLeading;
     float footerCellHeight;
     float footerTopBoarder;
 
@@ -197,15 +191,8 @@ public class Pdf {
         }
 
         cellHeight = fontSize + fontLeading;
-//        if (configuration.isShowHorizontalBoarders()) {
-//            cellHeight += configuration.getLineWidth();
-//        }
 
-        footerFontCapHeight = getFontDescriptor(ordinaryFont).getCapHeight() * configuration.getPageFooterFontSize() / 1000;
-        footerFontAscent = getFontDescriptor(ordinaryFont).getAscent() * configuration.getPageFooterFontSize() / 1000;
-        footerFontDescent = getFontDescriptor(ordinaryFont).getDescent() * configuration.getPageFooterFontSize() / 1000;
-        footerFontLeading = getFontDescriptor(ordinaryFont).getLeading() * configuration.getPageFooterFontSize() / 1000;
-        footerCellHeight = footerFontCapHeight + footerFontAscent - footerFontDescent + footerFontLeading;
+        footerCellHeight =  configuration.getPageFooterFontSize();
 
 
         footerTopBoarder = configuration.getBottomMargin() + ((float) configuration.getLinesOfPageFooter().size() / 2 + 1.5F)*footerCellHeight;
@@ -252,8 +239,6 @@ public class Pdf {
 
         //change global cell height and fontDescent
         float tempCellHeight = cellHeight;
-        float tempFontDescent = fontDescent;
-        fontDescent = footerFontDescent;
         cellHeight = footerCellHeight;
 
         for (int i=0; i< document.getNumberOfPages(); i++) {
@@ -301,7 +286,6 @@ public class Pdf {
 
         //change global cell height and font descent back
         cellHeight = tempCellHeight;
-        fontDescent = tempFontDescent;
     }
 
     public void addTableHeader(PDPageContentStream contentStream) throws IOException {
