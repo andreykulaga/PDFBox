@@ -200,7 +200,7 @@ public class Pdf {
         footerCellHeight = footerFontCapHeight + footerFontAscent - footerFontDescent + footerFontLeading;
 
 
-        footerTopBoarder = configuration.getBottomMargin() + ((float) configuration.getLinesOfPageFooter().size() / 2 + 3)*footerCellHeight;
+        footerTopBoarder = configuration.getBottomMargin() + ((float) configuration.getLinesOfPageFooter().size() / 2 + 1.5F)*footerCellHeight;
     }
 
 
@@ -253,6 +253,7 @@ public class Pdf {
 
             //draw a line above the footer
             contentStream.moveTo(configuration.getLeftMargin(), footerTopBoarder - footerCellHeight);
+            contentStream.setLineWidth(0.5F);
             contentStream.lineTo(initX+tableWidth, footerTopBoarder - footerCellHeight);
             contentStream.stroke();
 
@@ -262,7 +263,7 @@ public class Pdf {
                 addCellWithText(contentStream, "Page " + (i+1) + " of " + document.getNumberOfPages(),
                 TextAlign.RIGHT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
                 configuration.getLeftMargin(),
-                footerTopBoarder - 3*footerCellHeight - (footerCellHeight * ((float) configuration.getLinesOfPageFooter().size()/2 -1))/2,
+                footerTopBoarder - 1.5F*footerCellHeight - (footerCellHeight * ((float) configuration.getLinesOfPageFooter().size()/2 -1))/2,
                 tableWidth, configuration.getPageFooterFontSize(), true, boldFont);
             }
 
@@ -273,7 +274,7 @@ public class Pdf {
                 String ordinaryString = configuration.getLinesOfPageFooter().get(j+1);
                 float lengthOfOrdinaryString = ordinaryFont.getStringWidth(ordinaryString + " ") * configuration.getPageFooterFontSize() / 1000;
 
-                float y = footerTopBoarder - 3*footerCellHeight - (footerCellHeight * j/2);
+                float y = footerTopBoarder - 1.5F*footerCellHeight - (footerCellHeight * j/2);
 
                 addCellWithText(contentStream, boldString,
                 TextAlign.LEFT, configuration.getPageFooterBackGroundColor(), configuration.getPageFooterFontColor(), Outline.NOTOUTLINED,
