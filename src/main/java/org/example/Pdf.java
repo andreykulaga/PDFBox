@@ -380,19 +380,33 @@ public class Pdf {
                 pageHeaderBackGroundColor = Color.white;
             }
 
+
             //define cell height by font and it's size
             float headerFontCapHeight = getFontDescriptor(ordinaryFont).getCapHeight() * pageHeaderFontSize / 1000;
             float headerFontAscent = getFontDescriptor(ordinaryFont).getAscent() * pageHeaderFontSize / 1000;
             float headerFontDescent = getFontDescriptor(ordinaryFont).getDescent() * pageHeaderFontSize / 1000;
-            float headerFontLeading = getFontDescriptor(ordinaryFont).getLeading() * pageHeaderFontSize / 1000;
-            float headerCellHeight = headerFontCapHeight + headerFontAscent - headerFontDescent + headerFontLeading;
+            float headerFontLeading = headerFontCapHeight;
+            float headerCellHeight = pageHeaderFontSize + headerFontLeading;
 
-            //change global cell height and font descent
+            float headerFontShoulder;
+            if (headerFontCapHeight > headerFontAscent) {
+                headerFontShoulder = (pageHeaderFontSize + headerFontDescent - headerFontCapHeight)/2;
+            } else {
+                headerFontShoulder = (pageHeaderFontSize + headerFontDescent - headerFontAscent)/2;
+            }
+
+            //change global cell height, font descent, leading and shoulder
             float tempCellHeight = cellHeight;
             float tempFontDescent = fontDescent;
+            float tempFontLeading = fontLeading;
+            float tempFontShoulder = fontShoulder;
             cellHeight = headerCellHeight;
             fontDescent = headerFontDescent;
+            fontLeading = headerFontLeading;
+            fontShoulder = headerFontShoulder;
 
+            //move initY up to compensate empty cell height above Report name.
+            initY += pageHeaderFontSize + headerFontDescent + pageHeaderFontSize/2 + headerFontDescent/2 - headerFontAscent/2 - headerFontCapHeight/2;
 
             //if it is the first line draw it as one cell with green dot at the end
             if (i == 0) {
@@ -403,15 +417,21 @@ public class Pdf {
                 // (to prevent the first letter from connecting with cell boarder), but for Report name we need it
                 // to start as the table boarder -> iniX minus average font width minus width of table boarder
 
-                addCellWithText(contentStream, text,
+                float spaceWidth = ordinaryFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+                addCellWithMultipleTextLines(contentStream, text,
                         textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                        initX - fontAverageWidth - configuration.getLineWidth(),
-                        initY, tableWidth, pageHeaderFontSize, true, ordinaryFont);
+                        initX - spaceWidth - configuration.getLineWidth(),
+                        initY, tableWidth, 1, pageHeaderFontSize, ordinaryFont);
+//                addCellWithText(contentStream, text,
+//                        textAlign, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+//                        initX - fontAverageWidth - configuration.getLineWidth(),
+//                        initY, tableWidth, pageHeaderFontSize, true, ordinaryFont);
 
                 //add green dot
                 float w = headerFontCapHeight/2;
                 float x = initX + ordinaryFont.getStringWidth(text + " ") / 1000 * pageHeaderFontSize;
-                float y = initY - cellHeight + w;
+                float y = initY - pageHeaderFontSize - fontLeading/2 - fontDescent - fontShoulder;
+//                float y = initY - cellHeight + w;
                 contentStream.setNonStrokingColor(Color.decode("#03af52"));
                 drawCircle(contentStream, x + w/2, y + w/2, w/2, Color.decode("#03af52"));
 //                //add green rectangle
@@ -432,16 +452,23 @@ public class Pdf {
                     if (j%2 == 0) {
                         text = configuration.getPageHeaderLines().get(i).get(j) + ": ";
                         cellWidth = boldFont.getStringWidth(text) / 1000 * pageHeaderFontSize;
-                        addCellWithText(contentStream, text,
+                        float spaceWidth = ordinaryFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+                        addCellWithMultipleTextLines(contentStream, text,
                                 TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                                initX, initY, cellWidth, pageHeaderFontSize, true, boldFont);
+                                initX - spaceWidth - configuration.getLineWidth(), initY, cellWidth, 1, pageHeaderFontSize, boldFont);
+//                        addCellWithText(contentStream, text,
+//                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+//                                initX, initY, cellWidth, pageHeaderFontSize, true, boldFont);
                         initX += cellWidth;
                     } else {
                         text = configuration.getPageHeaderLines().get(i).get(j);
                         cellWidth = ordinaryFont.getStringWidth(text) / 1000 * pageHeaderFontSize;
-                        addCellWithText(contentStream, text,
+                        addCellWithMultipleTextLines(contentStream, text,
                                 TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                                initX, initY, cellWidth, pageHeaderFontSize, true, ordinaryFont);
+                                initX, initY, cellWidth, 1, pageHeaderFontSize, ordinaryFont);
+//                        addCellWithText(contentStream, text,
+//                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+//                                initX, initY, cellWidth, pageHeaderFontSize, true, ordinaryFont);
 //                        initX = configuration.getLeftMargin() + Math.round((float) j /2) * (tableWidth/3);
                         columnWidth += columnLengths[j/2];
                         initX = configuration.getLeftMargin() + columnWidth  * tableWidth / allLengths;
@@ -458,6 +485,8 @@ public class Pdf {
             //change global cell height and font descent back
             cellHeight = tempCellHeight;
             fontDescent = tempFontDescent;
+            fontLeading = tempFontLeading;
+            fontShoulder = tempFontShoulder;
 
         }
 
