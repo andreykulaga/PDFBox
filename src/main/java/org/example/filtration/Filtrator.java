@@ -1,6 +1,5 @@
 package org.example.filtration;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,21 +74,30 @@ public class Filtrator {
     private boolean applyFilterToString(String columnName, String string) {
 
         for (Filter filter: filtersForFields.get(columnName)) {
-            if (filter.getOperator().equals(Filter.Operator.eq) && filter.getValue().equalsIgnoreCase(string)) {
+            if (filter.getOperator().equals(Filter.Operator.eq)) {
+
+                if (string.equals("null")  && filter.getValue().equals("")) {
+                    return true;
+                } else if (filter.getValue().equalsIgnoreCase(string)) {
+                    return true;
+                }
+            } else if (filter.getOperator().equals(Filter.Operator.neq)) {
+                if (string.equals("null") && filter.getValue().equals("")) {
+                    return false;
+                } else if (!filter.getValue().equalsIgnoreCase(string)) {
+                    return true;
+                }
+            } else if (filter.getOperator().equals(Filter.Operator.contains) && string.toLowerCase().toLowerCase().contains(filter.getValue().toLowerCase())) {
                 return true;
-            } else if (filter.getOperator().equals(Filter.Operator.neq) && !filter.getValue().equalsIgnoreCase(string)) {
+            } else if (filter.getOperator().equals(Filter.Operator.doesnotcontain) && !string.toLowerCase().toLowerCase().contains(filter.getValue().toLowerCase())) {
                 return true;
-            } else if (filter.getOperator().equals(Filter.Operator.contains) && filter.getValue().toLowerCase().contains(string.toLowerCase())) {
+            } else if (filter.getOperator().equals(Filter.Operator.beginswith) && string.toLowerCase().startsWith(filter.getValue().toLowerCase())) {
                 return true;
-            } else if (filter.getOperator().equals(Filter.Operator.doesnotcontain) && !filter.getValue().toLowerCase().contains(string.toLowerCase())) {
+            } else if (filter.getOperator().equals(Filter.Operator.endswith) && string.toLowerCase().endsWith(filter.getValue().toLowerCase())) {
                 return true;
-            } else if (filter.getOperator().equals(Filter.Operator.beginswith) && filter.getValue().toLowerCase().startsWith(string.toLowerCase())) {
+            } else if (filter.getOperator().equals(Filter.Operator.isempty) && (string.equals("null") || string.equals(""))) {
                 return true;
-            } else if (filter.getOperator().equals(Filter.Operator.endswith) && filter.getValue().toLowerCase().endsWith(string.toLowerCase())) {
-                return true;
-            } else if (filter.getOperator().equals(Filter.Operator.isempty) && string.equals("null")) {
-                return true;
-            } else if (filter.getOperator().equals(Filter.Operator.isnotempty) && !string.equals("null")) {
+            } else if (filter.getOperator().equals(Filter.Operator.isnotempty) && !(string.equals("null") || string.equals(""))) {
                 return true;
             }
         }
@@ -103,13 +111,13 @@ public class Filtrator {
         for (Filter filter: filtersForFields.get(columnName)) {
 
             if (filter.getOperator().equals(Filter.Operator.isnull)) {
-                if (string.equalsIgnoreCase("null")) {
+                if (string.equals("null") || string.equals("")) {
                     return true;
                 } else {
                     return false;
                 }
             } else if (filter.getOperator().equals(Filter.Operator.isnotnull)) {
-                if (!string.equalsIgnoreCase("null")) {
+                if (!(string.equals("null") || string.equals(""))) {
                     return true;
                 } else {
                     return false;
@@ -118,10 +126,13 @@ public class Filtrator {
             } else {
 
                 //if string is "null" it cannot pass any other test
-                if (string.equalsIgnoreCase("null")) {
-                    return false;
+                if (string.equalsIgnoreCase("null") || string.equalsIgnoreCase("")) {
+                    if (filter.getOperator().equals(Filter.Operator.neq)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
-
                 dl = Double.parseDouble(string);
                 filterValue = Double.parseDouble(filter.getValue());
                 if (filter.getOperator().equals(Filter.Operator.eq) && filterValue == dl) {

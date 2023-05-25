@@ -112,11 +112,7 @@
             "negativeNumberOption":{
                 "decorateWith": "Parenthesis",
                 "fontColor": "#FF0000"
-                },
-                 			"filters":[{
-                                 			    "operator" :"neq",
-                                                 "value" : "2023-02-10 T09:12:00"
-                                                 }]
+                }
 			}, {
             "name": "Transaction",
 			"displayName": "Transaction",
@@ -161,10 +157,9 @@
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
 			    },
-                "filters":[
-                           {
-                           "operator" :"gt",
-                           "value" : "-10"
+                "filters":[{
+                           "operator" :"isnull",
+                           "value" : "39.58"
                            }]
 			}, {
             "name": "Notional Amount (Local)",
@@ -176,11 +171,7 @@
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
-			    },
-                 			    "filters":[{
-                                                                  			    "operator" :"isnotnull",
-                                                                                  "value" : ""
-                                                                                  }]
+			    }
 			}
 	],
 	"columnsToGroupBy": [
