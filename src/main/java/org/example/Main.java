@@ -110,8 +110,6 @@ public class Main {
         //create array list of transactions and extract from JsonResponse, maxLengthsOfTextInCell are updated
         ArrayList<Transaction> transactions = jsonResponse.extractTransactions(maxLengthsOfTextInCell, notStringMaxLengths, configuration);
 
-    
-
         //clean maxLengthsOfTextInCell from columns that are hidden
         for (String string : configuration.getWhatColumnsToHide()) {
             maxLengthsOfTextInCell.remove(string);
@@ -172,7 +170,7 @@ public class Main {
                 pdf.createHeadOfReport();
 
                 if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
-                    Subtotal subtotal = new Subtotal(transactions.get(0));
+                    Subtotal subtotal = new Subtotal(hashMapOfTypes);
                     for (Transaction t : transactions) {
                         if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
                             pdf.addTableRow(t);
@@ -193,7 +191,7 @@ public class Main {
                     //Create array of transaction to store subtotals and grand total
                     Subtotal[] subtotals = new Subtotal[configuration.getColumnsToGroupBy().size() + 1];
                     for (int j = 0; j < configuration.getColumnsToGroupBy().size() + 1; j++) {
-                        subtotals[j] = new Subtotal(transactions.get(0));
+                        subtotals[j] = new Subtotal(hashMapOfTypes);
                     }
 
                     //add header for the first grouping
@@ -220,9 +218,9 @@ public class Main {
                             for (int k = 0; k <= columnPlace; k++) {
                                 //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                                 String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                                pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                                pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllFieldsAsStrings().get(subgroupForSubtotal),
                                         subtotals[k], hashMapOfTypes);
-                                subtotals[k] = new Subtotal(transactions.get(0));
+                                subtotals[k] = new Subtotal(hashMapOfTypes);
                             }
                             //add header for next grouping
                             for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
@@ -241,7 +239,7 @@ public class Main {
                         for (int k = 0; k < subtotals.length - 1; k++) {
                             //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                             String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                            pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                            pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllFieldsAsStrings().get(subgroupForSubtotal),
                                     subtotals[k], hashMapOfTypes);
                         }
                     }
@@ -268,7 +266,7 @@ public class Main {
                 pdf.createHeadOfReport();
 
                 if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
-                    Subtotal subtotal = new Subtotal(transactions.get(0));
+                    Subtotal subtotal = new Subtotal(hashMapOfTypes);
                     for (Transaction t : transactions) {
                         pdf.addTableRow(t);
                         subtotal.addToSubtotal(t);
@@ -282,7 +280,7 @@ public class Main {
                     //Create array of transaction to store subtotals and grand total
                     Subtotal[] subtotals = new Subtotal[configuration.getColumnsToGroupBy().size() + 1];
                     for (int j = 0; j < configuration.getColumnsToGroupBy().size() + 1; j++) {
-                        subtotals[j] = new Subtotal(transactions.get(0));
+                        subtotals[j] = new Subtotal(hashMapOfTypes);
                     }
 
 
@@ -309,9 +307,9 @@ public class Main {
                             for (int k = 0; k <= columnPlace; k++) {
                                 //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                                 String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                                pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                                pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllFieldsAsStrings().get(subgroupForSubtotal),
                                         subtotals[k], hashMapOfTypes);
-                                subtotals[k] = new Subtotal(transactions.get(0));
+                                subtotals[k] = new Subtotal(hashMapOfTypes);
                             }
                             //add header for next grouping
                             for (int k = positionOfChangedField; k < configuration.getColumnsToGroupBy().size(); k++) {
@@ -329,7 +327,7 @@ public class Main {
                     for (int k = 0; k < subtotals.length - 1; k++) {
                         //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                         String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
-                        pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllValuesAsString(configuration).get(subgroupForSubtotal),
+                        pdf.addSubtotalOrTotalRow(false, subgroupForSubtotal + ": " + transactions.get(j).getAllFieldsAsStrings().get(subgroupForSubtotal),
                                 subtotals[k], hashMapOfTypes);
                     }
                     //add total

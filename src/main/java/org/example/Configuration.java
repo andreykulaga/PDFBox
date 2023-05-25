@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.example.filtration.Filter;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ public class Configuration {
     HashMap<String, Color> textColor = new HashMap<>();
     HashMap<String, Color> negativeValueColor = new HashMap<>();
     HashMap<String, Boolean> negativeAsParenthesesHashMap = new HashMap<>();
+    HashMap<String, ArrayList<Filter>> filtersForFields = new HashMap<>();
 
 
     String reportName;
@@ -180,7 +182,7 @@ public class Configuration {
                 if (nJCR.getFields().get(i).type.equalsIgnoreCase("number")) {
                     format = "#,##0.00";
                 } else if (nJCR.getFields().get(i).type.equalsIgnoreCase("Datetime")) {
-                    format = "MM/DD/YYYY";
+                    format = "MM/dd/YYYY";
                 } else {
                     format = "text";
                 }
@@ -208,6 +210,11 @@ public class Configuration {
             } catch (NumberFormatException e) {
                 negativeValueColor.put(columnName, Color.BLACK);
             }
+
+            if (nJCR.getFields().get(i).filters != null) {
+                filtersForFields.put(columnName, nJCR.getFields().get(i).filters);
+            }
+
             
         }
         

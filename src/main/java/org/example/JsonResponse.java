@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.example.filtration.Filtrator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 
 @Setter
@@ -95,19 +98,28 @@ public class JsonResponse {
 
     public ArrayList<Transaction> extractTransactions(HashMap<String, Float> textLengths, HashMap<String, Float> notStringMaxLengths, Configuration configuration) {
         ArrayList<Transaction> transactions = new ArrayList<>();
-        
+
         HashMap<String, String> hashMapOfTypes = createHashMapOfTypes();
+        Filtrator filtrator = new Filtrator(configuration.getFiltersForFields(), hashMapOfTypes);
         long transactionNumber = 1;
         
         ArrayList<Datum> data = cacheItem.get(0).report.data;
         for (Datum d: data) {
+            boolean passedTheFilter = false;
             HashMap<String, Double> numberFields = new HashMap<>();
             HashMap<String, LocalDateTime> dateTimeFields = new HashMap<>();
             HashMap<String, String> textFields = new HashMap<>();
+            HashMap<String, String> allFieldsAsStrings = new HashMap<>();
             for (String s: d.fieldsAndValues.keySet()) {
                 //need to replace "_" because we store fields names that way
                 String key = s.replaceAll("_", " ").toLowerCase();
                 String value = d.fieldsAndValues.get(s);
+
+                passedTheFilter = filtrator.applyFilter(key, value);
+                if (!passedTheFilter) {
+                    break;
+                }
+
 
                 if (value.equalsIgnoreCase("null")) {
                     value = "";
@@ -118,24 +130,30 @@ public class JsonResponse {
                     double f;
                     if (value.equalsIgnoreCase("")) {
                         f = 0;
+                        allFieldsAsStrings.put(key, "");
                     } else {
                         f = Double.parseDouble(value);
+                        allFieldsAsStrings.put(key, DoubleFormatter.format(f, key, configuration));
                     }
                     numberFields.put(key, f);
-                }
-                if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
+                } else if (hashMapOfTypes.get(key).equalsIgnoreCase("Datetime")) {
                     LocalDateTime ldt;
                     if (value.equalsIgnoreCase("")) {
                         ldt = LocalDateTime.of(1, 1, 1, 0,0, 0, 0);
+                        allFieldsAsStrings.put(key, "");
                     } else {
                         ldt = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+                        String pattern = configuration.getTextFormat().get(key);
+                        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+                        String temp = ldt.format(dateTimeFormatter);
+                        allFieldsAsStrings.put(key, temp);
                     }
 
                     dateTimeFields.put(key, ldt);
                 } else {
                     textFields.put(key, value);
+                    allFieldsAsStrings.put(key, value);
                 }
-
 
                 //if it is number, get a double and format it
                 if (hashMapOfTypes.get(key).equalsIgnoreCase("number")) {
@@ -186,10 +204,15 @@ public class JsonResponse {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
             }
-            Transaction t = new Transaction(transactionNumber,numberFields,dateTimeFields,textFields);
-            transactions.add(t);
-            transactionNumber++;
+
+            if (passedTheFilter) {
+                Transaction t = new Transaction(transactionNumber, numberFields, dateTimeFields, textFields, allFieldsAsStrings);
+                transactions.add(t);
+                transactionNumber++;
+            }
+
         }
         return transactions;
     }

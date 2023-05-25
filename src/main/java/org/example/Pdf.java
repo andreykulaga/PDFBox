@@ -543,7 +543,7 @@ public class Pdf {
                 }
             }
 
-            addCellWithMultipleTextLines(contentStream, transaction.getAllValuesAsString(configuration).get(string),
+            addCellWithMultipleTextLines(contentStream, transaction.getAllFieldsAsStrings().get(string),
                     textAlign, Color.WHITE, fontColor, Outline.OUTLINED,
                     initX, initY, cellWidth, quantityOfLines, fontSize, ordinaryFont);
             initX += cellWidth;
@@ -574,7 +574,7 @@ public class Pdf {
 
 //        contentStream.setNonStrokingColor(configuration.getGroupFillingColor());
 
-        String text = columnName + ": " + transaction.getAllValuesAsString(configuration).get(columnName);
+        String text = columnName + ": " + transaction.getAllFieldsAsStrings().get(columnName);
         if (level <= 2) {
             addCellWithText(contentStream, text, TextAlign.LEFT, backgroundColor,
                     fontColor, Outline.OUTLINED,
@@ -774,7 +774,7 @@ public class Pdf {
         int result = 1;
 
         for (String key : columnNames) {
-            String text = transaction.getAllValuesAsString(configuration).get(key);
+            String text = transaction.getAllFieldsAsStrings().get(key);
             float cellWidth = tableWidth * maxLengthsOfTextInCell.get(key) / sumOfAllMaxWidth;
             float doubleSpaceWidth = font.getStringWidth("  ") * fontSize / 1000;
             float widthAvailableForText = cellWidth - doubleSpaceWidth;

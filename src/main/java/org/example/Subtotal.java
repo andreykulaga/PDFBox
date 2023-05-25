@@ -14,10 +14,12 @@ public class Subtotal {
 //    HashMap<String, LocalDateTime> dateTimeFields;
    HashMap<String, String> textFields;
 
-    public Subtotal(Transaction transaction) {
+    public Subtotal(HashMap<String, String> hashMapOfTypes) {
         HashMap<String, Double> newNumberFields = new HashMap<>();
-        for (String string: transaction.getNumberFields().keySet()) {
-            newNumberFields.put(string, (double) 0);
+        for (String string: hashMapOfTypes.keySet()) {
+            if (hashMapOfTypes.get(string).equalsIgnoreCase("number")) {
+                newNumberFields.put(string, (double) 0);
+            }
         }
         this.numberFields = newNumberFields;
 

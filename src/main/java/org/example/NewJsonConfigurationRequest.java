@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.example.filtration.Filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,6 +85,8 @@ public class NewJsonConfigurationRequest {
         @JsonProperty("fontColor")
         public String textColor;
         public HashMap<String, String> negativeNumberOption;
+        @JsonProperty("filters")
+        public ArrayList<Filter> filters;
     }
     
     public static class PageFooter{

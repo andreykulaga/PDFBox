@@ -3,13 +3,9 @@ package org.example;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 @Setter
 @Getter
@@ -22,6 +18,7 @@ public class Transaction {
     HashMap<String, Double> numberFields;
     HashMap<String, LocalDateTime> dateTimeFields;
     HashMap<String, String> textFields;
+    HashMap<String, String> allFieldsAsStrings;
 
     public int compareWithBy(Transaction transactionToCompare, String columnName, String columnType) {
         if (columnType.equalsIgnoreCase("float")) {
@@ -36,35 +33,6 @@ public class Transaction {
             return -1;
         }
     }
-
-    public HashMap<String, String> getAllValuesAsString(Configuration configuration) {
-        HashMap<String, String> result = new HashMap<>(textFields);
-
-        for (String st: numberFields.keySet()) {
-
-            double dbl = numberFields.get(st);
-            String doubleAsString = DoubleFormatter.format(dbl, st, configuration);
-
-            result.put(st, doubleAsString);
-        }
-        for (String st: dateTimeFields.keySet()) {
-            if (dateTimeFields.get(st).isEqual(LocalDateTime.of(1, 1, 1, 0,0, 0, 0))) {
-               result.put(st, "");
-            } else {
-                result.put(st, dateTimeFields.get(st).format(DateTimeFormatter.ofPattern(configuration.getTextFormat().get(st))));
-            }
-        }
-        
-      return result;
-    }
-
-    // public  Transaction createTransactionWithEmptyTextAndDateFieldsAndZeroNumbers() {
-    //     HashMap<String, Double> newNumberFields = numberFields;
-    //     newNumberFields.replaceAll((s, v) -> (double) 0);
-    //     Transaction newTransaction = new Transaction();
-    //     newTransaction.setNumberFields(newNumberFields);
-    //     return newTransaction;
-    // }
 
     public static Transaction createTransactionFromColumnNames(ArrayList<String> columnNames, HashMap<String, String> columnNamesForTableHead) {
         Transaction transaction = new Transaction();
@@ -83,23 +51,10 @@ public class Transaction {
         return transaction;
     }
 
-
-
-
-
-
-
-//    public void setFieldsToCheck(Configuration configuration) {
-//        int k =0;
-//        for (ColumnName columnName: configuration.getColumnsToGroupBy()) {
-//            fieldsToCheck[k] = getValue(columnName);
-//            k++;
-//        }
-//    }
-//
     public boolean isFieldChanged(Transaction transactionToCompare, Configuration configuration) {
         for (String columnName: configuration.getColumnsToGroupBy()) {
-            if (!getAllValuesAsString(configuration).get(columnName).equals(transactionToCompare.getAllValuesAsString(configuration).get(columnName))) {
+//            if (!getAllValuesAsString(configuration).get(columnName).equals(transactionToCompare.getAllValuesAsString(configuration).get(columnName))) {
+            if (!allFieldsAsStrings.get(columnName).equals(transactionToCompare.getAllFieldsAsStrings().get(columnName))) {
                 return true;
             }
         }
@@ -108,98 +63,10 @@ public class Transaction {
     public int whatFieldIsChanged(Transaction transactionToCompare, Configuration configuration) {
         int i = 0;
         String result = configuration.getColumnsToGroupBy().get(i);
-        while (getAllValuesAsString(configuration).get(result).equals(transactionToCompare.getAllValuesAsString(configuration).get(result))) {
+        while (allFieldsAsStrings.get(result).equals(transactionToCompare.getAllFieldsAsStrings().get(result))) {
             i++;
             result = configuration.getColumnsToGroupBy().get(i);
         }
         return i;
     }
-//
-//
-
-//
-//    public String getValue(ColumnName columnName) {
-//       if (columnName == ColumnName.Investment_Name) {
-//           return investmentName;
-//       }
-//       if (columnName == ColumnName.Transaction_Type_Name) {
-//           return transactionTypeName;
-//       }
-//       if (columnName == ColumnName.Contract_Settlement) {
-//           return contractSettlement;
-//       }
-//       if (columnName == ColumnName.Currency_Cd) {
-//           return currencyCode;
-//       }
-//       if (columnName == ColumnName.Trade_Dt) {
-//           return tradeDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"));
-//       }
-//       if (columnName == ColumnName.Unit_Price_Local_Amt) {
-//           return String.valueOf(unitPriceLocalAmount);
-//       }
-//       if (columnName == ColumnName.Asset_Type_Nm) {
-//           return assetTypeName;
-//       }
-//       if (columnName == ColumnName.Net_Local_Amt) {
-//           return String.valueOf(netLocalAmount);
-//       }
-//       if (columnName == ColumnName.Trade_Type) {
-//           return tradeType;
-//       }
-//       if (columnName == ColumnName.Transaction_Event) {
-//           return transactionEvent;
-//       }
-//       if (columnName == ColumnName.Tax_Local_Amt) {
-//            return String.valueOf(taxLocalAmount);
-//       } else {
-//           return createDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm a"));
-//       }
-//    }
-//
-////    public String columnNameToFieldName(ColumnName columnName) {
-////       if (columnName == ColumnName.Investment_Name) {
-////           return "investmentName";
-////       }
-////       if (columnName == ColumnName.Transaction_Type_Name) {
-////           return "transactionTypeName";
-////       }
-////       if (columnName == ColumnName.Contract_Settlement) {
-////           return "contractSettlement";
-////       }
-////       if (columnName == ColumnName.Currency_Cd) {
-////           return "currencyCode";
-////       }
-////       if (columnName == ColumnName.Trade_Dt) {
-////           return "tradeDate";
-////       }
-////       if (columnName == ColumnName.Unit_Price_Local_Amt) {
-////           return "unitPriceLocalAmount";
-////       }
-////       if (columnName == ColumnName.Asset_Type_Nm) {
-////           return "assetTypeName";
-////       }
-////       if (columnName == ColumnName.Net_Local_Amt) {
-////           return "netLocalAmount";
-////       }
-////       if (columnName == ColumnName.Trade_Type) {
-////           return "tradeType";
-////       }
-////       if (columnName == ColumnName.Transaction_Event) {
-////           return "transactionEvent";
-////       }
-////       if (columnName == ColumnName.Tax_Local_Amt) {
-////            return "taxLocalAmount";
-////       } else {
-////           return "createDateTime";
-////       }
-////    }
-//
-//
-////    public String[] getFields() {
-////        String[] array = {investmentName, transactionTypeName, contractSettlement, currencyCode,
-////                String.valueOf(tradeDate), String.valueOf(unitPriceLocalAmount), assetTypeName,
-////                String.valueOf(netLocalAmount), tradeType, transactionEvent, String.valueOf(taxLocalAmount),
-////                String.valueOf(createDateTime)};
-////        return array;
-////    }
 }
