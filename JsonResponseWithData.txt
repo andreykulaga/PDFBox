@@ -9,8 +9,8 @@
 			"data": [
 			{
                             "Client_Product_Id": "DYNGM3",
-              				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-              				"Investment_Nm": "Tiger Brands Lid. ADR",
+              				"Product_Nm": "1",
+              				"Investment_Nm": "Eni",
               				"Alt_Src_Sys_Investment_Id": "88673M201",
               				"TICKER_Id": "TBLM",
               				"Currency Code (Local)": "USD",
@@ -25,8 +25,8 @@
 
 			{
 			    "Client_Product_Id": "",
-              				"Product_Nm": "data with blank space instead of data",
-              				"Investment_Nm": "",
+              				"Product_Nm": "2",
+              				"Investment_Nm": "Embrayer",
               				"Alt_Src_Sys_Investment_Id": "",
               				"TICKER_Id": "",
               				"Currency Code (Local)": "",
@@ -39,8 +39,8 @@
               				"Notional Amount (Local)": ""
             }, {
                 "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "data with negative number",
-  				"Investment_Nm": " ",
+  				"Product_Nm": "3",
+  				"Investment_Nm": "Enel",
   				"Alt_Src_Sys_Investment_Id": " ",
   				"TICKER_Id": " ",
   				"Currency Code (Local)": " ",
@@ -53,8 +53,8 @@
   				"Notional Amount (Local)": -1.0
             }, {
                 "Client_Product_Id": " ",
-  				"Product_Nm": "data with positive numbers",
-  				"Investment_Nm": " ",
+  				"Product_Nm": "4",
+  				"Investment_Nm": "Erste",
   				"Alt_Src_Sys_Investment_Id": " ",
   				"TICKER_Id": " ",
   				"Currency Code (Local)": " ",
@@ -67,8 +67,8 @@
   				"Notional Amount (Local)": 500.0
             }, {
                 "Client_Product_Id": null,
-                				"Product_Nm": "data is null",
-                				"Investment_Nm": null,
+                				"Product_Nm": "5",
+                				"Investment_Nm": "Eni",
                 				"Alt_Src_Sys_Investment_Id": null,
                 				"TICKER_Id": null,
                 				"Currency Code (Local)": null,

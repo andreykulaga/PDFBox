@@ -62,7 +62,9 @@ public class Filtrator {
         if (!filtersForFields.containsKey(columnName)) {
             return true;
         } else {
-            if (hashMapOfTypes.get(columnName).equalsIgnoreCase("number")) {
+            if (filtersForFields.get(columnName).size()==0) {
+                return true;
+            } else if (hashMapOfTypes.get(columnName).equalsIgnoreCase("number")) {
                 return applyFilterToNumber(columnName, string);
             } else if (hashMapOfTypes.get(columnName). equalsIgnoreCase("Datetime")) {
                 return applyFilterToDatetime(columnName, string);

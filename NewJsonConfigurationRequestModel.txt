@@ -57,7 +57,11 @@
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
-			    }
+			    },
+                "filters":[{
+                           "operator" :"beginswith",
+                           "value" : "t"
+                           }]
 			}, {
 			"name": "Alt_Src_Sys_Investment_Id",
 			"displayName": "Alternate Source System Investment ID",
@@ -156,11 +160,7 @@
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
-			    },
-                "filters":[{
-                           "operator" :"isnull",
-                           "value" : "39.58"
-                           }]
+			    }
 			}, {
             "name": "Notional Amount (Local)",
 			"displayName": "Notional Amount (Local)",
