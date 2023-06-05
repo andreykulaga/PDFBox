@@ -89,6 +89,11 @@ public class Configuration {
         wrapTextInTable = nJCR.wrapTextInTable;
         maxCharactersInTextLine = nJCR.maxCharactersInTextLine;
         forceFontSize = nJCR.forceFontSize;
+
+        if (forceFontSize == true) {
+            wrapTextInTable = true;
+        }
+
         fontSize = nJCR.fontSize;
         maxColumnsAllowed = nJCR.maxColumnsAllowed;
         lineWidth = nJCR.boarderOption.lineWidth;
