@@ -39,15 +39,18 @@ public class Transaction {
         HashMap<String, String> textFields = new HashMap<>();
         HashMap<String, Double> numberFields = new HashMap<>();
         HashMap<String, LocalDateTime> dateFields = new HashMap<>();
+        HashMap<String, String> allFieldsAsStrings = new HashMap<>();
 
         for (String string: columnNames) {
             textFields.put(string, columnNamesForTableHead.get(string));
+            allFieldsAsStrings.put(string, columnNamesForTableHead.get(string));
         }
 
         transaction.setTextFields(textFields);
         transaction.setNumberFields(numberFields);
         transaction.setDateTimeFields(dateFields);
         transaction.setNumberOfTransaction(-1);
+        transaction.setAllFieldsAsStrings(allFieldsAsStrings);
         return transaction;
     }
 

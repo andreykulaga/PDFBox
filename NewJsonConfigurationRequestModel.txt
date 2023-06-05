@@ -1,9 +1,9 @@
 {
 	"showHeaderOnEveryPage": true,
 	"wrapTextInTable": false,
-	"maxCharactersToWrap": 10,
-	"forceFontSize": false,
-	"fontSize": 11,
+	"maxCharactersToWrap": 2,
+	"forceFontSize": true,
+	"fontSize": 14,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",
     "rowHeaderBackgroundColor": "#000000",
