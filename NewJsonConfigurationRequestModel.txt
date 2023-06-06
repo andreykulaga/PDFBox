@@ -225,8 +225,8 @@
         			"value": "12/21/2021"
         		},
         		{
-        			"field": "To",
-        			"value": "12/31/2022"
+        			"field": "",
+        			"value": ""
         		},
         		{
         			"field": "Period Type",

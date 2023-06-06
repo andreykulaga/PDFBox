@@ -516,7 +516,11 @@ public class Pdf {
                                       Color pageHeaderBackGroundColor, Color pageHeaderFontColor) throws IOException {
 
 
-        String boldText = text[0] + ": ";
+        String boldText = text[0];
+        if (!boldText.equalsIgnoreCase("")) {
+            boldText = boldText.concat( ": ");
+        }
+
         String ordinaryText = text[1];
 
         float boldTextWidth = boldFont.getStringWidth(boldText) / 1000 * pageHeaderFontSize;
@@ -526,6 +530,10 @@ public class Pdf {
         float boldCellWidth = boldTextWidth * columnWidth / (boldTextWidth + ordinaryTextWidth);
         float ordinaryCellWidth = ordinaryTextWidth * columnWidth / (boldTextWidth + ordinaryTextWidth);
 
+        if (boldTextWidth==0 && ordinaryTextWidth == 0) {
+            boldCellWidth = columnWidth/2;
+            ordinaryCellWidth = columnWidth/2;
+        }
 
         float widthAvailableForBoldText = boldCellWidth - 2* boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
         float widthAvailableForOrdinaryText = ordinaryCellWidth - 2* ordinaryFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
