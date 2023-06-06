@@ -1,9 +1,9 @@
 {
 	"showHeaderOnEveryPage": true,
 	"wrapTextInTable": false,
-	"maxCharactersToWrap": 2,
+	"maxCharactersToWrap": 20 ,
 	"forceFontSize": true,
-	"fontSize": 14,
+	"fontSize": 15,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",
     "rowHeaderBackgroundColor": "#000000",
@@ -198,7 +198,7 @@
 				}
 			]
 		}, {
-			"fontSize": 10,
+			"fontSize": 9,
 			"fontColor": "#000000",
 			"backgroundColor": "#ffffff",
 			"data": [
@@ -216,7 +216,7 @@
 				}
 			]
 		}, {
-		    "fontSize": 10,
+		    "fontSize": 9,
         	"fontColor": "#000000",
         	"backgroundColor": "#ffffff",
         	"data": [
@@ -230,11 +230,11 @@
         		},
         		{
         			"field": "Period Type",
-        			"value": "Access Period"
+        			"value": "Access Periodegsegsfbsbsrgbsrbsgrbsgbsgbsgb"
         		}
         	]
         }, {
-		    "fontSize": 10,
+		    "fontSize": 9,
         	"fontColor": "#000000",
         	"backgroundColor": "#ffffff",
         	"data": [

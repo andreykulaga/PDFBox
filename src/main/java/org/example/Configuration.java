@@ -69,7 +69,7 @@ public class Configuration {
 
     //PageHeader configuration
     ArrayList<HashMap<String, String>> pageHeaderConfiguration = new ArrayList<>();
-    ArrayList<ArrayList<String>> pageHeaderLines = new ArrayList<>();
+    ArrayList<ArrayList<String[]>> pageHeaderLines = new ArrayList<>();
 
     //Fields configuration
     HashMap<String, String> textFormat = new HashMap<>();
@@ -167,10 +167,15 @@ public class Configuration {
             hashMap.put("backGroundColor", nJCR.getPageHeader().get(i).backGroundColor);
             pageHeaderConfiguration.add(hashMap);
          
-            ArrayList<String> arrayList = new ArrayList<>();
+            ArrayList<String[]> arrayList = new ArrayList<>();
             for (int j=0; j < nJCR.getPageHeader().get(i).data.size(); j++) {
-                arrayList.add(nJCR.getPageHeader().get(i).data.get(j).field);
-                arrayList.add(nJCR.getPageHeader().get(i).data.get(j).value);
+                String[] strings = new String[2];
+                strings[0] = nJCR.getPageHeader().get(i).data.get(j).field;
+                strings[1] = nJCR.getPageHeader().get(i).data.get(j).value;
+                arrayList.add(strings);
+
+//                arrayList.add(nJCR.getPageHeader().get(i).data.get(j).field);
+//                arrayList.add(nJCR.getPageHeader().get(i).data.get(j).value);
             }
             pageHeaderLines.add(arrayList);
             

@@ -334,28 +334,37 @@ public class Pdf {
             }
         }
         //count all column lengths
-        float[] columnLengths = new float[]{0, 0, 0};
+        int maxcolumns = 0;
+        for (int i=1; i < configuration.getPageHeaderLines().size(); i++) {
+            if (configuration.getPageHeaderLines().get(i).size() > maxcolumns) {
+                maxcolumns = configuration.getPageHeaderLines().get(i).size();
+            }
+        }
+        float[] columnLengths = new float[maxcolumns];
+
         //"i" starts from 1 as the first one is the report name
         for (int i=1; i < configuration.getPageHeaderLines().size(); i++) {
-            for (int j=0; j < 6; j+=2) {
+            for (int j=0; j < configuration.getPageHeaderLines().get(i).size(); j++) {
                 //as there could be no text in some columns use try
                 try {
-                    float boldFontStringWidth = boldFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j) + ": ") / 1000 *
+                    float boldFontStringWidth = boldFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j)[0] + ": ") / 1000 *
                             Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
-                    float ordinaryFontStringWidth = ordinaryFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j+1)) / 1000 *
+                    float ordinaryFontStringWidth = ordinaryFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j)[1]) / 1000 *
                             Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
-                    if (columnLengths[j/2] < boldFontStringWidth+ordinaryFontStringWidth) {
-                        columnLengths[j/2] = boldFontStringWidth+ordinaryFontStringWidth;
+                    if (columnLengths[j] < boldFontStringWidth+ordinaryFontStringWidth) {
+                        columnLengths[j] = boldFontStringWidth+ordinaryFontStringWidth;
                     }
                 } catch (IndexOutOfBoundsException ignored) {
                 }
             }
         }
         float allLengths = 0;
-        for (int i = 0; i < 3; i++) {
-            allLengths += columnLengths[i];
+        for (float columnLength : columnLengths) {
+            allLengths += columnLength;
         }
 
+
+        float howManyLines = 1;
 
         //add all lines of Header line by line
         for (int i=0; i<configuration.getPageHeaderConfiguration().size(); i++) {
@@ -404,14 +413,19 @@ public class Pdf {
             fontDescent = headerFontDescent;
             fontLeading = headerFontLeading;
             fontShoulder = headerFontShoulder;
+            float tempFontSize = fontSize;
+            fontSize = pageHeaderFontSize;
+
 
             //move initY up to compensate empty cell height above Report name.
-            initY += pageHeaderFontSize + headerFontDescent + pageHeaderFontSize/2 + headerFontDescent/2 - headerFontAscent/2 - headerFontCapHeight/2;
+            if (i == 0) {
+                initY += pageHeaderFontSize + headerFontDescent + pageHeaderFontSize/2 + headerFontDescent/2 - headerFontAscent/2 - headerFontCapHeight/2;
+            }
 
             //if it is the first line draw it as one cell with green dot at the end
             if (i == 0) {
                 //get text from second item of array, because the first one is "Report name"
-                String text = configuration.getPageHeaderLines().get(i).get(1);
+                String text = configuration.getPageHeaderLines().get(i).get(0)[1];
                 TextAlign textAlign = TextAlign.LEFT;
                 //For all other cells in report we start text with tabulation of one font average font width
                 // (to prevent the first letter from connecting with cell boarder), but for Report name we need it
@@ -443,50 +457,36 @@ public class Pdf {
 
             } else {
 
-                //draw the line by drawing each part of it's data
-                float columnWidth = 0;
-                for (int j=0; j<configuration.getPageHeaderLines().get(i).size(); j++) {
-                    String text;
-                    float cellWidth;
+                //move initX to align with tables below
+                initX -= boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize - configuration.getLineWidth();
 
-                    if (j%2 == 0) {
-                        text = configuration.getPageHeaderLines().get(i).get(j) + ": ";
-                        cellWidth = boldFont.getStringWidth(text) / 1000 * pageHeaderFontSize;
-                        float spaceWidth = ordinaryFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
-                        addCellWithMultipleTextLines(contentStream, text,
-                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                                initX - spaceWidth - configuration.getLineWidth(), initY, cellWidth, 1, pageHeaderFontSize, boldFont);
-//                        addCellWithText(contentStream, text,
-//                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-//                                initX, initY, cellWidth, pageHeaderFontSize, true, boldFont);
-                        initX += cellWidth;
-                    } else {
-                        text = configuration.getPageHeaderLines().get(i).get(j);
-                        cellWidth = ordinaryFont.getStringWidth(text) / 1000 * pageHeaderFontSize;
-                        addCellWithMultipleTextLines(contentStream, text,
-                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-                                initX, initY, cellWidth, 1, pageHeaderFontSize, ordinaryFont);
-//                        addCellWithText(contentStream, text,
-//                                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
-//                                initX, initY, cellWidth, pageHeaderFontSize, true, ordinaryFont);
-//                        initX = configuration.getLeftMargin() + Math.round((float) j /2) * (tableWidth/3);
-                        columnWidth += columnLengths[j/2];
-                        initX = configuration.getLeftMargin() + columnWidth  * tableWidth / allLengths;
+                //draw the line by drawing each part of it's data
+                for (int j = 0; j < configuration.getPageHeaderLines().get(i).size(); j++) {
+                    float columnWidth = columnLengths[j] * tableWidth / allLengths;
+                    int temp = drawCellOfHeadOfReport(configuration.getPageHeaderLines().get(i).get(j), contentStream, columnWidth,
+                            pageHeaderFontSize, pageHeaderBackGroundColor, pageHeaderFontColor);
+
+                    if (temp > howManyLines) {
+                        howManyLines = temp;
                     }
+
+
                 }
+
                 //add additional empty line after the last line
                 if (i == configuration.getPageHeaderConfiguration().size() - 1) {
                     initY -= headerCellHeight;
                 }
             }
             initX = configuration.getLeftMargin();
-            initY -= headerCellHeight;
+            initY -= headerCellHeight * howManyLines;
 
             //change global cell height and font descent back
             cellHeight = tempCellHeight;
             fontDescent = tempFontDescent;
             fontLeading = tempFontLeading;
             fontShoulder = tempFontShoulder;
+            fontSize = tempFontSize;
 
         }
 
@@ -512,6 +512,61 @@ public class Pdf {
         contentStream.close();
     }
 
+    public int drawCellOfHeadOfReport(String[] text, PDPageContentStream contentStream, float columnWidth, float pageHeaderFontSize,
+                                      Color pageHeaderBackGroundColor, Color pageHeaderFontColor) throws IOException {
+
+
+        String boldText = text[0] + ": ";
+        String ordinaryText = text[1];
+
+        float boldTextWidth = boldFont.getStringWidth(boldText) / 1000 * pageHeaderFontSize;
+        float ordinaryTextWidth = ordinaryFont.getStringWidth(ordinaryText) / 1000 * pageHeaderFontSize;
+
+        //define cell width for each text as a proportion from total cell width
+        float boldCellWidth = boldTextWidth * columnWidth / (boldTextWidth + ordinaryTextWidth);
+        float ordinaryCellWidth = ordinaryTextWidth * columnWidth / (boldTextWidth + ordinaryTextWidth);
+
+
+        float widthAvailableForBoldText = boldCellWidth - 2* boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+        float widthAvailableForOrdinaryText = ordinaryCellWidth - 2* ordinaryFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+
+        //count how many lines we will have
+        LinkedList<String> listOfBoldText = splitTextByLines(boldText, widthAvailableForBoldText, boldFont);
+        LinkedList<String> listOfOrdinaryText = splitTextByLines(ordinaryText, widthAvailableForOrdinaryText, ordinaryFont);
+
+        int howManyLines = Math.max(listOfBoldText.size(), listOfOrdinaryText.size());
+
+        //add bold text
+        addCellWithMultipleTextLines(contentStream, boldText,
+                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+                initX, initY, boldCellWidth, howManyLines, pageHeaderFontSize, boldFont);
+
+        //count how width was the bold text in reality
+        float realBoldCellWidth = 0;
+        for (String string: listOfBoldText) {
+            float fl = boldFont.getStringWidth(string) / 1000 * pageHeaderFontSize;
+            if (fl > realBoldCellWidth) {
+                realBoldCellWidth = fl;
+            }
+        }
+        realBoldCellWidth += boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+
+        initX += realBoldCellWidth;
+
+        //need to add to ordinary cell width the difference between real bold cell width and calculated
+        ordinaryCellWidth += boldCellWidth - realBoldCellWidth;
+
+
+        // add ordinary text
+        addCellWithMultipleTextLines(contentStream, ordinaryText,
+                TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
+                initX, initY, ordinaryCellWidth, howManyLines, pageHeaderFontSize, ordinaryFont);
+
+        initX += ordinaryCellWidth;
+
+        return howManyLines;
+
+    }
     public void addTableRow(Transaction transaction) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
