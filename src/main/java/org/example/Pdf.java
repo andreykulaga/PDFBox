@@ -340,28 +340,29 @@ public class Pdf {
                 maxcolumns = configuration.getPageHeaderLines().get(i).size();
             }
         }
-        float[] columnLengths = new float[maxcolumns];
 
-        //"i" starts from 1 as the first one is the report name
-        for (int i=1; i < configuration.getPageHeaderLines().size(); i++) {
-            for (int j=0; j < configuration.getPageHeaderLines().get(i).size(); j++) {
-                //as there could be no text in some columns use try
-                try {
-                    float boldFontStringWidth = boldFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j)[0] + ": ") / 1000 *
-                            Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
-                    float ordinaryFontStringWidth = ordinaryFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j)[1]) / 1000 *
-                            Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
-                    if (columnLengths[j] < boldFontStringWidth+ordinaryFontStringWidth) {
-                        columnLengths[j] = boldFontStringWidth+ordinaryFontStringWidth;
-                    }
-                } catch (IndexOutOfBoundsException ignored) {
-                }
-            }
-        }
-        float allLengths = 0;
-        for (float columnLength : columnLengths) {
-            allLengths += columnLength;
-        }
+//        float[] columnLengths = new float[maxcolumns];
+//
+//        //"i" starts from 1 as the first one is the report name
+//        for (int i=1; i < configuration.getPageHeaderLines().size(); i++) {
+//            for (int j=0; j < configuration.getPageHeaderLines().get(i).size(); j++) {
+//                //as there could be no text in some columns use try
+//                try {
+//                    float boldFontStringWidth = boldFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j)[0] + ": ") / 1000 *
+//                            Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
+//                    float ordinaryFontStringWidth = ordinaryFont.getStringWidth(configuration.getPageHeaderLines().get(i).get(j)[1]) / 1000 *
+//                            Float.parseFloat(configuration.getPageHeaderConfiguration().get(i).get("fontSize"));
+//                    if (columnLengths[j] < boldFontStringWidth+ordinaryFontStringWidth) {
+//                        columnLengths[j] = boldFontStringWidth+ordinaryFontStringWidth;
+//                    }
+//                } catch (IndexOutOfBoundsException ignored) {
+//                }
+//            }
+//        }
+//        float allLengths = 0;
+//        for (float columnLength : columnLengths) {
+//            allLengths += columnLength;
+//        }
 
 
         float howManyLines = 1;
@@ -462,7 +463,8 @@ public class Pdf {
 
                 //draw the line by drawing each part of it's data
                 for (int j = 0; j < configuration.getPageHeaderLines().get(i).size(); j++) {
-                    float columnWidth = columnLengths[j] * tableWidth / allLengths;
+//                    float columnWidth = columnLengths[j] * tableWidth / allLengths;
+                    float columnWidth = tableWidth / 3;
                     int temp = drawCellOfHeadOfReport(configuration.getPageHeaderLines().get(i).get(j), contentStream, columnWidth,
                             pageHeaderFontSize, pageHeaderBackGroundColor, pageHeaderFontColor);
 
@@ -524,45 +526,52 @@ public class Pdf {
         String ordinaryText = text[1];
 
         float boldTextWidth = boldFont.getStringWidth(boldText) / 1000 * pageHeaderFontSize;
-        float ordinaryTextWidth = ordinaryFont.getStringWidth(ordinaryText) / 1000 * pageHeaderFontSize;
+//        float ordinaryTextWidth = ordinaryFont.getStringWidth(ordinaryText) / 1000 * pageHeaderFontSize;
 
         //define cell width for each text as a proportion from total cell width
-        float boldCellWidth = boldTextWidth * columnWidth / (boldTextWidth + ordinaryTextWidth);
-        float ordinaryCellWidth = ordinaryTextWidth * columnWidth / (boldTextWidth + ordinaryTextWidth);
+        float boldCellWidth = boldTextWidth + 2* boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+        float ordinaryCellWidth = columnWidth - boldTextWidth;
 
-        if (boldTextWidth==0 && ordinaryTextWidth == 0) {
+        //the warning message
+        if (ordinaryCellWidth < ordinaryFont.getAverageFontWidth() / 1000 * pageHeaderFontSize) {
+            System.out.println("the bold part is so long, that in is impossible to write ordinary part even as one symbol per line. The result will look broken");
+        }
+
+        if (boldText.equalsIgnoreCase("") && ordinaryText.equalsIgnoreCase("")) {
             boldCellWidth = columnWidth/2;
             ordinaryCellWidth = columnWidth/2;
         }
 
-        float widthAvailableForBoldText = boldCellWidth - 2* boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+//        float widthAvailableForBoldText = boldCellWidth - 2* boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
         float widthAvailableForOrdinaryText = ordinaryCellWidth - 2* ordinaryFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
 
         //count how many lines we will have
-        LinkedList<String> listOfBoldText = splitTextByLines(boldText, widthAvailableForBoldText, boldFont);
+//        LinkedList<String> listOfBoldText = splitTextByLines(boldText, widthAvailableForBoldText, boldFont);
         LinkedList<String> listOfOrdinaryText = splitTextByLines(ordinaryText, widthAvailableForOrdinaryText, ordinaryFont);
 
-        int howManyLines = Math.max(listOfBoldText.size(), listOfOrdinaryText.size());
+//        int howManyLines = Math.max(listOfBoldText.size(), listOfOrdinaryText.size());
+        int howManyLines = listOfOrdinaryText.size();
 
         //add bold text
         addCellWithMultipleTextLines(contentStream, boldText,
                 TextAlign.LEFT, pageHeaderBackGroundColor, pageHeaderFontColor, Outline.NOTOUTLINED,
                 initX, initY, boldCellWidth, howManyLines, pageHeaderFontSize, boldFont);
 
-        //count how width was the bold text in reality
-        float realBoldCellWidth = 0;
-        for (String string: listOfBoldText) {
-            float fl = boldFont.getStringWidth(string) / 1000 * pageHeaderFontSize;
-            if (fl > realBoldCellWidth) {
-                realBoldCellWidth = fl;
-            }
-        }
-        realBoldCellWidth += boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+//        //count how width was the bold text in reality
+//        float realBoldCellWidth = 0;
+//        for (String string: listOfBoldText) {
+//            float fl = boldFont.getStringWidth(string) / 1000 * pageHeaderFontSize;
+//            if (fl > realBoldCellWidth) {
+//                realBoldCellWidth = fl;
+//            }
+//        }
+//        realBoldCellWidth += boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
+//
+//        initX += realBoldCellWidth;
+        initX += boldCellWidth;
 
-        initX += realBoldCellWidth;
-
-        //need to add to ordinary cell width the difference between real bold cell width and calculated
-        ordinaryCellWidth += boldCellWidth - realBoldCellWidth;
+//        //need to add to ordinary cell width the difference between real bold cell width and calculated
+//        ordinaryCellWidth += boldCellWidth - realBoldCellWidth;
 
 
         // add ordinary text

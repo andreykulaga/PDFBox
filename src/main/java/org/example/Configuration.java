@@ -169,6 +169,10 @@ public class Configuration {
          
             ArrayList<String[]> arrayList = new ArrayList<>();
             for (int j=0; j < nJCR.getPageHeader().get(i).data.size(); j++) {
+                //break if in configuration set more than 3 columns in report headers. We save only the first three.
+                if (j == 3) {
+                    break;
+                }
                 String[] strings = new String[2];
                 strings[0] = nJCR.getPageHeader().get(i).data.get(j).field;
                 strings[1] = nJCR.getPageHeader().get(i).data.get(j).value;
