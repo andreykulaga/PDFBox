@@ -365,6 +365,10 @@ public class Pdf {
 //        }
 
 
+        //change alignment in cell, so it will be always top alignment in the report header
+        TextAlign tempRowHeaderVerticalAlignment = configuration.getRowHeaderVerticalAlignment();
+        configuration.setRowHeaderVerticalAlignment(TextAlign.TOP);
+
         float howManyLines = 1;
 
         //add all lines of Header line by line
@@ -492,6 +496,8 @@ public class Pdf {
 
         }
 
+        //change alignment in cell back to what was set in configuration
+        configuration.setRowHeaderVerticalAlignment(tempRowHeaderVerticalAlignment);
         
         // //Add base for grouping
         // if (configuration.getColumnsToGroupBy() != null && configuration.getColumnsToGroupBy().size() > 0) {
@@ -508,6 +514,7 @@ public class Pdf {
 
         // }
         // initY -= cellHeight;
+
 
         //Add table header
         addTableHeader(contentStream);
@@ -538,7 +545,7 @@ public class Pdf {
         }
 
         if (boldText.equalsIgnoreCase("") && ordinaryText.equalsIgnoreCase("")) {
-            boldCellWidth = columnWidth/2;
+            boldCellWidth = columnWidth/2 + 2* boldFont.getStringWidth(" ") / 1000 * pageHeaderFontSize;
             ordinaryCellWidth = columnWidth/2;
         }
 

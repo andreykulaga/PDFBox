@@ -1,6 +1,6 @@
 {
 	"showHeaderOnEveryPage": true,
-	"wrapTextInTable": false,
+	"wrapTextInTable": true,
 	"maxCharactersToWrap": 20 ,
 	"forceFontSize": false,
 	"fontSize": 15,
@@ -225,8 +225,8 @@
         			"value": "12/21/2021"
         		},
         		{
-        			"field": "",
-        			"value": ""
+        			"field": "aefgaefag",
+        			"value": "sfgasfgfa"
         		},
         		{
         			"field": "Period Type",
