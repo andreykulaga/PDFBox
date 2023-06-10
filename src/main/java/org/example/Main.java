@@ -19,7 +19,7 @@ public class Main {
 
         //Create Configuration, read NewJsonConfigurationRequest and import it to Configuration;
         Configuration configuration = new Configuration();
-        NewJsonConfigurationRequest nJCR = new NewJsonConfigurationRequest();
+        NewJsonConfigurationRequest nJCR;
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("./NewJsonConfigurationRequestModel.txt"))) {
             String line = bufferedReader.readLine();
@@ -46,7 +46,7 @@ public class Main {
         module.addDeserializer(JsonResponse.class, new JsonResponseDeserializer());
         mapper.registerModule(module);
         
-        JsonResponse jsonResponse = new JsonResponse();
+        JsonResponse jsonResponse;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("./JsonResponseWithData.txt"))) {
             String line = bufferedReader.readLine();
             String myJsonString = "";
@@ -81,19 +81,19 @@ public class Main {
 
         try {
             //fill array that we will need to calculate cell width
-            for (int i = 0; i < columnNames.size(); i++) {
-                String line = columnNamesForTableHead.get(columnNames.get(i));
+            for (String columnName : columnNames) {
+                String line = columnNamesForTableHead.get(columnName);
                 float length = PDType1Font.HELVETICA_BOLD.getStringWidth(line + "  ") / 1000;
 
                 if (!configuration.forceFontSize) {
                     if (configuration.isWrapTextInTable() && line.length() > configuration.getMaxCharactersInTextLine()) {
-                        maxLengthsOfTextInCell.put(columnNames.get(i), PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine() - 1) + "  ") / 1000);
+                        maxLengthsOfTextInCell.put(columnName, PDType1Font.HELVETICA_BOLD.getStringWidth(line.substring(0, configuration.getMaxCharactersInTextLine() - 1) + "  ") / 1000);
                     } else {
-                        maxLengthsOfTextInCell.put(columnNames.get(i), length);
+                        maxLengthsOfTextInCell.put(columnName, length);
                     }
                 } else {
-                    maxLengthsOfTextInCell.put(columnNames.get(i), length);
-                    notStringMaxLengths.put(columnNames.get(i), (float) 0);
+                    maxLengthsOfTextInCell.put(columnName, length);
+                    notStringMaxLengths.put(columnName, (float) 0);
                 }
             }
 
