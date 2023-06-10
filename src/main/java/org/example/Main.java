@@ -94,13 +94,6 @@ public class Main {
                 } else {
                     maxLengthsOfTextInCell.put(columnNames.get(i), length);
                     notStringMaxLengths.put(columnNames.get(i), (float) 0);
-
-//                    //if font size is forced than count only for text column names
-//                    if (hashMapOfTypes.get(columnNames.get(i)).equalsIgnoreCase("string")) {
-//                        maxLengthsOfTextInCell.put(columnNames.get(i), length);
-//                    } else {
-//                        maxLengthsOfTextInCell.put(columnNames.get(i), (float) 0);
-//                    }
                 }
             }
 
@@ -258,7 +251,7 @@ public class Main {
                                 pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1), k+1);
                             }
 
-                            //if we print subtotal and we are suppressing some values we should treat next transaction as a new one
+                            //if we print subtotal and we suppress some values, we should treat next transaction as a new one
                             //reset textFieldsOfPreviousTransaction
                             for (String columnName: hashMapOfTypes.keySet()) {
                                 textFieldsOfPreviousTransaction.put(columnName, "");
@@ -361,7 +354,7 @@ public class Main {
                                 pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1), k+1);
                             }
 
-                            //if we print subtotal and we are suppressing some values we should treat next transaction as a new one
+                            //if we print subtotal and we suppress some values, we should treat next transaction as a new one
                             //reset textFieldsOfPreviousTransaction
                             for (String columnName: hashMapOfTypes.keySet()) {
                                 textFieldsOfPreviousTransaction.put(columnName, "");
