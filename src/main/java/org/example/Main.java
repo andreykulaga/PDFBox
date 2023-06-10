@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import javax.swing.JDialog;
@@ -110,6 +111,30 @@ public class Main {
         //create array list of transactions and extract from JsonResponse, maxLengthsOfTextInCell are updated
         ArrayList<Transaction> transactions = jsonResponse.extractTransactions(maxLengthsOfTextInCell, notStringMaxLengths, configuration);
 
+        //sort transactions
+        for (int i = configuration.getColumnsToSortBy().size()-1; i >= 0; i--) {
+            String[] sortBase = configuration.getColumnsToSortBy().get(i);
+            String fieldNameForSorting = sortBase[0];
+            String typeOfSorting = sortBase[1];
+            String typeOfField = hashMapOfTypes.get(fieldNameForSorting);
+
+            Comparator<Transaction> comp;
+            if (typeOfField.equalsIgnoreCase("number")) {
+                comp = Comparator.comparing((Transaction t) -> t.getNumberFields().get(fieldNameForSorting));
+            } else if (typeOfField.equalsIgnoreCase("Datetime")) {
+                comp = Comparator.comparing((Transaction t) -> t.getDateTimeFields().get(fieldNameForSorting));
+            } else {
+                comp = Comparator.comparing((Transaction t) -> t.getTextFields().get(fieldNameForSorting));
+            }
+
+            if (typeOfSorting.equalsIgnoreCase("desc")) {
+                comp = comp.reversed();
+            }
+
+            transactions.sort(comp);
+        }
+
+
         //clean maxLengthsOfTextInCell from columns that are hidden
         for (String string : configuration.getWhatColumnsToHide()) {
             maxLengthsOfTextInCell.remove(string);
@@ -167,7 +192,6 @@ public class Main {
         for (String columnName: hashMapOfTypes.keySet()) {
             textFieldsOfPreviousTransaction.put(columnName, "");
         }
-
 
         //create preview
         if (configuration.isPreview()) {

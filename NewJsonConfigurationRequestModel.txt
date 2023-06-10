@@ -188,10 +188,10 @@
     ],
     "sorting": [
     {
-        "field": "Investment_Nm",
+        "field": "Unit Price",
         "type": "desc"
     }, {
-        "field": "Original_Share_Qty",
+        "field": "Product_Nm",
         "type": "asc"
     }],
 
