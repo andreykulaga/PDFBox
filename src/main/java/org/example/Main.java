@@ -162,6 +162,13 @@ public class Main {
         File ordinaryFontFile = new File("arial.ttf");
         File boldFontFile = new File("arial-bold.ttf");
 
+        //to suppress duplicates create hashmap where we are going to store the previous value for suppressed fields
+        HashMap<String, String> textFieldsOfPreviousTransaction = new HashMap<>();
+        for (String columnName: hashMapOfTypes.keySet()) {
+            textFieldsOfPreviousTransaction.put(columnName, "");
+        }
+
+
         //create preview
         if (configuration.isPreview()) {
             try (PDDocument doc = new PDDocument()) {
@@ -173,7 +180,7 @@ public class Main {
                     Subtotal subtotal = new Subtotal(hashMapOfTypes);
                     for (Transaction t : transactions) {
                         if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
-                            pdf.addTableRow(t);
+                            pdf.addTableRow(t, textFieldsOfPreviousTransaction);
                             subtotal.addToSubtotal(t);
                         }
                     }
@@ -206,7 +213,7 @@ public class Main {
                         }
                         //print transaction
                         if (doc.getNumberOfPages() <= configuration.getNumberOfPagesInPreview()) {
-                            pdf.addTableRow(transactions.get(j));
+                            pdf.addTableRow(transactions.get(j), textFieldsOfPreviousTransaction);
                         }
 
                         //if next transaction has not equal some fields that we are grouping by
@@ -227,6 +234,12 @@ public class Main {
                                 pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1), k+1);
                             }
 
+                            //if we print subtotal and we are suppressing some values we should treat next transaction as a new one
+                            //reset textFieldsOfPreviousTransaction
+                            for (String columnName: hashMapOfTypes.keySet()) {
+                                textFieldsOfPreviousTransaction.put(columnName, "");
+                            }
+
                         }
                     }
                     //add the last transaction
@@ -235,7 +248,7 @@ public class Main {
                         for (Subtotal subtotalTransaction : subtotals) {
                             subtotalTransaction.addToSubtotal(transactions.get(j));
                         }
-                        pdf.addTableRow(transactions.get(j));
+                        pdf.addTableRow(transactions.get(j), textFieldsOfPreviousTransaction);
                         for (int k = 0; k < subtotals.length - 1; k++) {
                             //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                             String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);
@@ -256,7 +269,15 @@ public class Main {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+            //clean textFieldsOfPreviousTransaction after preview creating
+            for (String columnName: hashMapOfTypes.keySet()) {
+                textFieldsOfPreviousTransaction.put(columnName, "");
+            }
+
         }
+
+
 
         //create result PDF document
         if (configuration.isPdfExport()) {
@@ -268,7 +289,7 @@ public class Main {
                 if (configuration.getColumnsToGroupBy() == null || configuration.getColumnsToGroupBy().size() == 0) {
                     Subtotal subtotal = new Subtotal(hashMapOfTypes);
                     for (Transaction t : transactions) {
-                        pdf.addTableRow(t);
+                        pdf.addTableRow(t, textFieldsOfPreviousTransaction);
                         subtotal.addToSubtotal(t);
                     }
                     pdf.addSubtotalOrTotalRow(true, "", subtotal, hashMapOfTypes);
@@ -295,7 +316,7 @@ public class Main {
                             subtotalTransaction.addToSubtotal(transactions.get(j));
                         }
                         //print transaction
-                        pdf.addTableRow(transactions.get(j));
+                        pdf.addTableRow(transactions.get(j), textFieldsOfPreviousTransaction);
 
                         //if next transaction has not equal some fields that we are grouping by
                         if (transactions.get(j).isFieldChanged(transactions.get(j + 1), configuration)) {
@@ -316,6 +337,12 @@ public class Main {
                                 pdf.addGroupHead(configuration.getColumnsToGroupBy().get(k), transactions.get(j + 1), k+1);
                             }
 
+                            //if we print subtotal and we are suppressing some values we should treat next transaction as a new one
+                            //reset textFieldsOfPreviousTransaction
+                            for (String columnName: hashMapOfTypes.keySet()) {
+                                textFieldsOfPreviousTransaction.put(columnName, "");
+                            }
+
                         }
                     }
                     //add the last transaction
@@ -323,7 +350,7 @@ public class Main {
                     for (Subtotal subtotalTransaction : subtotals) {
                         subtotalTransaction.addToSubtotal(transactions.get(j));
                     }
-                    pdf.addTableRow(transactions.get(j));
+                    pdf.addTableRow(transactions.get(j), textFieldsOfPreviousTransaction);
                     for (int k = 0; k < subtotals.length - 1; k++) {
                         //name of subgroupForSubtotal get from array of configuration.getColumnsToGroupBy starting from the end of the array
                         String subgroupForSubtotal = configuration.getColumnsToGroupBy().get(configuration.getColumnsToGroupBy().size()-k-1);

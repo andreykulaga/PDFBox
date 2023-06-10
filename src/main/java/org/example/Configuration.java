@@ -78,6 +78,9 @@ public class Configuration {
     HashMap<String, Color> textColor = new HashMap<>();
     HashMap<String, Color> negativeValueColor = new HashMap<>();
     HashMap<String, Boolean> negativeAsParenthesesHashMap = new HashMap<>();
+    HashMap<String, Boolean> isAbsoluteValueHashMap = new HashMap<>();
+    HashMap<String, Boolean> isIncludePercentSignHashMap = new HashMap<>();
+    HashMap<String, Boolean> isSuppressDuplicateHashMap = new HashMap<>();
     HashMap<String, ArrayList<Filter>> filtersForFields = new HashMap<>();
 
 
@@ -229,7 +232,10 @@ public class Configuration {
                 filtersForFields.put(columnName, nJCR.getFields().get(i).filters);
             }
 
-            
+            isAbsoluteValueHashMap.put(columnName, nJCR.getFields().get(i).isAbsoluteValue);
+            isIncludePercentSignHashMap.put(columnName, nJCR.getFields().get(i).isIncludePercentSign);
+            isSuppressDuplicateHashMap.put(columnName, nJCR.getFields().get(i).isSuppressDuplicate);
+
         }
         
         reportName = nJCR.pageHeader.get(0).data.get(0).value;

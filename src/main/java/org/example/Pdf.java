@@ -591,11 +591,31 @@ public class Pdf {
         return howManyLines;
 
     }
-    public void addTableRow(Transaction transaction) throws IOException {
+    public void addTableRow(Transaction transaction, HashMap<String, String> textFieldsOfPreviousTransaction) throws IOException {
         PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(document.getNumberOfPages()-1), PDPageContentStream.AppendMode.APPEND, true);
 
         float cellWidth;
 
+        //to suppress the next transaction values we check does it has the same value with current transaction, and then change the value in hashmap
+        //also we keep the original value to make transaction as it was after printing, cause we will work again with that transaction if we create preview now
+        HashMap<String, String> tempStorage = new HashMap<>();
+        if (configuration.getIsSuppressDuplicateHashMap().containsValue(true)) {
+            for (String columnName: transaction.getAllFieldsAsStrings().keySet()) {
+                String currentValue = transaction.getAllFieldsAsStrings().get(columnName);
+                if (configuration.getIsSuppressDuplicateHashMap().get(columnName)) {
+                    String previousValue = textFieldsOfPreviousTransaction.get(columnName);
+                    if (previousValue.equals(currentValue)) {
+                        //if we create preview, we need to store original value to make transaction as it was after printing
+                        if (configuration.isPreview()) {
+                            tempStorage.put(columnName, currentValue);
+                        }
+                        transaction.getAllFieldsAsStrings().put(columnName, "");
+                    } else {
+                        textFieldsOfPreviousTransaction.put(columnName, currentValue);
+                    }
+                }
+            }
+        }
 
         int quantityOfLines = 1;
         if (configuration.isWrapTextInTable()) {
@@ -632,6 +652,13 @@ public class Pdf {
         initY -= cellHeight*quantityOfLines;
         if (configuration.isShowHorizontalBoarders()) {
             initY -= configuration.getLineWidth();
+        }
+
+        //return values of transaction to original if preview is enabled
+        if (configuration.isPreview()) {
+            for (String columnName: tempStorage.keySet()) {
+                transaction.getAllFieldsAsStrings().put(columnName, tempStorage.get(columnName));
+            }
         }
 
         contentStream.close();

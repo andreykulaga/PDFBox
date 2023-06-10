@@ -54,6 +54,7 @@
 			"dataFormat": null,
 			"textAlignment": "Left",
 			"fontColor": "#000000",
+			"isSuppressDuplicate": true,
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
@@ -135,6 +136,7 @@
 			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
+			"isAbsoluteValue": true,
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
@@ -146,6 +148,7 @@
 			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
+			"isIncludePercentSign": true,
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
@@ -157,6 +160,7 @@
 			"dataFormat": null,
 			"textAlignment": "Right",
 			"fontColor": "#000000",
+			"isIncludePercentSign": true,
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
@@ -174,9 +178,15 @@
 			    }
 			}
 	],
-	"columnsToGroupBy": [
+	"columnsToGroupBy":[
+	{
+    		"field": "Currency Code (Local)",
+    		"type": "string",
+    		"fontColor": "#ffffff",
+            "backgroundColor":"#313094"
+    	}
+    ],
 
-	],
 	"ColumnsToAggregate": [{
 		"field": "Investment_Nm",
 		"aggregate": "CNT"

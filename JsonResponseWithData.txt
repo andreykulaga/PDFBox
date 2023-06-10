@@ -18,7 +18,7 @@
               				"Actual Settlement Date": "2023-02-02T09:12:00",
               				"Transaction": "Dividend",
               				"Quantity": 0.0,
-              				"Unit Price": 0.0,
+              				"Unit Price": 1,
               				"Net Amount": -183.69,
               				"Notional Amount (Local)": 0.0
                         },
@@ -34,7 +34,7 @@
               				"Actual Settlement Date": "",
               				"Transaction": "",
               				"Quantity": "",
-              				"Unit Price": "",
+              				"Unit Price": "2",
               				"Net Amount": "",
               				"Notional Amount (Local)": ""
             }, {
@@ -48,7 +48,7 @@
   				"Actual Settlement Date": "2023-01-30T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": -314.0,
-  				"Unit Price": -4.5,
+  				"Unit Price": 3,
   				"Net Amount": -72.03,
   				"Notional Amount (Local)": -1.0
             }, {
@@ -62,7 +62,7 @@
   				"Actual Settlement Date": "2023-03-15T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 859.0,
-  				"Unit Price": 39.58,
+  				"Unit Price": 4,
   				"Net Amount": 35.6,
   				"Notional Amount (Local)": 500.0
             }, {
@@ -76,7 +76,7 @@
                 				"Actual Settlement Date": null,
                 				"Transaction": null,
                 				"Quantity": null,
-                				"Unit Price": null,
+                				"Unit Price": 5,
                 				"Net Amount": null,
                 				"Notional Amount (Local)": null
   			}, {
@@ -90,7 +90,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 6,
   				"Net Amount": 182.84,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -104,7 +104,35 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 7,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "Tiger Brands Lid. ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "TBLM",
+  				"Currency Code (Local)": "EUR",
+  				"Trade Date": "2023-01-19T09:12:00",
+  				"Actual Settlement Date": "2023-02-02T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 8,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "Tiger Brands Lid. ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "TBLM",
+  				"Currency Code (Local)": "EUR",
+  				"Trade Date": "2023-01-19T09:12:00",
+  				"Actual Settlement Date": "2023-02-02T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 9,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -118,35 +146,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
-  				"Net Amount": -183.69,
-  				"Notional Amount (Local)": 0.0
-            }, {
-                "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-  				"Investment_Nm": "Tiger Brands Lid. ADR",
-  				"Alt_Src_Sys_Investment_Id": "88673M201",
-  				"TICKER_Id": "TBLM",
-  				"Currency Code (Local)": "USD",
-  				"Trade Date": "2023-01-19T09:12:00",
-  				"Actual Settlement Date": "2023-02-02T09:12:00",
-  				"Transaction": "Dividend",
-  				"Quantity": 0.0,
-  				"Unit Price": 0.0,
-  				"Net Amount": -183.69,
-  				"Notional Amount (Local)": 0.0
-            }, {
-                "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-  				"Investment_Nm": "Tiger Brands Lid. ADR",
-  				"Alt_Src_Sys_Investment_Id": "88673M201",
-  				"TICKER_Id": "TBLM",
-  				"Currency Code (Local)": "USD",
-  				"Trade Date": "2023-01-19T09:12:00",
-  				"Actual Settlement Date": "2023-02-02T09:12:00",
-  				"Transaction": "Dividend",
-  				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 10,
   				"Net Amount": null,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -160,7 +160,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 11,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -174,7 +174,21 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 12,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "Tiger Brands Lid. ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "TBLM",
+  				"Currency Code (Local)": "EUR",
+  				"Trade Date": "2023-01-19T09:12:00",
+  				"Actual Settlement Date": "2023-02-02T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 13,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -188,7 +202,21 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 14,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "Tiger Brands Lid. ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "TBLM",
+  				"Currency Code (Local)": "EUR",
+  				"Trade Date": "2023-01-19T09:12:00",
+  				"Actual Settlement Date": "2023-02-02T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 15,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -202,7 +230,21 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 16,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "Tiger Brands Lid. ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "TBLM",
+  				"Currency Code (Local)": "EUR",
+  				"Trade Date": "2023-01-19T09:12:00",
+  				"Actual Settlement Date": "2023-02-02T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 17,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -216,7 +258,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 18,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -230,7 +272,21 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 19,
+  				"Net Amount": -183.69,
+  				"Notional Amount (Local)": 0.0
+            }, {
+                "Client_Product_Id": "DYNGM3",
+  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
+  				"Investment_Nm": "Tiger Brands Lid. ADR",
+  				"Alt_Src_Sys_Investment_Id": "88673M201",
+  				"TICKER_Id": "TBLM",
+  				"Currency Code (Local)": "EUR",
+  				"Trade Date": "2023-01-19T09:12:00",
+  				"Actual Settlement Date": "2023-02-02T09:12:00",
+  				"Transaction": "Dividend",
+  				"Quantity": 0.0,
+  				"Unit Price": 20,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -244,7 +300,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 21,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -258,7 +314,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 22,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -272,7 +328,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 23,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -286,7 +342,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 24,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -300,63 +356,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
-  				"Net Amount": -183.69,
-  				"Notional Amount (Local)": 0.0
-            }, {
-                "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-  				"Investment_Nm": "Tiger Brands Lid. ADR",
-  				"Alt_Src_Sys_Investment_Id": "88673M201",
-  				"TICKER_Id": "TBLM",
-  				"Currency Code (Local)": "USD",
-  				"Trade Date": "2023-01-19T09:12:00",
-  				"Actual Settlement Date": "2023-02-02T09:12:00",
-  				"Transaction": "Dividend",
-  				"Quantity": 0.0,
-  				"Unit Price": 0.0,
-  				"Net Amount": -183.69,
-  				"Notional Amount (Local)": 0.0
-            }, {
-                "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-  				"Investment_Nm": "Tiger Brands Lid. ADR",
-  				"Alt_Src_Sys_Investment_Id": "88673M201",
-  				"TICKER_Id": "TBLM",
-  				"Currency Code (Local)": "USD",
-  				"Trade Date": "2023-01-19T09:12:00",
-  				"Actual Settlement Date": "2023-02-02T09:12:00",
-  				"Transaction": "Dividend",
-  				"Quantity": 0.0,
-  				"Unit Price": 0.0,
-  				"Net Amount": -183.69,
-  				"Notional Amount (Local)": 0.0
-            }, {
-                "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-  				"Investment_Nm": "Tiger Brands Lid. ADR",
-  				"Alt_Src_Sys_Investment_Id": "88673M201",
-  				"TICKER_Id": "TBLM",
-  				"Currency Code (Local)": "USD",
-  				"Trade Date": "2023-01-19T09:12:00",
-  				"Actual Settlement Date": "2023-02-02T09:12:00",
-  				"Transaction": "Dividend",
-  				"Quantity": 0.0,
-  				"Unit Price": 0.0,
-  				"Net Amount": -183.69,
-  				"Notional Amount (Local)": 0.0
-            }, {
-                "Client_Product_Id": "DYNGM3",
-  				"Product_Nm": "C4B88A8E0AF41870DC2F56BAEF3",
-  				"Investment_Nm": "Tiger Brands Lid. ADR",
-  				"Alt_Src_Sys_Investment_Id": "88673M201",
-  				"TICKER_Id": "TBLM",
-  				"Currency Code (Local)": "USD",
-  				"Trade Date": "2023-01-19T09:12:00",
-  				"Actual Settlement Date": "2023-02-02T09:12:00",
-  				"Transaction": "Dividend",
-  				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 25,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -370,7 +370,7 @@
   				"Actual Settlement Date": "2023-02-10T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 26,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -384,7 +384,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 27,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -398,7 +398,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 28,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -412,7 +412,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 29,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -426,7 +426,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 30,
   				"Net Amount": -183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -440,7 +440,7 @@
   				"Actual Settlement Date": "2023-01-23T09:12:00",
   				"Transaction": "Buy",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 31,
   				"Net Amount": -1413.00,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -454,7 +454,7 @@
   				"Actual Settlement Date": "2023-02-02T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 32,
   				"Net Amount": 183.69,
   				"Notional Amount (Local)": 0.0
             }, {
@@ -468,7 +468,7 @@
   				"Actual Settlement Date": "2023-02-01T09:12:00",
   				"Transaction": "Dividend",
   				"Quantity": 0.0,
-  				"Unit Price": 0.0,
+  				"Unit Price": 33,
   				"Net Amount": -5238.11,
   				"Notional Amount (Local)": 0.0
 			}],

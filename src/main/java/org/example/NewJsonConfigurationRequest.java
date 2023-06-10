@@ -87,6 +87,12 @@ public class NewJsonConfigurationRequest {
         public HashMap<String, String> negativeNumberOption;
         @JsonProperty("filters")
         public ArrayList<Filter> filters;
+        @JsonProperty("isIncludePercentSign")
+        public boolean isIncludePercentSign;
+        @JsonProperty("isAbsoluteValue")
+        public boolean isAbsoluteValue;
+        @JsonProperty("isSuppressDuplicate")
+        public boolean isSuppressDuplicate;
     }
     
     public static class PageFooter{
