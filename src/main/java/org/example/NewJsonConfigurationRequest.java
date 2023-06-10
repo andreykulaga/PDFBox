@@ -37,7 +37,6 @@ public class NewJsonConfigurationRequest {
     public HashMap<String, String> pageMargin;
     public BoarderOption boarderOption;
 
-
     public ArrayList<Sorting> sorting;
 
     public ArrayList<WhatColumnsToHide> whatColumnsToHide;

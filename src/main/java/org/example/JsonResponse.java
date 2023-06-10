@@ -133,6 +133,12 @@ public class JsonResponse {
                         allFieldsAsStrings.put(key, "");
                     } else {
                         f = Double.parseDouble(value);
+
+                        //make the number absolute
+                        if (configuration.getIsAbsoluteValueHashMap().get(key)) {
+                            f = Math.abs(f);
+                        }
+
                         allFieldsAsStrings.put(key, DoubleFormatter.format(f, key, configuration));
                     }
                     numberFields.put(key, f);

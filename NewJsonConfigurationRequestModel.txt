@@ -161,6 +161,7 @@
 			"textAlignment": "Right",
 			"fontColor": "#000000",
 			"isIncludePercentSign": true,
+			"isAbsoluteValue": true,
 			"negativeNumberOption":{
 			    "decorateWith": "Parenthesis",
 			    "fontColor": "#FF0000"
