@@ -186,6 +186,14 @@
             "backgroundColor":"#313094"
     	}
     ],
+    "sorting": [
+    {
+        "field": "Investment_Nm",
+        "type": "desc"
+    }, {
+        "field": "Original_Share_Qty",
+        "type": "asc"
+    }],
 
 	"ColumnsToAggregate": [{
 		"field": "Investment_Nm",

@@ -57,6 +57,7 @@ public class Configuration {
     boolean showHorizontalBoarders;
     ArrayList<String> columnsToGroupBy = new ArrayList<>();
     ArrayList<String> whatColumnsToHide = new ArrayList<>();
+    HashMap<String, String> columnsToSortBy = new HashMap<>();
 
 
     //PageFooter configuration
@@ -135,6 +136,12 @@ public class Configuration {
         if (nJCR.whatColumnsToHide.size() > 0) {
             for (int i=0; i<nJCR.whatColumnsToHide.size(); i++) {
                 whatColumnsToHide.add(nJCR.whatColumnsToHide.get(i).field.toLowerCase().replace("_", " "));
+            }
+        }
+
+        if (nJCR.sorting.size() > 0) {
+            for (int i=0; i<nJCR.sorting.size(); i++) {
+                columnsToSortBy.put(nJCR.sorting.get(i).field.toLowerCase().replace("_", " "), nJCR.sorting.get(i).type);
             }
         }
 

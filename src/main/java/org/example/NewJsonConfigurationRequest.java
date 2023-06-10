@@ -38,6 +38,8 @@ public class NewJsonConfigurationRequest {
     public BoarderOption boarderOption;
 
 
+    public ArrayList<Sorting> sorting;
+
     public ArrayList<WhatColumnsToHide> whatColumnsToHide;
     public ArrayList<Field> fields;
     public ArrayList<ColumnsToGroupBy> columnsToGroupBy;
@@ -65,6 +67,11 @@ public class NewJsonConfigurationRequest {
         public String type;
         public String fontColor;
         public String backgroundColor;
+    }
+
+    public static class Sorting {
+        public String field;
+        public String type;
     }
     
     public static class Datum{
