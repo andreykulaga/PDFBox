@@ -27,7 +27,7 @@ public class Subtotal {
     }
 
     public void addToSubtotal(Transaction transaction) {
-        for (String string: transaction.getNumberFields().keySet()) {
+        for (String string: numberFields.keySet()) {
             Double dbl = numberFields.get(string) + transaction.getNumberFields().get(string);
             numberFields.put(string, dbl);
         }

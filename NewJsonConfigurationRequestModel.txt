@@ -2,8 +2,8 @@
 	"showHeaderOnEveryPage": true,
 	"wrapTextInTable": true,
 	"maxCharactersToWrap": 20 ,
-	"forceFontSize": false,
-	"fontSize": 15,
+	"forceFontSize": true,
+	"fontSize": 0.015,
 	"maxColumnsAllowed": 20,
 	"columnHeaderFontColor": "#ffffff",
     "rowHeaderBackgroundColor": "#000000",
@@ -24,7 +24,38 @@
 	"whatColumnsToHide": [{
 		"field": "Client_Product_Id",
 		"type": "string"
-	}],
+	    }, {
+	    "field": "Product_Nm",
+        "type": "string"
+        }, {
+	    "field": "Investment_Nm",
+        "type": "string"
+        }, {
+    	"field": "Alt_Src_Sys_Investment_Id",
+        "type": "string"
+    	}, {
+        "field": "TICKER_Id",
+        "type": "string"
+        }, {
+    	"field": "Trade Date",
+        "type": "Datetime"
+        }, {
+   	    "field": "Actual Settlement Date",
+           "type": "Datetime"
+        }, {
+   	    "field": "Transaction",
+           "type": "string"
+        }, {
+   	    "field": "Quantity",
+           "type": "number"
+        }, {
+   	    "field": "Unit Price",
+           "type": "number"
+        }, {
+   	    "field": "Net Amount",
+           "type": "number"
+        }
+	],
 	"fields": [{
 			"name": "Client_Product_Id",
 			"displayName": "Portfolio External",
@@ -207,7 +238,7 @@
 		"aggregate": "AVG"
 	}],
 	"pageHeaderRows": [{
-			"fontSize": 32,
+			"fontSize": 9,
 			"fontColor": "#000000",
 			"backgroundColor": "#ffffff",
 			"data": [
