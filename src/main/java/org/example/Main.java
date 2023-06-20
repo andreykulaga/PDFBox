@@ -146,6 +146,11 @@ public class Main {
             dialog.setVisible(true); // to visible the dialog
         }
 
+        //to suppress duplicates create hashmap where we are going to store the previous value for suppressed fields
+        HashMap<String, String> textFieldsOfPreviousTransaction = new HashMap<>();
+        for (String columnName: hashMapOfTypes.keySet()) {
+            textFieldsOfPreviousTransaction.put(columnName, "");
+        }
         //clean map of types from hidden columns
         for (String string : configuration.getWhatColumnsToHide()) {
             hashMapOfTypes.remove(string);
@@ -180,11 +185,6 @@ public class Main {
         File ordinaryFontFile = new File("arial.ttf");
         File boldFontFile = new File("arial-bold.ttf");
 
-        //to suppress duplicates create hashmap where we are going to store the previous value for suppressed fields
-        HashMap<String, String> textFieldsOfPreviousTransaction = new HashMap<>();
-        for (String columnName: hashMapOfTypes.keySet()) {
-            textFieldsOfPreviousTransaction.put(columnName, "");
-        }
 
         //create preview
         if (configuration.isPreview()) {
