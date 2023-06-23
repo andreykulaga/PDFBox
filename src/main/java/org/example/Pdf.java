@@ -240,6 +240,9 @@ public class Pdf {
         //change global cell height and fontDescent
         float tempCellHeight = cellHeight;
         cellHeight = footerCellHeight;
+        float tempFontDescent = fontDescent;
+        fontDescent = getFontDescriptor(boldFont).getDescent() * configuration.getPageFooterFontSize() / 1000;
+
 
         for (int i=0; i< document.getNumberOfPages(); i++) {
             PDPageContentStream contentStream = new PDPageContentStream(document, document.getPage(i), PDPageContentStream.AppendMode.APPEND, true);
@@ -250,7 +253,7 @@ public class Pdf {
             contentStream.lineTo(initX+tableWidth, footerTopBoarder - footerCellHeight);
             contentStream.stroke();
 
-            //add page number
+           //add page number
             if (configuration.isPageNumberFlag()) {
                 
                 addCellWithText(contentStream, "Page " + (i+1) + " of " + document.getNumberOfPages(),
@@ -286,6 +289,7 @@ public class Pdf {
 
         //change global cell height and font descent back
         cellHeight = tempCellHeight;
+        fontDescent = tempFontDescent;
     }
 
     public void addTableHeader(PDPageContentStream contentStream) throws IOException {
